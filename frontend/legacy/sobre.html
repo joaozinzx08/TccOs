@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sobre o projeto Gestão OS - Plataforma de Ordens de Serviço Empresarial">
+    <title>Sobre - Gestão OS</title>
+    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+<link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        /* ==========================================
+           PAGE HERO
+           ========================================== */
+        .page-hero {
+            padding: 60px 0 40px;
+            text-align: center;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .page-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-hero p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        /* ==========================================
+           SEÇÕES
+           ========================================== */
+        .about-section {
+            padding: 60px 0;
+        }
+
+        .about-section.alt {
+            background: var(--bg-card);
+        }
+
+        .about-section h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .about-section > .container > p {
+            text-align: center;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 48px;
+        }
+
+        /* ==========================================
+           MISSÃO / VISÃO / VALORES
+           ========================================== */
+        .mvv-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .mvv-card {
+            background: var(--bg-card);
+            padding: 36px 28px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-section.alt .mvv-card {
+            background: var(--bg);
+        }
+
+        .mvv-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+
+        .mvv-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .mvv-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .mvv-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        }
+
+        .mvv-card h3 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .mvv-card p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* ==========================================
+           SOBRE O PROJETO (TCC)
+           ========================================== */
+        .projeto-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .projeto-box {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            margin-bottom: 24px;
+        }
+
+        [data-theme="dark"] .projeto-box {
+            border-color: #2d3748;
+        }
+
+        .projeto-box h3 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.375rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .projeto-box h3 .projeto-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: var(--blue-50);
+            font-size: 1.25rem;
+        }
+
+        [data-theme="dark"] .projeto-box h3 .projeto-icon {
+            background: #1e3a8a;
+        }
+
+        .projeto-box p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.8;
+            margin: 0 0 16px;
+        }
+
+        .projeto-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .projeto-box strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .projeto-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: var(--bg);
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            border-left: 3px solid var(--primary);
+        }
+
+        .info-item-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .info-item-value {
+            font-size: 0.9375rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ==========================================
+           TECNOLOGIAS
+           ========================================== */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tech-card {
+            background: var(--bg-card);
+            padding: 24px 16px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--blue-200);
+        }
+
+        .tech-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .tech-card h4 {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .tech-card span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           VALORES
+           ========================================== */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .value-card {
+            background: var(--bg-card);
+            padding: 24px 20px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .about-section.alt .value-card {
+            background: var(--bg);
+        }
+
+        .value-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--blue-200);
+            box-shadow: var(--shadow-md);
+        }
+
+        .value-icon {
+            font-size: 1.75rem;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .value-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .value-card p {
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* ==========================================
+           EQUIPE / CONTRIBUIÇÃO
+           ========================================== */
+        .contribuicao-box {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(96, 165, 250, 0.05) 100%);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            border: 1px solid rgba(37, 99, 235, 0.15);
+            text-align: center;
+        }
+
+        .contribuicao-box .quote-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            opacity: 0.3;
+            line-height: 1;
+            margin-bottom: 16px;
+        }
+
+        .contribuicao-box blockquote {
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: var(--text);
+            font-style: italic;
+            margin: 0 0 20px;
+            font-weight: 500;
+        }
+
+        .contribuicao-box .author {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           CTA FINAL
+           ========================================== */
+        .cta-section {
+            padding: 80px 0;
+            background: var(--gradient-hero);
+            color: #fff;
+            text-align: center;
+        }
+
+        .cta-content h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .cta-content p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto 32px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-buttons .btn-outline {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .cta-buttons .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+            color: #fff;
+        }
+
+        /* ==========================================
+           RESPONSIVO
+           ========================================== */
+        @media (max-width: 1024px) {
+            .mvv-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .values-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-hero {
+                padding: 40px 0 30px;
+            }
+
+            .page-hero h1 {
+                font-size: 2rem;
+            }
+
+            .page-hero p {
+                font-size: 1rem;
+            }
+
+            .about-section {
+                padding: 40px 0;
+            }
+
+            .about-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .projeto-box {
+                padding: 24px;
+            }
+
+            .projeto-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contribuicao-box {
+                padding: 28px 20px;
+            }
+
+            .contribuicao-box blockquote {
+                font-size: 1rem;
+            }
+
+            .cta-content h2 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         NAVBAR
+         ============================================ -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <img src="assets/logo.png" alt="Gestão OS" style="height: 40px; width: auto;">
+                <span class="brand-text">Gestão OS</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="recursos.html">Recursos</a></li>
+                <li><a href="como-funciona.html">Como Funciona</a></li>
+                <li><a href="seguranca.html">Segurança</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="sobre.html" class="active">Sobre</a></li>
+                <li><a href="contato.html">Contato</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="btn btn-outline" onclick="window.location.href='entrar-empresa.html'">
+                    Entrar
+                </button>
+                <button class="btn btn-primary" onclick="window.location.href='criar-empresa.html'">
+                    Criar Empresa
+                </button>
+                <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema">[[icone:lua]]</button>
+                <button class="nav-toggle" aria-label="Menu">[[icone:menu]]</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================
+         PAGE HERO
+         ============================================ -->
+    <section class="page-hero">
+        <div class="container page-hero-content">
+            <span class="section-badge">Sobre</span>
+            <h1>Sobre o Projeto</h1>
+            <p>Conheça a história, a missão e a tecnologia por trás da plataforma Gestão OS</p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         SOBRE O PROJETO
+         ============================================ -->
+    <section class="about-section">
+        <div class="container">
+            <h2>O que é o Gestão OS</h2>
+            <p>Uma plataforma web multiempresa desenvolvida como Trabalho de Conclusão de Curso</p>
+
+            <div class="projeto-container">
+                <div class="projeto-box">
+                    <h3>
+                        <span class="projeto-icon">[[icone:ordens]]</span>
+                        Visão Geral
+                    </h3>
+                    <p>
+                        O <strong>Gestão OS</strong> é uma plataforma web corporativa multiempresa 
+                        para gerenciamento de <strong>ordens de serviço</strong>, solicitações e 
+                        ocorrências internas. Foi desenvolvida como Trabalho de Conclusão de Curso 
+                        (TCC) do curso de Análise e Desenvolvimento de Sistemas.
+                    </p>
+                    <p>
+                        A plataforma permite que diferentes empresas criem seus próprios ambientes 
+                        independentes, com total isolamento de dados, e gerenciem suas solicitações 
+                        internas de forma organizada, rastreável e eficiente.
+                    </p>
+                </div>
+
+                <div class="projeto-box">
+                    <h3>
+                        <span class="projeto-icon">[[icone:alvo]]</span>
+                        Propósito
+                    </h3>
+                    <p>
+                        O principal objetivo é resolver o problema da <strong>desorganização de 
+                        solicitações internas</strong> em empresas, que frequentemente são feitas 
+                        por canais informais como WhatsApp, e-mail ou papel.
+                    </p>
+                    <p>
+                        Com o Gestão OS, todas as solicitações são centralizadas, classificadas, 
+                        encaminhadas, atendidas e concluídas com total rastreabilidade.
+                    </p>
+                </div>
+
+                <div class="projeto-box">
+                    <h3>
+                        <span class="projeto-icon">[[icone:conhecimento]]</span>
+                        Informações Acadêmicas
+                    </h3>
+                    <p>
+                        Este projeto foi desenvolvido como requisito para obtenção do título de 
+                        tecnólogo, seguindo as normas acadêmicas e boas práticas de desenvolvimento 
+                        de software.
+                    </p>
+                    
+                    <div class="projeto-info-grid">
+                        <div class="info-item">
+                            <div class="info-item-label">Curso</div>
+                            <div class="info-item-value">Análise e Desenvolvimento de Sistemas</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-label">Tipo</div>
+                            <div class="info-item-value">Trabalho de Conclusão de Curso</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-label">Categoria</div>
+                            <div class="info-item-value">Plataforma Web Multiempresa (SaaS)</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-item-label">Área</div>
+                            <div class="info-item-value">Desenvolvimento Web Full-Stack</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         MISSÃO / VISÃO / VALORES
+         ============================================ -->
+    <section class="about-section alt">
+        <div class="container">
+            <span class="section-badge">Filosofia</span>
+            <h2>Missão, Visão e Valores</h2>
+            <p>Os princípios que guiaram o desenvolvimento da plataforma</p>
+
+            <div class="mvv-grid">
+                <div class="mvv-card">
+                    <div class="mvv-icon">[[icone:alvo]]</div>
+                    <h3>Missão</h3>
+                    <p>
+                        Facilitar a gestão de ordens de serviço para empresas de todos os tamanhos, 
+                        proporcionando organização, eficiência e controle total sobre processos internos.
+                    </p>
+                </div>
+
+                <div class="mvv-card">
+                    <div class="mvv-icon">[[icone:buscar]]</div>
+                    <h3>Visão</h3>
+                    <p>
+                        Ser uma plataforma referência em gestão de ordens de serviço multiempresa, 
+                        reconhecida pela segurança, confiabilidade e inovação constante.
+                    </p>
+                </div>
+
+                <div class="mvv-card">
+                    <div class="mvv-icon">[[icone:estrela]]</div>
+                    <h3>Valores</h3>
+                    <p>
+                        Transparência, segurança, eficiência, usabilidade e compromisso com a 
+                        privacidade dos dados de cada empresa e seus colaboradores.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         TECNOLOGIAS
+         ============================================ -->
+    <section class="about-section">
+        <div class="container">
+            <span class="section-badge">Tecnologia</span>
+            <h2>Tecnologias Utilizadas</h2>
+            <p>Stack moderna e robusta para garantir desempenho e segurança</p>
+
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:empresa]]</span>
+                    <h4>HTML5</h4>
+                    <span>Frontend</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:configuracoes]]</span>
+                    <h4>CSS3</h4>
+                    <span>Frontend</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:prioridade]]</span>
+                    <h4>JavaScript</h4>
+                    <span>Full-Stack</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:status]]</span>
+                    <h4>Node.js</h4>
+                    <span>Backend</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:caixa]]</span>
+                    <h4>Express.js</h4>
+                    <span>Backend</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:caixa]]</span>
+                    <h4>db.json</h4>
+                    <span>Database</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:cadeado]]</span>
+                    <h4>JWT</h4>
+                    <span>Auth</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:cadeado]]</span>
+                    <h4>bcryptjs</h4>
+                    <span>Segurança</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:email]]</span>
+                    <h4>Nodemailer</h4>
+                    <span>E-mail</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:anexo]]</span>
+                    <h4>Multer</h4>
+                    <span>Upload</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:painel]]</span>
+                    <h4>Chart.js</h4>
+                    <span>Gráficos</span>
+                </div>
+
+                <div class="tech-card">
+                    <span class="tech-icon">[[icone:seguranca]]</span>
+                    <h4>Helmet</h4>
+                    <span>Segurança</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         VALORES DO PROJETO
+         ============================================ -->
+    <section class="about-section alt">
+        <div class="container">
+            <span class="section-badge">Princípios</span>
+            <h2>O que nos guia</h2>
+            <p>Decisões de design e desenvolvimento baseadas em princípios sólidos</p>
+
+            <div class="values-grid">
+                <div class="value-card">
+                    <span class="value-icon">[[icone:cadeado]]</span>
+                    <h4>Segurança</h4>
+                    <p>Proteção de dados em múltiplas camadas.</p>
+                </div>
+
+                <div class="value-card">
+                    <span class="value-icon">[[icone:prioridade]]</span>
+                    <h4>Eficiência</h4>
+                    <p>Processos otimizados e respostas rápidas.</p>
+                </div>
+
+                <div class="value-card">
+                    <span class="value-icon">[[icone:alvo]]</span>
+                    <h4>Clareza</h4>
+                    <p>Interface simples e intuitiva para todos.</p>
+                </div>
+
+                <div class="value-card">
+                    <span class="value-icon">[[icone:grafico]]</span>
+                    <h4>Escalabilidade</h4>
+                    <p>Preparada para atender múltiplas empresas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CONTRIBUIÇÃO / QUOTE
+         ============================================ -->
+    <section class="about-section">
+        <div class="container">
+            <div class="contribuicao-box">
+                <div class="quote-icon">"</div>
+                <blockquote>
+                    Desenvolver o Gestão OS foi um desafio que uniu teoria acadêmica e prática 
+                    profissional, resultando em uma plataforma completa, segura e pronta para 
+                    uso real por empresas de diferentes segmentos.
+                </blockquote>
+                <div class="author">
+                    — Equipe de Desenvolvimento do Projeto
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CTA FINAL
+         ============================================ -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Pronto para conhecer na prática?</h2>
+                <p>Crie sua empresa e veja a plataforma funcionando de verdade</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary btn-lg" onclick="window.location.href='criar-empresa.html'">
+                        Criar Empresa Grátis
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="window.location.href='contato.html'">
+                        Falar Conosco
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="brand">[[icone:ordens]] Gestão OS</span>
+                    <p>Plataforma profissional para gestão de ordens de serviço empresarial.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="LinkedIn">[[icone:link]]</a>
+                        <a href="#" aria-label="GitHub">[[icone:caixa]]</a>
+                        <a href="#" aria-label="YouTube">[[icone:direita]]</a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Produto</h4>
+                    <a href="recursos.html">Recursos</a>
+                    <a href="como-funciona.html">Como Funciona</a>
+                    <a href="seguranca.html">Segurança</a>
+                    <a href="faq.html">FAQ</a>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Empresa</h4>
+                    <a href="sobre.html">Sobre</a>
+                    <a href="contato.html">Contato</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Privacidade</a>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Acesso</h4>
+                    <a href="login.html">Login</a>
+                    <a href="criar-empresa.html">Criar Empresa</a>
+                    <a href="entrar-empresa.html">Entrar em Empresa</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Gestão de Ordens de Serviço Empresarial. Todos os direitos reservados.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // Scroll suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                e.preventDefault();
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            navbar.style.boxShadow = window.scrollY > 50 
+                ? '0 4px 20px rgba(0, 0, 0, 0.1)' 
+                : '';
+        });
+    </script>
+
+<script src="js/icones.js"></script>
+</body>
+</html>

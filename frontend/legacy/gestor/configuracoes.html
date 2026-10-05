@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Configurações - Gestão OS">
+    <title>Configurações - Gestão OS</title>
+    <script src="../js/i18n.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+<link rel="icon" type="image/png" href="../assets/logo.png">
+    <style>
+        /* ==========================================
+           TABS DE NAVEGAÇÃO
+           ========================================== */
+        .settings-tabs {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 8px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        [data-theme="dark"] .settings-tabs {
+            border-color: #2d3748;
+        }
+
+        .settings-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .settings-tabs::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 4px;
+        }
+
+        .settings-tab {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .settings-tab:hover:not(.active) {
+            background: var(--gray-100);
+            color: var(--text);
+        }
+
+        [data-theme="dark"] .settings-tab:hover:not(.active) {
+            background: #2d3748;
+        }
+
+        .settings-tab.active {
+            background: var(--gradient-primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        /* ==========================================
+           PANEL DE CONTEÚDO
+           ========================================== */
+        .settings-panel {
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .settings-section {
+            border-color: #2d3748;
+        }
+
+        .settings-section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        [data-theme="dark"] .settings-section-header {
+            border-bottom-color: #2d3748;
+        }
+
+        .settings-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .settings-section-subtitle {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .settings-section-body {
+            padding: 0;
+        }
+
+        /* ==========================================
+           LINHA DE CONFIGURAÇÃO
+           ========================================== */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .setting-item {
+            border-bottom-color: #2d3748;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-item:hover {
+            background: var(--gray-50);
+        }
+
+        [data-theme="dark"] .setting-item:hover {
+            background: #1a2332;
+        }
+
+        .setting-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .setting-label {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .setting-description {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .setting-control {
+            flex-shrink: 0;
+        }
+
+        /* ==========================================
+           SWITCH (Toggle)
+           ========================================== */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--gray-300);
+            border-radius: 28px;
+            transition: var(--transition);
+        }
+
+        .switch-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .switch input:checked + .switch-slider {
+            background: var(--gradient-primary);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .switch input:checked + .switch-slider::before {
+            transform: translateX(20px);
+        }
+
+        .switch input:disabled + .switch-slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ==========================================
+           SELETOR DE TEMA
+           ========================================== */
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 20px 24px;
+        }
+
+        .theme-option {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .theme-option {
+            border-color: #2d3748;
+        }
+
+        .theme-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .theme-option.active {
+            border-color: var(--primary);
+            background: var(--blue-50);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        [data-theme="dark"] .theme-option.active {
+            background: #1e3a8a;
+        }
+
+        .theme-option-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .theme-option-label {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .theme-option-hint {
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .theme-option-check {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: var(--transition);
+        }
+
+        .theme-option.active .theme-option-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ==========================================
+           FORMULÁRIOS
+           ========================================== */
+        .form-row-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 20px 24px;
+        }
+
+        .form-row-settings .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .setting-form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .setting-form-group label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .setting-form-group input,
+        .setting-form-group select {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .setting-form-group input:focus,
+        .setting-form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* ==========================================
+           SESSÕES ATIVAS
+           ========================================== */
+        .session-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            align-items: center;
+        }
+
+        [data-theme="dark"] .session-item {
+            border-bottom-color: #2d3748;
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: var(--blue-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .session-icon {
+            background: #1e3a8a;
+        }
+
+        .session-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .session-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .session-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .session-badge-current {
+            font-size: 0.6875rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: var(--success-light);
+            color: var(--success);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        [data-theme="dark"] .session-badge-current {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+
+        /* ==========================================
+           ZONA DE PERIGO
+           ========================================== */
+        .danger-zone {
+            border: 2px solid var(--danger-light);
+        }
+
+        [data-theme="dark"] .danger-zone {
+            border-color: #7f1d1d;
+        }
+
+        .danger-zone .settings-section-header {
+            background: var(--danger-light);
+            border-bottom-color: rgba(220, 38, 38, 0.2);
+        }
+
+        [data-theme="dark"] .danger-zone .settings-section-header {
+            background: #7f1d1d;
+        }
+
+        .danger-zone .settings-section-title {
+            color: var(--danger);
+        }
+
+        [data-theme="dark"] .danger-zone .settings-section-title {
+            color: #fca5a5;
+        }
+
+        /* ==========================================
+           AVISO
+           ========================================== */
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.8125rem;
+            color: #78350f;
+            line-height: 1.6;
+            margin: 16px 24px;
+        }
+
+        [data-theme="dark"] .warning-box {
+            background: #78350f;
+            border-color: #92400e;
+            color: #fcd34d;
+        }
+
+        .info-box {
+            background: var(--blue-50);
+            border: 1px solid #93c5fd;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.8125rem;
+            color: #1e40af;
+            line-height: 1.6;
+            margin: 16px 24px;
+        }
+
+        [data-theme="dark"] .info-box {
+            background: #1e3a8a;
+            border-color: #2563eb;
+            color: #93c5fd;
+        }
+
+        /* ==========================================
+           BOTÕES
+           ========================================== */
+        .settings-actions {
+            padding: 16px 24px;
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        [data-theme="dark"] .settings-actions {
+            border-top-color: #2d3748;
+        }
+
+        /* ==========================================
+           AVATAR PREVIEW
+           ========================================== */
+        .preferences-avatar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        [data-theme="dark"] .preferences-avatar {
+            border-bottom-color: #2d3748;
+        }
+
+        .avatar-big-preview {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .avatar-big-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ==========================================
+           RESPONSIVO
+           ========================================== */
+        @media (max-width: 768px) {
+            .settings-tab {
+                padding: 10px 14px;
+                font-size: 0.75rem;
+            }
+
+            .settings-tab span:not(.tab-icon) {
+                display: none;
+            }
+
+            .settings-tab .tab-icon {
+                font-size: 1.25rem;
+            }
+
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .setting-control {
+                width: 100%;
+            }
+
+            .switch {
+                margin-left: auto;
+            }
+
+            .theme-selector {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+
+            .form-row-settings {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+
+            .session-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 16px;
+            }
+
+            .settings-actions {
+                padding: 16px;
+                flex-direction: column;
+            }
+
+            .settings-actions button {
+                width: 100%;
+            }
+
+            .settings-section-header {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- ============================================
+             SIDEBAR
+             ============================================ -->
+        <nav class="sidebar">
+    <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px;">
+        <img src="../assets/logo.png" alt="Gestão OS" style="height: 32px; width: auto;">
+        <span class="brand">Gestão OS</span>
+    </div>
+
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">[[icone:usuario]]</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Carregando...</span>
+                    <span class="user-role" id="user-role">Admin</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu" id="sidebar-menu">
+                <!-- Preenchido via JS -->
+            </ul>
+        </nav>
+
+        <!-- ============================================
+             CONTEÚDO PRINCIPAL
+             ============================================ -->
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle">[[icone:menu]]</button>
+                    <h1>Configurações</h1>
+                    <div class="breadcrumb">
+                        <span id="breadcrumb-tipo">Admin</span>
+                        <span>/</span>
+                        <span>Configurações</span>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn-icon" onclick="window.location.href='notificacoes.html'" aria-label="Notificações" style="position:relative;">
+                        [[icone:notificacao]]
+                        <span id="notificacoes-badge" class="badge badge-danger" style="position:absolute;top:-4px;right:-8px;font-size:10px;padding:2px 6px;min-width:18px;justify-content:center;">0</span>
+                    </button>
+                    <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema">[[icone:lua]]</button>
+                </div>
+            </header>
+
+            <!-- TABS -->
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="geral" onclick="mudarTab('geral', this)">
+                    <span class="tab-icon">[[icone:configuracoes]]</span>
+                    <span>Geral</span>
+                </button>
+                <button class="settings-tab" data-tab="notificacoes" onclick="mudarTab('notificacoes', this)">
+                    <span class="tab-icon">[[icone:notificacao]]</span>
+                    <span>Notificações</span>
+                </button>
+                <button class="settings-tab" data-tab="seguranca" onclick="mudarTab('seguranca', this)">
+                    <span class="tab-icon">[[icone:cadeado]]</span>
+                    <span>Segurança</span>
+                </button>
+                <button class="settings-tab" data-tab="preferencias" onclick="mudarTab('preferencias', this)">
+                    <span class="tab-icon">[[icone:configuracoes]]</span>
+                    <span>Preferências</span>
+                </button>
+                <button class="settings-tab" data-tab="sistema" onclick="mudarTab('sistema', this)">
+                    <span class="tab-icon">[[icone:salvar]]</span>
+                    <span>Sistema</span>
+                </button>
+            </div>
+
+            <!-- ============================================
+                 TAB: GERAL
+                 ============================================ -->
+            <div class="settings-panel active" id="panel-geral">
+
+                <!-- Tema -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:configuracoes]] Aparência</div>
+                            <div class="settings-section-subtitle">Escolha o tema da interface</div>
+                        </div>
+                    </div>
+                    <div class="theme-selector">
+                        <div class="theme-option" data-theme-value="light" onclick="mudarTema('light')">
+                            <div class="theme-option-check">✓</div>
+                            <span class="theme-option-icon">[[icone:sol]]</span>
+                            <div class="theme-option-label">Claro</div>
+                            <div class="theme-option-hint">Fundo branco</div>
+                        </div>
+                        <div class="theme-option" data-theme-value="dark" onclick="mudarTema('dark')">
+                            <div class="theme-option-check">✓</div>
+                            <span class="theme-option-icon">[[icone:lua]]</span>
+                            <div class="theme-option-label">Escuro</div>
+                            <div class="theme-option-hint">Fundo escuro</div>
+                        </div>
+                        <div class="theme-option" data-theme-value="system" onclick="mudarTema('system')">
+                            <div class="theme-option-check">✓</div>
+                            <span class="theme-option-icon">[[icone:computador]]</span>
+                            <div class="theme-option-label">Sistema</div>
+                            <div class="theme-option-hint">Automático</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Idioma e Formato -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:empresa]] Idioma e Região</div>
+                            <div class="settings-section-subtitle">Configure suas preferências regionais</div>
+                        </div>
+                    </div>
+                    <div class="form-row-settings">
+                        <div class="setting-form-group">
+                            <label for="select-idioma">Idioma</label>
+                            <select id="select-idioma" onchange="salvarConfig('idioma', this.value)">
+                                <option value="pt-BR">PT-BR Português (Brasil)</option>
+                                <option value="en-US">EN English (US)</option>
+                                <option value="es-ES">ES Español</option>
+                            </select>
+                        </div>
+                        <div class="setting-form-group">
+                            <label for="select-data">Formato de Data</label>
+                            <select id="select-data" onchange="salvarConfig('formatoData', this.value)">
+                                <option value="DD/MM/YYYY">DD/MM/AAAA</option>
+                                <option value="MM/DD/YYYY">MM/DD/AAAA</option>
+                                <option value="YYYY-MM-DD">AAAA-MM-DD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Densidade -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:caixa]] Densidade</div>
+                            <div class="settings-section-subtitle">Ajuste o espaçamento dos elementos</div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">[[icone:buscar]] Modo Compacto</div>
+                            <div class="setting-description">
+                                Reduz espaçamentos para exibir mais conteúdo na tela
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-compacto" onchange="salvarConfig('compacto', this.checked)">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================
+                 TAB: NOTIFICAÇÕES
+                 ============================================ -->
+            <div class="settings-panel" id="panel-notificacoes">
+
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:ordens]] Ordens de Serviço</div>
+                            <div class="settings-section-subtitle">Notificações relacionadas a OS</div>
+                        </div>
+                    </div>
+                    <div class="settings-section-body">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:email]] Nova OS criada</div>
+                                <div class="setting-description">
+                                    Receber notificação quando uma nova OS for criada
+                                </div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-nova-os" onchange="salvarConfigNotif('novaOS', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:atualizar]] Atualizações de status</div>
+                                <div class="setting-description">
+                                    Notificar quando o status de uma OS mudar
+                                </div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-atualizacoes" onchange="salvarConfigNotif('atualizacoes', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:relogio]] Prazos próximos</div>
+                                <div class="setting-description">
+                                    Avisar quando uma OS estiver próxima do prazo (3 dias antes)
+                                </div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-prazos" onchange="salvarConfigNotif('prazos', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:status]] OS urgentes</div>
+                                <div class="setting-description">
+                                    Notificação especial para OS com prioridade urgente
+                                </div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-urgentes" onchange="salvarConfigNotif('urgentes', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:chat]] Comunicação</div>
+                            <div class="settings-section-subtitle">Notificações de chat e mensagens</div>
+                        </div>
+                    </div>
+                    <div class="settings-section-body">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:chat]] Mensagens do chat</div>
+                                <div class="setting-description">
+                                    Notificar sobre novas mensagens no chat interno
+                                </div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-chat" onchange="salvarConfigNotif('chat', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:email]] Resumo por e-mail</div>
+                                <div class="setting-description">
+                                    Receber resumo diário das atividades por e-mail
+                                </div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-email" onchange="salvarConfigNotif('email', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:notificacao]] Modo Silencioso</div>
+                            <div class="settings-section-subtitle">Pausar temporariamente todas as notificações</div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">[[icone:lua]] Não perturbe</div>
+                            <div class="setting-description">
+                                Silenciar todas as notificações até você desativar
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="notif-silencioso" onchange="toggleSilencioso(this.checked)">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="warning-box" id="aviso-silencioso" style="display:none;">
+                        <span>[[icone:notificacao]]</span>
+                        <div>
+                            <strong>Modo silencioso ativado</strong>
+                            <div style="margin-top:4px;">
+                                Você não receberá nenhuma notificação até desativar esta opção.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================
+                 TAB: SEGURANÇA
+                 ============================================ -->
+            <div class="settings-panel" id="panel-seguranca">
+
+                <!-- Alterar senha -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:chave]] Senha</div>
+                            <div class="settings-section-subtitle">Mantenha sua conta segura com uma senha forte</div>
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="window.location.href='perfil.html'">
+                            [[icone:cadeado]] Alterar Senha
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sessões ativas -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:computador]] Sessões Ativas</div>
+                            <div class="settings-section-subtitle">Dispositivos conectados à sua conta</div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="encerrarOutrasSessoes()">
+                            [[icone:sair]] Encerrar todas
+                        </button>
+                    </div>
+                    <div class="settings-section-body" id="sessoes-list">
+                        <div class="session-item">
+                            <div class="session-icon">[[icone:computador]]</div>
+                            <div class="session-info">
+                                <div class="session-title">
+                                    Navegador Atual
+                                    <span class="session-badge-current">Atual</span>
+                                </div>
+                                <div class="session-meta" id="session-atual-meta">
+                                    Carregando...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2FA (futuro) -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:cadeado]] Autenticação em Dois Fatores (2FA)</div>
+                            <div class="settings-section-subtitle">Adicione uma camada extra de segurança</div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">[[icone:seguranca]] Ativar 2FA</div>
+                            <div class="setting-description">
+                                Requer um código adicional além da senha para fazer login
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn btn-secondary btn-sm" onclick="showToast('[[icone:alerta]] Recurso em desenvolvimento', 'info')">
+                                Em breve
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logout -->
+                <div class="settings-section danger-zone">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:sair]] Sair</div>
+                            <div class="settings-section-subtitle">Encerrar sua sessão atual</div>
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-danger" onclick="logout()">
+                            [[icone:sair]] Sair da Conta
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================
+                 TAB: PREFERÊNCIAS
+                 ============================================ -->
+            <div class="settings-panel" id="panel-preferencias">
+
+                <!-- Avatar -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:usuario]] Avatar</div>
+                            <div class="settings-section-subtitle">Sua foto de perfil</div>
+                        </div>
+                    </div>
+                    <div class="preferences-avatar">
+                        <div class="avatar-big-preview" id="pref-avatar-preview">?</div>
+                        <div style="flex:1;">
+                            <button class="btn btn-primary btn-sm" onclick="window.location.href='perfil.html'">
+                                [[icone:camera]] Alterar Avatar
+                            </button>
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">
+                                Recomendado: imagem 400x400px, JPG ou PNG, máx. 5MB
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard padrão -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:inicio]] Página Inicial</div>
+                            <div class="settings-section-subtitle">Escolha qual página abrir após o login</div>
+                        </div>
+                    </div>
+                    <div class="form-row-settings">
+                        <div class="setting-form-group full-width">
+                            <label for="select-pagina">Página padrão</label>
+                            <select id="select-pagina" onchange="salvarConfig('paginaInicial', this.value)">
+                                <option value="dashboard">Dashboard</option>
+                                <option value="ordens">Ordens de Serviço</option>
+                                <option value="kanban">Kanban</option>
+                                <option value="calendario">Calendário</option>
+                                <option value="relatorios">Relatórios</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Itens por página -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:painel]] Visualização</div>
+                            <div class="settings-section-subtitle">Como os dados são exibidos</div>
+                        </div>
+                    </div>
+                    <div class="form-row-settings">
+                        <div class="setting-form-group">
+                            <label for="select-itens">Itens por página</label>
+                            <select id="select-itens" onchange="salvarConfig('itensPorPagina', this.value)">
+                                <option value="10">10 itens</option>
+                                <option value="20" selected>20 itens</option>
+                                <option value="50">50 itens</option>
+                                <option value="100">100 itens</option>
+                            </select>
+                        </div>
+                        <div class="setting-form-group">
+                            <label for="select-ordem">Ordenação padrão</label>
+                            <select id="select-ordem" onchange="salvarConfig('ordenacao', this.value)">
+                                <option value="recentes">Mais recentes primeiro</option>
+                                <option value="antigas">Mais antigas primeiro</option>
+                                <option value="prioridade">Por prioridade</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resetar preferências -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:atualizar]] Restaurar Padrões</div>
+                            <div class="settings-section-subtitle">Reverter todas as preferências para o padrão</div>
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary" onclick="restaurarPadroes()">
+                            [[icone:atualizar]] Restaurar Padrões
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================
+                 TAB: SISTEMA
+                 ============================================ -->
+            <div class="settings-panel" id="panel-sistema">
+
+                <!-- Informações do sistema -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:informacao]] Informações do Sistema</div>
+                            <div class="settings-section-subtitle">Detalhes técnicos da plataforma</div>
+                        </div>
+                    </div>
+                    <div class="settings-section-body">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:ordens]] Versão</div>
+                                <div class="setting-description">Versão atual da plataforma</div>
+                            </div>
+                            <div class="setting-control" style="font-family:'Courier New',monospace; font-weight:700; color:var(--primary);">
+                                v1.0.0
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:caixa]] Status da API</div>
+                                <div class="setting-description">Conexão com o servidor backend</div>
+                            </div>
+                            <div class="setting-control">
+                                <span id="status-api" style="display:inline-flex; align-items:center; gap:6px; font-size:0.8125rem; font-weight:700; color:var(--text-muted);">
+                                    <span style="width:8px; height:8px; border-radius:50%; background:var(--gray-400);"></span>
+                                    Verificando...
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:salvar]] Armazenamento Local</div>
+                                <div class="setting-description">Uso do localStorage do navegador</div>
+                            </div>
+                            <div class="setting-control" style="font-family:'Courier New',monospace; font-weight:700;">
+                                <span id="storage-usage" style="color:var(--primary);">—</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:empresa]] Navegador</div>
+                                <div class="setting-description">Informações do navegador atual</div>
+                            </div>
+                            <div class="setting-control" style="font-size:0.75rem; color:var(--text-muted); max-width:200px; text-align:right; word-break:break-word;" id="browser-info">
+                                —
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Limpar cache -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:excluir]] Manutenção</div>
+                            <div class="settings-section-subtitle">Limpe dados temporários para melhor desempenho</div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">[[icone:excluir]] Limpar Cache</div>
+                            <div class="setting-description">
+                                Remove dados temporários. Você permanecerá logado.
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn btn-outline btn-sm" onclick="limparCache()">
+                                Limpar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">[[icone:enviar]] Exportar Dados</div>
+                            <div class="setting-description">
+                                Baixe uma cópia das suas preferências atuais
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn btn-outline btn-sm" onclick="exportarConfiguracoes()">
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info TCC -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div>
+                            <div class="settings-section-title">[[icone:conhecimento]] Sobre o Projeto</div>
+                            <div class="settings-section-subtitle">Informações acadêmicas</div>
+                        </div>
+                    </div>
+                    <div class="info-box" style="margin:16px 24px;">
+                        <span>[[icone:ordens]]</span>
+                        <div>
+                            <strong>Gestão de Ordens de Serviço Empresarial</strong>
+                            <div style="margin-top:6px;">
+                                Trabalho de Conclusão de Curso — Análise e Desenvolvimento de Sistemas
+                            </div>
+                            <div style="margin-top:8px; font-size:0.75rem; opacity:0.9;">
+                                Plataforma multiempresa com isolamento de dados, verificação de e-mail, 
+                                auditoria completa e interface responsiva.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <script>
+        // ==========================================
+        // PROTEÇÃO
+        // ==========================================
+        const usuarioAtual = getUsuario();
+        
+        if (!protegerPagina(['administrador_principal', 'administrador_setor', 'gestor', 'colaborador'])) {
+            throw new Error('Acesso negado');
+        }
+
+        const isGestor = usuarioAtual.role === 'gestor';
+        const isColaborador = usuarioAtual.role === 'colaborador';
+        const isAdmin = usuarioAtual.role === 'administrador_principal' || usuarioAtual.role === 'administrador_setor';
+
+        // ==========================================
+        // ESTADO
+        // ==========================================
+        let config = {
+            tema: 'light',
+            idioma: 'pt-BR',
+            formatoData: 'DD/MM/YYYY',
+            compacto: false,
+            paginaInicial: 'dashboard',
+            itensPorPagina: '20',
+            ordenacao: 'recentes',
+            notificacoes: {
+                novaOS: true,
+                atualizacoes: true,
+                prazos: true,
+                urgentes: true,
+                chat: true,
+                email: false
+            }
+        };
+
+        // ==========================================
+        // BREADCRUMB
+        // ==========================================
+        document.getElementById('breadcrumb-tipo').textContent = 
+            isAdmin ? 'Admin' : (isGestor ? 'Gestor' : 'Colaborador');
+
+        // ==========================================
+        // MENU LATERAL DINÂMICO
+        // ==========================================
+        function renderizarMenuLateral() {
+            const menu = document.getElementById('sidebar-menu');
+            let html = '';
+
+            if (isAdmin) {
+                html = `
+                    <li><a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                    <li><a href="usuarios.html"><span class="menu-icon">[[icone:equipe]]</span> Usuários</a></li>
+                    <li><a href="setores.html"><span class="menu-icon">[[icone:setores]]</span> Setores</a></li>
+                    <li><a href="ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                    <li><a href="kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                    <li><a href="calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                    <li><a href="relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
+                    <li><a href="auditoria.html"><span class="menu-icon">[[icone:buscar]]</span> Auditoria</a></li>
+                    <li class="divider"></li>
+                    <li><a href="empresa.html"><span class="menu-icon">[[icone:empresa]]</span> Minha Empresa</a></li>
+                    <li><a href="conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
+                    <li><a href="chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                    <li class="divider"></li>
+                    <li><a href="perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                    <li class="active"><a href="configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
+                    <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+                `;
+            } else if (isGestor) {
+                html = `
+                    <li><a href="../gestor/dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                    <li><a href="../gestor/ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                    <li><a href="../gestor/kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                    <li><a href="../gestor/calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                    <li><a href="../gestor/relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
+                    <li class="divider"></li>
+                    <li><a href="../gestor/chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                    <li><a href="../gestor/perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                    <li class="active"><a href="../gestor/configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
+                    <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+                `;
+            } else {
+                html = `
+                    <li><a href="../colaborador/dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                    <li><a href="../colaborador/minhas-ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Minhas Ordens</a></li>
+                    <li><a href="../colaborador/minhas-ordens.html?acao=nova"><span class="menu-icon">[[icone:adicionar]]</span> Nova OS</a></li>
+                    <li class="divider"></li>
+                    <li><a href="../colaborador/chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                    <li><a href="../colaborador/perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                    <li class="active"><a href="../colaborador/configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
+                    <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+                `;
+            }
+
+            menu.innerHTML = html;
+
+            const logoutBtn = document.getElementById('logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+        }
+
+        // ==========================================
+        // CARREGAR USUÁRIO
+        // ==========================================
+        function carregarInfoUsuario() {
+            if (!usuarioAtual) return;
+            const primeiroNome = usuarioAtual.nome.split(' ')[0];
+
+            document.getElementById('user-name').textContent = usuarioAtual.nome;
+            
+            const roleLabels = {
+                'administrador_principal': 'Admin Principal',
+                'administrador_setor': 'Admin de Setor',
+                'gestor': 'Gestor',
+                'colaborador': 'Colaborador'
+            };
+            document.getElementById('user-role').textContent = roleLabels[usuarioAtual.role] || 'Admin';
+
+            const avatarEl = document.getElementById('sidebar-avatar');
+            if (usuarioAtual.avatar) {
+                avatarEl.innerHTML = `<img src="${window.avatarURL(usuarioAtual.avatar)}" alt="Avatar">`;
+            } else {
+                avatarEl.textContent = primeiroNome.charAt(0).toUpperCase();
+            }
+
+            // Preview do avatar nas preferências
+            const prefAvatar = document.getElementById('pref-avatar-preview');
+            if (usuarioAtual.avatar) {
+                prefAvatar.innerHTML = `<img src="${window.avatarURL(usuarioAtual.avatar)}" alt="Avatar">`;
+            } else {
+                prefAvatar.textContent = primeiroNome.charAt(0).toUpperCase();
+            }
+        }
+
+        // ==========================================
+        // CARREGAR CONFIGURAÇÕES
+        // ==========================================
+        function carregarConfiguracoes() {
+            try {
+                const saved = localStorage.getItem('gestaoos_config');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    config = { ...config, ...parsed };
+                    if (parsed.notificacoes) {
+                        config.notificacoes = { ...config.notificacoes, ...parsed.notificacoes };
+                    }
+                }
+            } catch (e) {
+                console.warn('Erro ao carregar config:', e);
+            }
+
+            // Aplicar nas UIs
+            aplicarConfigUI();
+        }
+
+        // ==========================================
+        // APLICAR CONFIG NA UI
+        // ==========================================
+        function aplicarConfigUI() {
+            // Tema
+            const temaSalvo = localStorage.getItem('theme') || 'light';
+            let temaAtivo = temaSalvo;
+            
+            // Verificar se tema é do sistema
+            if (config.tema === 'system') {
+                temaAtivo = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('active');
+                if (opt.dataset.themeValue === config.tema) {
+                    opt.classList.add('active');
+                }
+            });
+
+            // Idioma
+            document.getElementById('select-idioma').value = config.idioma || 'pt-BR';
+            
+            // Formato de Data
+            document.getElementById('select-data').value = config.formatoData || 'DD/MM/YYYY';
+            
+            // Densidade
+            document.getElementById('toggle-compacto').checked = !!config.compacto;
+
+            // Notificações
+            document.getElementById('notif-nova-os').checked = config.notificacoes.novaOS !== false;
+            document.getElementById('notif-atualizacoes').checked = config.notificacoes.atualizacoes !== false;
+            document.getElementById('notif-prazos').checked = config.notificacoes.prazos !== false;
+            document.getElementById('notif-urgentes').checked = config.notificacoes.urgentes !== false;
+            document.getElementById('notif-chat').checked = config.notificacoes.chat !== false;
+            document.getElementById('notif-email').checked = !!config.notificacoes.email;
+
+            // Preferências
+            document.getElementById('select-pagina').value = config.paginaInicial || 'dashboard';
+            document.getElementById('select-itens').value = config.itensPorPagina || '20';
+            document.getElementById('select-ordem').value = config.ordenacao || 'recentes';
+
+            // Sessão atual
+            atualizarInfoSessao();
+        }
+
+        // ==========================================
+        // MUDAR TAB
+        // ==========================================
+        function mudarTab(tab, element) {
+            // Tabs
+            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+
+            // Panels
+            document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`panel-${tab}`).classList.add('active');
+        }
+
+        // ==========================================
+        // MUDAR TEMA
+        // ==========================================
+        function mudarTema(tema) {
+            config.tema = tema;
+
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('active');
+                if (opt.dataset.themeValue === tema) {
+                    opt.classList.add('active');
+                }
+            });
+
+            if (tema === 'system') {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', tema);
+                localStorage.setItem('theme', tema);
+            }
+
+            salvarConfiguracoes();
+            showToast(`[[icone:confirmar]] Tema alterado para "${tema}"`, 'success');
+        }
+
+        // ==========================================
+        // SALVAR CONFIG
+        // ==========================================
+        function salvarConfig(key, value) {
+            config[key] = value;
+            salvarConfiguracoes();
+            showToast('[[icone:confirmar]] Preferência salva', 'success');
+        }
+
+        function salvarConfigNotif(key, value) {
+            config.notificacoes[key] = value;
+            salvarConfiguracoes();
+            showToast('[[icone:confirmar]] Notificação atualizada', 'success');
+        }
+
+        function salvarConfiguracoes() {
+            try {
+                localStorage.setItem('gestaoos_config', JSON.stringify(config));
+            } catch (e) {
+                console.warn('Erro ao salvar config:', e);
+            }
+        }
+
+        // ==========================================
+        // MODO SILENCIOSO
+        // ==========================================
+        function toggleSilencioso(ativo) {
+            const aviso = document.getElementById('aviso-silencioso');
+            aviso.style.display = ativo ? 'flex' : 'none';
+            
+            localStorage.setItem('gestaoos_silencioso', ativo ? 'true' : 'false');
+            
+            if (ativo) {
+                showToast('[[icone:notificacao]] Modo silencioso ativado', 'info');
+            } else {
+                showToast('[[icone:notificacao]] Notificações reativadas', 'success');
+            }
+        }
+
+        // ==========================================
+        // INFO DA SESSÃO
+        // ==========================================
+        function atualizarInfoSessao() {
+            const meta = document.getElementById('session-atual-meta');
+            if (meta) {
+                const ua = navigator.userAgent;
+                let browser = 'Navegador';
+                let os = '';
+
+                if (ua.includes('Chrome')) browser = 'Chrome';
+                else if (ua.includes('Firefox')) browser = 'Firefox';
+                else if (ua.includes('Safari')) browser = 'Safari';
+                else if (ua.includes('Edge')) browser = 'Edge';
+
+                if (ua.includes('Windows')) os = 'Windows';
+                else if (ua.includes('Mac')) os = 'macOS';
+                else if (ua.includes('Linux')) os = 'Linux';
+                else if (ua.includes('Android')) os = 'Android';
+                else if (ua.includes('iPhone')) os = 'iOS';
+
+                meta.textContent = `${browser} em ${os} • Início: ${new Date().toLocaleTimeString('pt-BR')}`;
+            }
+
+            // Info do sistema
+            const browserInfo = document.getElementById('browser-info');
+            if (browserInfo) {
+                browserInfo.textContent = navigator.userAgent.substring(0, 60) + '...';
+            }
+        }
+
+        // ==========================================
+        // ENCERRAR SESSÕES
+        // ==========================================
+        async function encerrarOutrasSessoes() {
+            try{await apiRequest('/sessoes',{method:'DELETE'});showToast('Outras sessões encerradas','success');}catch(e){showToast(e.message,'error');}
+        }
+
+        // ==========================================
+        // RESTAURAR PADRÕES
+        // ==========================================
+        function restaurarPadroes() {
+            if (!confirm('[[icone:alerta]] Restaurar todas as preferências para o padrão?\n\nSuas configurações personalizadas serão perdidas.')) {
+                return;
+            }
+
+            localStorage.removeItem('gestaoos_config');
+            localStorage.removeItem('gestaoos_silencioso');
+
+            // Reset
+            config = {
+                tema: 'light',
+                idioma: 'pt-BR',
+                formatoData: 'DD/MM/YYYY',
+                compacto: false,
+                paginaInicial: 'dashboard',
+                itensPorPagina: '20',
+                ordenacao: 'recentes',
+                notificacoes: {
+                    novaOS: true,
+                    atualizacoes: true,
+                    prazos: true,
+                    urgentes: true,
+                    chat: true,
+                    email: false
+                }
+            };
+
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+
+            aplicarConfigUI();
+            showToast('[[icone:confirmar]] Preferências restauradas!', 'success');
+        }
+
+        // ==========================================
+        // LIMPAR CACHE
+        // ==========================================
+        function limparCache() {
+            if (!confirm('[[icone:excluir]] Limpar dados temporários?\n\nVocê permanecerá logado.')) {
+                return;
+            }
+
+            // Preservar dados essenciais
+            const token = localStorage.getItem('token');
+            const usuario = localStorage.getItem('usuario');
+            const empresa = localStorage.getItem('empresa');
+            const config = localStorage.getItem('gestaoos_config');
+            const theme = localStorage.getItem('theme');
+
+            // Limpar
+            localStorage.clear();
+
+            // Restaurar
+            if (token) localStorage.setItem('token', token);
+            if (usuario) localStorage.setItem('usuario', usuario);
+            if (empresa) localStorage.setItem('empresa', empresa);
+            if (config) localStorage.setItem('gestaoos_config', config);
+            if (theme) localStorage.setItem('theme', theme);
+
+            showToast('[[icone:confirmar]] Cache limpo com sucesso', 'success');
+        }
+
+        // ==========================================
+        // EXPORTAR CONFIGURAÇÕES
+        // ==========================================
+        function exportarConfiguracoes() {
+            const dados = {
+                config: config,
+                usuario: {
+                    nome: usuarioAtual.nome,
+                    email: usuarioAtual.email,
+                    role: usuarioAtual.role
+                },
+                exportadoEm: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `configuracoes-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            showToast('[[icone:confirmar]] Configurações exportadas!', 'success');
+        }
+
+        // ==========================================
+        // VERIFICAR STATUS DA API
+        // ==========================================
+        async function verificarAPI() {
+            const statusEl = document.getElementById('status-api');
+            
+            try {
+                const response = await fetch(`${API_BASE}/status`);
+                
+                if (response.ok) {
+                    statusEl.innerHTML = `
+                        <span style="width:8px; height:8px; border-radius:50%; background:var(--success); box-shadow:0 0 0 3px rgba(5,150,105,0.15);"></span>
+                        <span style="color:var(--success);">Online</span>
+                    `;
+                } else {
+                    throw new Error('Offline');
+                }
+            } catch (e) {
+                statusEl.innerHTML = `
+                    <span style="width:8px; height:8px; border-radius:50%; background:var(--danger);"></span>
+                    <span style="color:var(--danger);">Offline</span>
+                `;
+            }
+        }
+
+        // ==========================================
+        // CALCULAR USO DO STORAGE
+        // ==========================================
+        function calcularStorage() {
+            let total = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length + key.length;
+                }
+            }
+            
+            const kb = (total / 1024).toFixed(2);
+            const el = document.getElementById('storage-usage');
+            if (el) el.textContent = `${kb} KB`;
+        }
+
+        // ==========================================
+        // NOTIFICAÇÕES
+        // ==========================================
+        async function carregarNotificacoes() {
+            try {
+                const data = await apiRequest('/notificacoes');
+                const badge = document.getElementById('notificacoes-badge');
+                if (badge) {
+                    const naoLidas = data.naoLidas || 0;
+                    badge.textContent = naoLidas;
+                    badge.style.display = naoLidas > 0 ? 'inline-flex' : 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar notificações:', error);
+            }
+        }
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarMenuLateral();
+            carregarInfoUsuario();
+            carregarConfiguracoes();
+            carregarNotificacoes();
+            verificarAPI();
+            calcularStorage();
+
+            // Verificar modo silencioso
+            const silencioso = localStorage.getItem('gestaoos_silencioso') === 'true';
+            document.getElementById('notif-silencioso').checked = silencioso;
+            if (silencioso) {
+                document.getElementById('aviso-silencioso').style.display = 'flex';
+            }
+
+            // Listener para mudança de tema do sistema
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (config.tema === 'system') {
+                    document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+                    localStorage.setItem('theme', e.matches ? 'dark' : 'light');
+                }
+            });
+
+            // Menu mobile
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('show');
+                });
+                document.addEventListener('click', (e) => {
+                    if (window.innerWidth > 768) return;
+                    if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+
+<script src="../js/icones.js"></script>
+</body>
+</html>

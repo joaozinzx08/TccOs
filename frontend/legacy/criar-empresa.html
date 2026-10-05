@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Crie sua empresa na plataforma Gestão OS">
+    <title>Criar Empresa - Gestão OS</title>
+    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+<link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        /* ==========================================
+           HERO DA PÁGINA
+           ========================================== */
+        .auth-hero {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-hero-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            font-size: 2.25rem;
+            margin-bottom: 16px;
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
+            animation: bounceIn 0.6s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* ==========================================
+           INFO BOX
+           ========================================== */
+        .info-box-success {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.8125rem;
+            color: #1e40af;
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] .info-box-success {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: #93c5fd;
+        }
+
+        .info-box-success .icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: -2px;
+        }
+
+        .info-box-success strong {
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+
+        [data-theme="dark"] .info-box-success strong {
+            color: #bfdbfe;
+        }
+
+        /* ==========================================
+           FORMULÁRIO
+           ========================================== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+        }
+
+        .form-group label .label-icon {
+            font-size: 0.9375rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-family: var(--font);
+            font-size: 0.9375rem;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Input de senha com botão */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 48px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 8px;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            line-height: 1;
+        }
+
+        .toggle-password:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        [data-theme="dark"] .toggle-password:hover {
+            background: #2d3748;
+        }
+
+        /* Força da senha */
+        .password-strength {
+            margin-top: 8px;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .strength-bar-fill {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-bar-fill.fraca {
+            width: 33%;
+            background: var(--danger);
+        }
+
+        .strength-bar-fill.media {
+            width: 66%;
+            background: var(--warning);
+        }
+
+        .strength-bar-fill.forte {
+            width: 100%;
+            background: var(--success);
+        }
+
+        .strength-text {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .strength-text.fraca { color: var(--danger); }
+        .strength-text.media { color: var(--warning); }
+        .strength-text.forte { color: var(--success); }
+
+        /* ==========================================
+           BOTÕES
+           ========================================== */
+        .btn-criar {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-criar::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-criar:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-criar:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-criar:disabled:hover::after {
+            width: 0;
+            height: 0;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ==========================================
+           DIVISOR
+           ========================================== */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        [data-theme="dark"] .divider::before,
+        [data-theme="dark"] .divider::after {
+            background: #2d3748;
+        }
+
+        /* ==========================================
+           TERMOS
+           ========================================== */
+        .terms-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 14px 16px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            margin-bottom: 18px;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        [data-theme="dark"] .terms-check {
+            background: #1a2332;
+        }
+
+        .terms-check input[type="checkbox"] {
+            margin-top: 3px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .terms-check label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 400;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            display: inline;
+        }
+
+        .terms-check a {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           BENEFÍCIOS
+           ========================================== */
+        .benefits-list {
+            display: grid;
+            gap: 10px;
+            margin: 24px 0;
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+        }
+
+        [data-theme="dark"] .benefits-list {
+            background: #1a2332;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .benefit-item .check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--success-light);
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .benefit-item .check {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+
+        /* ==========================================
+           FOOTER
+           ========================================== */
+        .auth-footer {
+            margin-top: 24px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        [data-theme="dark"] .auth-footer {
+            border-top-color: #2d3748;
+        }
+
+        .auth-footer p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .auth-footer a {
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           ERRO/SUCESSO
+           ========================================== */
+        .error-message,
+        .success-message {
+            display: none;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            margin-top: 16px;
+            line-height: 1.5;
+            animation: slideDown 0.3s ease;
+        }
+
+        .error-message {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message.show,
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==========================================
+           RESPONSIVO
+           ========================================== */
+        @media (max-width: 480px) {
+            .auth-hero-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.875rem;
+            }
+
+            .benefits-list {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body class="auth-page">
+
+    <div class="auth-container" style="max-width: 480px;">
+        <div class="auth-card">
+
+            <!-- ============================================
+                 BRAND
+                 ============================================ -->
+            <a href="index.html" class="auth-brand" style="text-decoration:none;">
+                <img src="assets/logo.png" alt="Gestão OS" style="height: 40px; width: auto;">
+                <h1>Gestão OS</h1>
+            </a>
+
+            <!-- ============================================
+                 HERO
+                 ============================================ -->
+            <div class="auth-hero">
+                <div class="auth-hero-icon">[[icone:empresa]]</div>
+            </div>
+
+            <!-- ============================================
+                 HEADER
+                 ============================================ -->
+            <div class="auth-header">
+                <h2>Criar Nova Empresa</h2>
+                <p>Configure seu ambiente em menos de 1 minuto</p>
+            </div>
+
+            <!-- ============================================
+                 INFO BOX
+                 ============================================ -->
+            <div class="info-box-success">
+                <span class="icon">[[icone:estrela]]</span>
+                <div>
+                    <strong>100% Gratuito</strong> — Sem cartão de crédito, sem cobranças. 
+                    Você receberá um código único para adicionar seus funcionários.
+                </div>
+            </div>
+
+            <!-- ============================================
+                 FORMULÁRIO
+                 ============================================ -->
+            <div class="form-group">
+                <label for="nome">
+                    <span class="label-icon">[[icone:empresa]]</span>
+                    Nome da Empresa
+                </label>
+                <input 
+                    type="text" 
+                    id="nome" 
+                    placeholder="Ex: Minha Empresa Ltda"
+                    autocomplete="organization"
+                    autofocus
+                    maxlength="100"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="responsavel">
+                    <span class="label-icon">[[icone:usuario]]</span>
+                    Seu Nome Completo
+                </label>
+                <input 
+                    type="text" 
+                    id="responsavel" 
+                    placeholder="Ex: João Silva"
+                    autocomplete="name"
+                    maxlength="100"
+                >
+                <small>[[icone:estrela]] Você se tornará Administrador Principal</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">
+                    <span class="label-icon">[[icone:email]]</span>
+                    E-mail
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    placeholder="joao@empresa.com"
+                    autocomplete="email"
+                    maxlength="150"
+                >
+                <small>[[icone:pasta]] Usado para login e notificações importantes</small>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">
+                    <span class="label-icon">[[icone:cadeado]]</span>
+                    Senha
+                </label>
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="senha" 
+                        placeholder="Mínimo 8 caracteres"
+                        autocomplete="new-password"
+                        maxlength="100"
+                    >
+                    <button type="button" class="toggle-password" id="toggle-senha" aria-label="Mostrar senha">[[icone:visualizar]]</button>
+                </div>
+                <div class="password-strength" id="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-bar-fill" id="strength-fill"></div>
+                    </div>
+                    <div class="strength-text" id="strength-text">—</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="senha2">
+                    <span class="label-icon">[[icone:cadeado]]</span>
+                    Confirmar Senha
+                </label>
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="senha2" 
+                        placeholder="Repita a senha"
+                        autocomplete="new-password"
+                        maxlength="100"
+                    >
+                    <button type="button" class="toggle-password" id="toggle-senha2" aria-label="Mostrar senha">[[icone:visualizar]]</button>
+                </div>
+                <small id="senha-match" style="display:none;"></small>
+            </div>
+
+            <!-- ============================================
+                 TERMOS
+                 ============================================ -->
+            <div class="terms-check">
+                <input type="checkbox" id="aceitar-termos">
+                <label for="aceitar-termos">
+                    Concordo com os <a href="#" onclick="showToast('[[icone:documento]] Termos de Uso em desenvolvimento', 'info'); return false;">Termos de Uso</a> 
+                    e a <a href="#" onclick="showToast('[[icone:cadeado]] Política de Privacidade em desenvolvimento', 'info'); return false;">Política de Privacidade</a> da plataforma
+                </label>
+            </div>
+
+            <!-- ============================================
+                 BOTÃO CRIAR
+                 ============================================ -->
+            <button type="button" class="btn btn-primary btn-block btn-lg btn-criar" id="btn-criar" onclick="criarEmpresa()">
+                <span id="btn-criar-texto">[[icone:estrela]] Criar Minha Empresa</span>
+            </button>
+
+            <!-- ============================================
+                 MENSAGENS
+                 ============================================ -->
+            <div id="msg-erro" class="error-message"></div>
+            <div id="msg-sucesso" class="success-message"></div>
+
+            <!-- ============================================
+                 BENEFÍCIOS
+                 ============================================ -->
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <span class="check">✓</span>
+                    <span>Ambiente isolado e seguro por empresa</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="check">✓</span>
+                    <span>Código único para adicionar funcionários</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="check">✓</span>
+                    <span>10 setores pré-configurados (editáveis)</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="check">✓</span>
+                    <span>Dashboards, relatórios e auditoria inclusos</span>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 FOOTER
+                 ============================================ -->
+            <div class="auth-footer">
+                <p>Já tem uma conta? <a href="login.html">Fazer login</a></p>
+                <p>É funcionário? <a href="entrar-empresa.html">Entrar em uma empresa</a></p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // ==========================================
+        // ELEMENTOS
+        // ==========================================
+        const nomeInput = document.getElementById('nome');
+        const respInput = document.getElementById('responsavel');
+        const emailInput = document.getElementById('email');
+        const senhaInput = document.getElementById('senha');
+        const senha2Input = document.getElementById('senha2');
+        const aceitarTermos = document.getElementById('aceitar-termos');
+        const btnCriar = document.getElementById('btn-criar');
+        const btnCriarTexto = document.getElementById('btn-criar-texto');
+        const msgErro = document.getElementById('msg-erro');
+        const msgSucesso = document.getElementById('msg-sucesso');
+        const toggleSenha = document.getElementById('toggle-senha');
+        const toggleSenha2 = document.getElementById('toggle-senha2');
+        const passwordStrength = document.getElementById('password-strength');
+        const strengthFill = document.getElementById('strength-fill');
+        const strengthText = document.getElementById('strength-text');
+        const senhaMatch = document.getElementById('senha-match');
+
+        // ==========================================
+        // TOGGLE SENHA
+        // ==========================================
+        toggleSenha.addEventListener('click', function() {
+            const isPassword = senhaInput.type === 'password';
+            senhaInput.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? '[[icone:ocultar]]' : '[[icone:visualizar]]';
+        });
+
+        toggleSenha2.addEventListener('click', function() {
+            const isPassword = senha2Input.type === 'password';
+            senha2Input.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? '[[icone:ocultar]]' : '[[icone:visualizar]]';
+        });
+
+        // ==========================================
+        // FORÇA DA SENHA
+        // ==========================================
+        senhaInput.addEventListener('input', function() {
+            const senha = this.value;
+
+            if (senha.length === 0) {
+                passwordStrength.classList.remove('show');
+                return;
+            }
+
+            passwordStrength.classList.add('show');
+
+            let forca = 0;
+
+            if (senha.length >= 6) forca++;
+            if (senha.length >= 10) forca++;
+            if (/[A-Z]/.test(senha) && /[a-z]/.test(senha)) forca++;
+            if (/[0-9]/.test(senha)) forca++;
+            if (/[^A-Za-z0-9]/.test(senha)) forca++;
+
+            strengthFill.classList.remove('fraca', 'media', 'forte');
+            strengthText.classList.remove('fraca', 'media', 'forte');
+
+            if (forca <= 2) {
+                strengthFill.classList.add('fraca');
+                strengthText.classList.add('fraca');
+                strengthText.textContent = '[[icone:status]] Senha fraca';
+            } else if (forca <= 3) {
+                strengthFill.classList.add('media');
+                strengthText.classList.add('media');
+                strengthText.textContent = '[[icone:status]] Senha média';
+            } else {
+                strengthFill.classList.add('forte');
+                strengthText.classList.add('forte');
+                strengthText.textContent = '[[icone:status]] Senha forte';
+            }
+        });
+
+        // ==========================================
+        // VERIFICAR SE AS SENHAS COINCIDEM
+        // ==========================================
+        senha2Input.addEventListener('input', function() {
+            const s1 = senhaInput.value;
+            const s2 = this.value;
+
+            if (!s2) {
+                senhaMatch.style.display = 'none';
+                return;
+            }
+
+            senhaMatch.style.display = 'block';
+
+            if (s1 === s2) {
+                senhaMatch.style.color = 'var(--success)';
+                senhaMatch.textContent = '[[icone:confirmar]] As senhas coincidem';
+            } else {
+                senhaMatch.style.color = 'var(--danger)';
+                senhaMatch.textContent = '[[icone:fechar]] As senhas não coincidem';
+            }
+        });
+
+        // ==========================================
+        // MENSAGENS
+        // ==========================================
+        function mostrarErro(msg) {
+            msgSucesso.classList.remove('show');
+            msgErro.textContent = msg;
+            msgErro.classList.add('show');
+
+            // Scroll até o erro
+            msgErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function mostrarSucesso(msg) {
+            msgErro.classList.remove('show');
+            msgSucesso.innerHTML = msg;
+            msgSucesso.classList.add('show');
+        }
+
+        // ==========================================
+        // VALIDAÇÕES EM TEMPO REAL
+        // ==========================================
+        emailInput.addEventListener('blur', function() {
+            if (this.value && !validarEmail(this.value)) {
+                this.style.borderColor = 'var(--danger)';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+
+        emailInput.addEventListener('input', function() {
+            this.style.borderColor = '';
+        });
+
+        // ==========================================
+        // CRIAR EMPRESA
+        // ==========================================
+        function criarEmpresa() {
+            console.log('[[icone:estrela]] criarEmpresa() chamada');
+
+            msgErro.classList.remove('show');
+            msgSucesso.classList.remove('show');
+
+            const nome = nomeInput.value.trim();
+            const responsavel = respInput.value.trim();
+            const email = emailInput.value.trim();
+            const senha = senhaInput.value;
+            const senha2 = senha2Input.value;
+
+            // ===== VALIDAÇÕES =====
+            if (!nome || nome.length < 2) {
+                mostrarErro('[[icone:alerta]] Informe o nome da empresa (mínimo 2 caracteres)');
+                nomeInput.focus();
+                return;
+            }
+
+            if (!responsavel || responsavel.length < 3) {
+                mostrarErro('[[icone:alerta]] Informe seu nome completo (mínimo 3 caracteres)');
+                respInput.focus();
+                return;
+            }
+
+            if (!email) {
+                mostrarErro('[[icone:alerta]] Informe um e-mail');
+                emailInput.focus();
+                return;
+            }
+
+            if (!validarEmail(email)) {
+                mostrarErro('[[icone:alerta]] Formato de e-mail inválido');
+                emailInput.focus();
+                return;
+            }
+
+            if (!senha) {
+                mostrarErro('[[icone:alerta]] Informe uma senha');
+                senhaInput.focus();
+                return;
+            }
+
+            if (senha.length < 8) {
+                mostrarErro('[[icone:alerta]] A senha deve ter no mínimo 8 caracteres');
+                senhaInput.focus();
+                return;
+            }
+
+            if (senha !== senha2) {
+                mostrarErro('[[icone:alerta]] As senhas não coincidem');
+                senha2Input.focus();
+                return;
+            }
+
+            if (!aceitarTermos.checked) {
+                mostrarErro('[[icone:alerta]] Você precisa aceitar os Termos de Uso e a Política de Privacidade');
+                aceitarTermos.focus();
+                return;
+            }
+
+            // ===== LOADING =====
+            btnCriar.disabled = true;
+            btnCriarTexto.innerHTML = '<span class="loading-spinner"></span>Criando sua empresa...';
+
+            // ===== API =====
+            apiRequest('/empresas', {
+                method: 'POST',
+                body: JSON.stringify({
+                    nome: nome,
+                    responsavel: responsavel,
+                    email: email,
+                    senha: senha
+                })
+            })
+            .then(function(response) {
+                
+
+                // Salvar sessão
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('usuario', JSON.stringify(response.usuario));
+                localStorage.setItem('empresa', JSON.stringify(response.empresa));
+
+                // Mostrar sucesso
+                mostrarSucesso(
+                    '[[icone:estrela]] <strong>Empresa criada com sucesso!</strong><br><br>' +
+                    '[[icone:chave]] Código da Empresa:<br>' +
+                    '<span style="font-family: monospace; font-size: 1.1rem; font-weight: 800; color: var(--primary); background: white; padding: 4px 12px; border-radius: 6px; display: inline-block; margin: 8px 0;">' + 
+                    response.empresa.codigo + 
+                    '</span><br>' +
+                    '<small style="opacity: 0.8;">Guarde este código para adicionar funcionários</small><br><br>' +
+                    '[[icone:relogio]] Redirecionando para o dashboard...'
+                );
+
+                // Desabilitar interação
+                nomeInput.disabled = true;
+                respInput.disabled = true;
+                emailInput.disabled = true;
+                senhaInput.disabled = true;
+                senha2Input.disabled = true;
+
+                // Redirecionar
+                setTimeout(function() {
+                    window.location.href = 'admin/dashboard.html';
+                }, 2500);
+            })
+            .catch(function(error) {
+                console.error('[[icone:fechar]] Erro:', error);
+
+                let mensagem = error.message || 'Erro ao criar empresa';
+
+                if (mensagem.includes('já está cadastrado')) {
+                    mensagem = '[[icone:alerta]] Este e-mail já está cadastrado. Use outro e-mail ou faça login.';
+                } else if (mensagem.includes('conexão') || mensagem.includes('fetch')) {
+                    mensagem = '[[icone:caixa]] Erro de conexão. Verifique se o servidor está rodando.';
+                }
+
+                mostrarErro(mensagem);
+
+                btnCriar.disabled = false;
+                btnCriarTexto.innerHTML = '[[icone:estrela]] Criar Minha Empresa';
+            });
+        }
+
+        // ==========================================
+        // ENTER PARA ENVIAR
+        // ==========================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !btnCriar.disabled) {
+                const activeEl = document.activeElement;
+                if (activeEl && activeEl.tagName === 'INPUT') {
+                    criarEmpresa();
+                }
+            }
+        });
+
+        // ==========================================
+        // VERIFICAR SE JÁ ESTÁ LOGADO
+        // ==========================================
+        if (estaLogado()) {
+            const user = getUsuario();
+            if (user) {
+                const dashboards = {
+                    'administrador_principal': 'admin/dashboard.html',
+                    'administrador_setor': 'admin/dashboard.html',
+                    'gestor': 'gestor/dashboard.html',
+                    'colaborador': 'colaborador/dashboard.html'
+                };
+                if (dashboards[user.role]) {
+                    window.location.href = dashboards[user.role];
+                }
+            }
+        }
+
+        console.log('[[icone:confirmar]] criar-empresa.html carregado com sucesso!');
+    </script>
+
+<script src="js/icones.js"></script>
+</body>
+</html>

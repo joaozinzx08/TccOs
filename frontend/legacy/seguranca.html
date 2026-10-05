@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Conheça as medidas de segurança e privacidade da plataforma Gestão OS">
+    <title>Segurança - Gestão OS</title>
+    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+<link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        /* ==========================================
+           PAGE HERO
+           ========================================== */
+        .page-hero {
+            padding: 60px 0 40px;
+            text-align: center;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .page-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-hero-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.35);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 15px 40px rgba(37, 99, 235, 0.35); }
+            50% { box-shadow: 0 15px 50px rgba(37, 99, 235, 0.55); }
+        }
+
+        .page-hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-hero p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        /* ==========================================
+           SEÇÕES
+           ========================================== */
+        .security-section {
+            padding: 60px 0;
+        }
+
+        .security-section.alt {
+            background: var(--bg-card);
+        }
+
+        .security-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-align: center;
+            display: block;
+        }
+
+        .security-section h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .security-section > .container > p {
+            text-align: center;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 48px;
+        }
+
+        /* ==========================================
+           PILARES DE SEGURANÇA
+           ========================================== */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .pillar-card {
+            background: var(--bg-card);
+            padding: 32px 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .security-section.alt .pillar-card {
+            background: var(--bg);
+        }
+
+        .pillar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--blue-200);
+        }
+
+        .pillar-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .pillar-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--blue-50);
+            font-size: 2rem;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .pillar-icon {
+            background: #1e3a8a;
+        }
+
+        .pillar-card:hover .pillar-icon {
+            background: var(--gradient-primary);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .pillar-card h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pillar-card p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* ==========================================
+           ISOLAMENTO MULTIEMPRESA
+           ========================================== */
+        .isolation-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .isolation-diagram {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 24px;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .company-box {
+            background: var(--bg-card);
+            border: 2px solid var(--blue-200);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        .company-box:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .company-box-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .company-box-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .company-box-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .company-box-item:hover {
+            background: var(--blue-50);
+            color: var(--text);
+        }
+
+        [data-theme="dark"] .company-box-item:hover {
+            background: #1e3a8a;
+        }
+
+        .isolation-shield {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+        }
+
+        .isolation-shield-icon {
+            font-size: 3rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .isolation-shield-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--danger);
+            text-align: center;
+        }
+
+        .isolation-note {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(96, 165, 250, 0.05) 100%);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            text-align: center;
+        }
+
+        .isolation-note p {
+            color: var(--text);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* ==========================================
+           CAMADAS DE SEGURANÇA
+           ========================================== */
+        .layers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .layer-card {
+            display: flex;
+            gap: 16px;
+            padding: 24px;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .layer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--blue-200);
+        }
+
+        .layer-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius);
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.375rem;
+        }
+
+        .layer-content h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .layer-content p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .layer-content code {
+            background: var(--blue-50);
+            color: var(--blue-700);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8125rem;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .layer-content code {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        /* ==========================================
+           PRIVACIDADE / LGPD
+           ========================================== */
+        .privacy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .privacy-card {
+            background: var(--bg-card);
+            padding: 28px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .privacy-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--blue-200);
+        }
+
+        .privacy-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .privacy-card p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.7;
+            margin: 0 0 12px;
+        }
+
+        .privacy-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 6px;
+        }
+
+        .privacy-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .privacy-list li::before {
+            content: '';
+            display: inline-block; width: 1em; height: 1em;
+            background-color: currentColor;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' d='M5 10h14v11H5zM8 10V7a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / contain no-repeat;
+            flex-shrink: 0;
+        }
+
+        /* ==========================================
+           COMPROMISSO
+           ========================================== */
+        .commitment-section {
+            padding: 60px 0;
+            background: var(--gradient-dark);
+            color: #fff;
+        }
+
+        .commitment-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .commitment-content h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .commitment-content p {
+            font-size: 1.0625rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 32px;
+        }
+
+        .commitment-badges {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .commitment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        /* ==========================================
+           CTA FINAL
+           ========================================== */
+        .cta-section {
+            padding: 80px 0;
+            background: var(--gradient-hero);
+            color: #fff;
+            text-align: center;
+        }
+
+        .cta-content h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .cta-content p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto 32px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-buttons .btn-outline {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .cta-buttons .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+            color: #fff;
+        }
+
+        /* ==========================================
+           RESPONSIVO
+           ========================================== */
+        @media (max-width: 1024px) {
+            .pillars-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .layers-grid,
+            .privacy-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-hero {
+                padding: 40px 0 30px;
+            }
+
+            .page-hero h1 {
+                font-size: 2rem;
+            }
+
+            .page-hero p {
+                font-size: 1rem;
+            }
+
+            .security-section {
+                padding: 40px 0;
+            }
+
+            .security-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .pillars-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .isolation-diagram {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .isolation-shield {
+                padding: 8px;
+            }
+
+            .isolation-shield-icon {
+                transform: rotate(90deg);
+            }
+
+            .commitment-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .cta-content h2 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         NAVBAR
+         ============================================ -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <img src="assets/logo.png" alt="Gestão OS" style="height: 40px; width: auto;">
+                <span class="brand-text">Gestão OS</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="recursos.html">Recursos</a></li>
+                <li><a href="como-funciona.html">Como Funciona</a></li>
+                <li><a href="seguranca.html" class="active">Segurança</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="sobre.html">Sobre</a></li>
+                <li><a href="contato.html">Contato</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="btn btn-outline" onclick="window.location.href='entrar-empresa.html'">
+                    Entrar
+                </button>
+                <button class="btn btn-primary" onclick="window.location.href='criar-empresa.html'">
+                    Criar Empresa
+                </button>
+                <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema">[[icone:lua]]</button>
+                <button class="nav-toggle" aria-label="Menu">[[icone:menu]]</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================
+         PAGE HERO
+         ============================================ -->
+    <section class="page-hero">
+        <div class="container page-hero-content">
+            <div class="page-hero-icon">[[icone:cadeado]]</div>
+            <span class="section-badge">Segurança</span>
+            <h1>Segurança e Privacidade</h1>
+            <p>Seus dados protegidos com tecnologia de nível empresarial e as melhores práticas do mercado.</p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         PILARES DE SEGURANÇA
+         ============================================ -->
+    <section class="security-section">
+        <div class="container">
+            <span class="security-section-title">Pilares</span>
+            <h2>Nossos pilares de segurança</h2>
+            <p>Cada camada é pensada para proteger seus dados e garantir a integridade da plataforma</p>
+
+            <div class="pillars-grid">
+                <div class="pillar-card">
+                    <div class="pillar-icon">[[icone:chave]]</div>
+                    <h3>Autenticação Forte</h3>
+                    <p>Login com JWT (JSON Web Tokens) e verificação obrigatória de e-mail por código de 6 dígitos.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">[[icone:cadeado]]</div>
+                    <h3>Criptografia</h3>
+                    <p>Senhas armazenadas com hash bcryptjs de 10 salt rounds. Nunca salvamos senhas em texto puro.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">[[icone:empresa]]</div>
+                    <h3>Isolamento Total</h3>
+                    <p>Cada empresa tem seu próprio ambiente lógico. Os dados nunca se misturam entre empresas.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">[[icone:visualizar]]</div>
+                    <h3>Rastreabilidade</h3>
+                    <p>Auditoria completa de todas as ações: quem fez, quando, o que alterou e em qual registro.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">[[icone:seguranca]]</div>
+                    <h3>Proteção Ativa</h3>
+                    <p>Rate limiting, Helmet.js para headers HTTP seguros e validações rigorosas em todas as rotas.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">[[icone:cadeado]]</div>
+                    <h3>Sigilo de OS</h3>
+                    <p>Ordens sigilosas ocultam a identidade do solicitante em situações sensíveis como denúncias.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         ISOLAMENTO MULTIEMPRESA
+         ============================================ -->
+    <section class="security-section alt">
+        <div class="container">
+            <span class="security-section-title">Isolamento</span>
+            <h2>Arquitetura Multiempresa</h2>
+            <p>Cada empresa funciona como um ambiente completamente isolado. Nenhum dado é compartilhado entre empresas.</p>
+
+            <div class="isolation-container">
+                <div class="isolation-diagram">
+                    <!-- Empresa A -->
+                    <div class="company-box">
+                        <div class="company-box-title">
+                            [[icone:empresa]] Empresa A
+                        </div>
+                        <div class="company-box-items">
+                            <div class="company-box-item">[[icone:equipe]] Usuários próprios</div>
+                            <div class="company-box-item">[[icone:setores]] Setores próprios</div>
+                            <div class="company-box-item">[[icone:ordens]] Ordens próprias</div>
+                            <div class="company-box-item">[[icone:painel]] Relatórios próprios</div>
+                        </div>
+                    </div>
+
+                    <!-- Escudo -->
+                    <div class="isolation-shield">
+                        <div class="isolation-shield-icon">[[icone:seguranca]]</div>
+                        <div class="isolation-shield-text">
+                            Barreira<br>Total
+                        </div>
+                    </div>
+
+                    <!-- Empresa B -->
+                    <div class="company-box">
+                        <div class="company-box-title">
+                            [[icone:empresa]] Empresa B
+                        </div>
+                        <div class="company-box-items">
+                            <div class="company-box-item">[[icone:equipe]] Usuários próprios</div>
+                            <div class="company-box-item">[[icone:setores]] Setores próprios</div>
+                            <div class="company-box-item">[[icone:ordens]] Ordens próprias</div>
+                            <div class="company-box-item">[[icone:painel]] Relatórios próprios</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="isolation-note">
+                    <p>
+                        [[icone:bloquear]] <strong>Empresa A nunca acessa dados da Empresa B.</strong> O isolamento é 
+                        validado <strong>no backend</strong>, não apenas escondido no frontend.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CAMADAS DE SEGURANÇA
+         ============================================ -->
+    <section class="security-section">
+        <div class="container">
+            <span class="security-section-title">Camadas</span>
+            <h2>Camadas de proteção</h2>
+            <p>Múltiplas técnicas aplicadas em conjunto para máxima segurança</p>
+
+            <div class="layers-grid">
+                <div class="layer-card">
+                    <div class="layer-icon">[[icone:ordens]]</div>
+                    <div class="layer-content">
+                        <h4>Autenticação JWT</h4>
+                        <p>Tokens assinados com <code>jsonwebtoken</code> e expiração de 7 dias. Todas as rotas protegidas exigem token válido.</p>
+                    </div>
+                </div>
+
+                <div class="layer-card">
+                    <div class="layer-icon">[[icone:cadeado]]</div>
+                    <div class="layer-content">
+                        <h4>Hash de Senhas</h4>
+                        <p>Uso de <code>bcryptjs</code> com 10 salt rounds. Cada senha gera um hash único e irreversível.</p>
+                    </div>
+                </div>
+
+                <div class="layer-card">
+                    <div class="layer-icon">[[icone:bloquear]]</div>
+                    <div class="layer-content">
+                        <h4>Rate Limiting</h4>
+                        <p>Proteção contra ataques de força bruta com limite de requisições por IP em <code>15 minutos</code>.</p>
+                    </div>
+                </div>
+
+                <div class="layer-card">
+                    <div class="layer-icon">[[icone:seguranca]]</div>
+                    <div class="layer-content">
+                        <h4>Helmet.js</h4>
+                        <p>Configura cabeçalhos HTTP seguros automaticamente, prevenindo ataques como <code>XSS</code> e clickjacking.</p>
+                    </div>
+                </div>
+
+                <div class="layer-card">
+                    <div class="layer-icon">[[icone:email]]</div>
+                    <div class="layer-content">
+                        <h4>Verificação de E-mail</h4>
+                        <p>Código de 6 dígitos com expiração de <code>5 minutos</code>. Só pode ser usado uma única vez.</p>
+                    </div>
+                </div>
+
+                <div class="layer-card">
+                    <div class="layer-icon">[[icone:confirmar]]</div>
+                    <div class="layer-content">
+                        <h4>Validação Dupla</h4>
+                        <p>Validações <code>frontend</code> + <code>backend</code>. Nunca confiamos apenas no cliente para dados críticos.</p>
+                    </div>
+                </div>
+
+                <div class="layer-card">
+                    <div class="layer-icon">[[icone:editar]]</div>
+                    <div class="layer-content">
+                        <h4>Auditoria</h4>
+                        <p>Todas as ações importantes são registradas: quem fez, quando, o que alterou. Rastreabilidade total.</p>
+                    </div>
+                </div>
+
+                <div class="layer-card">
+                    <div class="layer-icon">[[icone:anexo]]</div>
+                    <div class="layer-content">
+                        <h4>Uploads Seguros</h4>
+                        <p>Validação de formato (<code>JPG</code>, <code>PNG</code>, <code>PDF</code>) e tamanho máximo de <code>5MB</code>. Nomes únicos gerados automaticamente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         PRIVACIDADE / LGPD
+         ============================================ -->
+    <section class="security-section alt">
+        <div class="container">
+            <span class="security-section-title">Privacidade</span>
+            <h2>Privacidade e LGPD</h2>
+            <p>Tratamos seus dados com o rigor que a Lei Geral de Proteção de Dados exige</p>
+
+            <div class="privacy-grid">
+                <div class="privacy-card">
+                    <h3>[[icone:ordens]] Coleta Mínima</h3>
+                    <p>Coletamos apenas os dados necessários para o funcionamento da plataforma: nome, e-mail e informações da empresa.</p>
+                    <ul class="privacy-list">
+                        <li>Nome completo</li>
+                        <li>E-mail para verificação</li>
+                        <li>Dados da empresa (nome, código)</li>
+                    </ul>
+                </div>
+
+                <div class="privacy-card">
+                    <h3>[[icone:alvo]] Uso Específico</h3>
+                    <p>Seus dados são usados exclusivamente para operar a plataforma. Não vendemos nem compartilhamos informações.</p>
+                    <ul class="privacy-list">
+                        <li>Autenticação e login</li>
+                        <li>Notificações sobre OS</li>
+                        <li>Relatórios internos</li>
+                    </ul>
+                </div>
+
+                <div class="privacy-card">
+                    <h3>[[icone:excluir]] Exclusão de Dados</h3>
+                    <p>O Administrador Principal pode excluir dados a qualquer momento. Funcionários podem sair da empresa mediante solicitação.</p>
+                    <ul class="privacy-list">
+                        <li>Exclusão de usuários</li>
+                        <li>Remoção de setores</li>
+                        <li>Cancelamento de conta</li>
+                    </ul>
+                </div>
+
+                <div class="privacy-card">
+                    <h3>[[icone:buscar]] Transparência</h3>
+                    <p>Cada empresa tem acesso total aos seus dados através de auditoria. Você sabe exatamente o que aconteceu e quando.</p>
+                    <ul class="privacy-list">
+                        <li>Log completo de ações</li>
+                        <li>Histórico de alterações</li>
+                        <li>Timeline das OS</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         COMPROMISSO
+         ============================================ -->
+    <section class="commitment-section">
+        <div class="container">
+            <div class="commitment-content">
+                <h2>Nosso compromisso</h2>
+                <p>
+                    Levamos segurança a sério. Cada decisão técnica é tomada pensando em proteger 
+                    seus dados e garantir a confiabilidade da plataforma para empresas de todos os tamanhos.
+                </p>
+                <div class="commitment-badges">
+                    <div class="commitment-badge">[[icone:cadeado]] Criptografia</div>
+                    <div class="commitment-badge">[[icone:seguranca]] Isolamento Total</div>
+                    <div class="commitment-badge">[[icone:ordens]] Auditoria Completa</div>
+                    <div class="commitment-badge">[[icone:confirmar]] LGPD</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CTA FINAL
+         ============================================ -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Pronto para começar com segurança?</h2>
+                <p>Crie sua empresa em minutos e conte com proteção de nível empresarial</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary btn-lg" onclick="window.location.href='criar-empresa.html'">
+                        Criar Empresa Grátis
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="window.location.href='contato.html'">
+                        Falar com Suporte
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="brand">[[icone:ordens]] Gestão OS</span>
+                    <p>Plataforma profissional para gestão de ordens de serviço empresarial.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="LinkedIn">[[icone:link]]</a>
+                        <a href="#" aria-label="GitHub">[[icone:caixa]]</a>
+                        <a href="#" aria-label="YouTube">[[icone:direita]]</a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Produto</h4>
+                    <a href="recursos.html">Recursos</a>
+                    <a href="como-funciona.html">Como Funciona</a>
+                    <a href="seguranca.html">Segurança</a>
+                    <a href="faq.html">FAQ</a>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Empresa</h4>
+                    <a href="sobre.html">Sobre</a>
+                    <a href="contato.html">Contato</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Privacidade</a>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Acesso</h4>
+                    <a href="login.html">Login</a>
+                    <a href="criar-empresa.html">Criar Empresa</a>
+                    <a href="entrar-empresa.html">Entrar em Empresa</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Gestão de Ordens de Serviço Empresarial. Todos os direitos reservados.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // Scroll suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                e.preventDefault();
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            navbar.style.boxShadow = window.scrollY > 50 
+                ? '0 4px 20px rgba(0, 0, 0, 0.1)' 
+                : '';
+        });
+    </script>
+
+<script src="js/icones.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+[
+  {
+    "arquivo": "css/style.css",
+    "sha256": "63c854a7b883e8108b38d2556bdf8be57bef258281a5f65256feb1c5e630cd33",
+    "identico_ao_zip_original": true
+  },
+  {
+    "arquivo": "css/dark-mode.css",
+    "sha256": "cc14d7df7cf4b72d3b34074a00e6050b29ac0b6d735fa28f8c225930c101317e",
+    "identico_ao_zip_original": true
+  },
+  {
+    "arquivo": "assets/logo.png",
+    "sha256": "d32c9eb934c96968e3d3a379e280583d482b5fb7d02f57d7256207eafe87c80d",
+    "identico_ao_zip_original": true
+  }
+]

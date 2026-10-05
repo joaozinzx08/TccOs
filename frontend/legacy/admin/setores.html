@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gerenciamento de Setores - Gestão OS">
+    <title>Setores - Admin | Gestão OS</title>
+    <script src="../js/i18n.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+<link rel="icon" type="image/png" href="../assets/logo.png">
+    <style>
+        /* ==========================================
+           STATS CLICÁVEIS
+           ========================================== */
+        .stats-setores {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-setor-card {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-setor-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--blue-200);
+        }
+
+        .stat-setor-card.active {
+            background: var(--gradient-primary);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .stat-setor-card.active .stat-setor-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-setor-icon {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: var(--blue-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        [data-theme="dark"] .stat-setor-icon {
+            background: #1e3a8a;
+        }
+
+        .stat-setor-card.active .stat-setor-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-setor-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stat-setor-label {
+            display: block;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+
+        .stat-setor-value {
+            display: block;
+            font-size: 1.375rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        /* ==========================================
+           FILTROS
+           ========================================== */
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filters-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filters-clear {
+            font-size: 0.8125rem;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+
+        .filters-clear:hover {
+            background: var(--blue-50);
+        }
+
+        [data-theme="dark"] .filters-clear:hover {
+            background: #1e3a8a;
+        }
+
+        /* ==========================================
+           GRID DE CARDS (Visualização em Cards)
+           ========================================== */
+        .setores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .setor-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            padding: 20px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .setor-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--blue-200);
+        }
+
+        .setor-card.inativo {
+            opacity: 0.6;
+        }
+
+        .setor-card.inativo:hover {
+            opacity: 1;
+        }
+
+        .setor-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .setor-card-icon {
+            flex-shrink: 0;
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius);
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+        }
+
+        .setor-card-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+        }
+
+        .setor-card-status.ativo {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .setor-card-status.ativo::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            display: inline-block;
+        }
+
+        .setor-card-status.inativo {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .setor-card-status.inativo::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--danger);
+            display: inline-block;
+        }
+
+        [data-theme="dark"] .setor-card-status.ativo {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        [data-theme="dark"] .setor-card-status.inativo {
+            background: #7f1d1d;
+            color: #f87171;
+        }
+
+        .setor-card-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .setor-card-desc {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+            min-height: 38px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .setor-card-desc.empty {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* ==========================================
+           GESTORES DO SETOR
+           ========================================== */
+        .setor-gestores {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            min-height: 48px;
+        }
+
+        .gestor-avatars {
+            display: flex;
+        }
+
+        .gestor-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 2px solid var(--bg);
+            margin-left: -8px;
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .gestor-avatar:first-child {
+            margin-left: 0;
+        }
+
+        .gestor-avatar:hover {
+            transform: translateY(-3px) scale(1.1);
+            z-index: 10;
+        }
+
+        .gestor-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gestor-avatar.mais {
+            background: var(--gray-200);
+            color: var(--text-secondary);
+        }
+
+        [data-theme="dark"] .gestor-avatar.mais {
+            background: #2d3748;
+            color: #cbd5e1;
+        }
+
+        .gestor-info {
+            flex: 1;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        .gestor-info strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           AÇÕES DO CARD
+           ========================================== */
+        .setor-card-actions {
+            display: flex;
+            gap: 8px;
+            padding-top: 12px;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        [data-theme="dark"] .setor-card-actions {
+            border-top-color: #2d3748;
+        }
+
+        .setor-action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--gray-200);
+            background: var(--bg);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-family: var(--font);
+        }
+
+        [data-theme="dark"] .setor-action-btn {
+            border-color: #2d3748;
+        }
+
+        .setor-action-btn:hover {
+            background: var(--blue-50);
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        [data-theme="dark"] .setor-action-btn:hover {
+            background: #1e3a8a;
+        }
+
+        .setor-action-btn.danger:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        [data-theme="dark"] .setor-action-btn.danger:hover {
+            background: #7f1d1d;
+        }
+
+        .setor-action-btn.success:hover {
+            background: var(--success-light);
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        [data-theme="dark"] .setor-action-btn.success:hover {
+            background: #064e3b;
+        }
+
+        /* ==========================================
+           MODAL
+           ========================================== */
+        .modal-content {
+            max-width: 560px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        /* ==========================================
+           EMPTY STATE
+           ========================================== */
+        .empty-grid {
+            grid-column: 1 / -1;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            padding: 60px 20px;
+        }
+
+        /* ==========================================
+           RESPONSIVO
+           ========================================== */
+        @media (max-width: 1024px) {
+            .stats-setores {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-setores {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .stat-setor-card {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .stat-setor-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .stat-setor-value {
+                font-size: 1.125rem;
+            }
+
+            .setores-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .setor-card-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- ============================================
+             SIDEBAR
+             ============================================ -->
+       <nav class="sidebar">
+    <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px;">
+        <img src="../assets/logo.png" alt="Gestão OS" style="height: 32px; width: auto;">
+        <span class="brand">Gestão OS</span>
+    </div>
+
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">[[icone:usuario]]</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Carregando...</span>
+                    <span class="user-role" id="user-role">Admin</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                <li><a href="usuarios.html"><span class="menu-icon">[[icone:equipe]]</span> Usuários</a></li>
+                <li class="active"><a href="setores.html"><span class="menu-icon">[[icone:setores]]</span> Setores</a></li>
+                <li><a href="ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                <li><a href="kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                <li><a href="calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                <li><a href="relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
+                <li><a href="auditoria.html"><span class="menu-icon">[[icone:buscar]]</span> Auditoria</a></li>
+                <li class="divider"></li>
+                <li><a href="empresa.html"><span class="menu-icon">[[icone:empresa]]</span> Minha Empresa</a></li>
+                <li><a href="conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
+                <li><a href="chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                <li class="divider"></li>
+                <li><a href="perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                <li><a href="configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
+                <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+            </ul>
+        </nav>
+
+        <!-- ============================================
+             CONTEÚDO PRINCIPAL
+             ============================================ -->
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle">[[icone:menu]]</button>
+                    <h1>Setores</h1>
+                    <div class="breadcrumb">
+                        <span>Admin</span>
+                        <span>/</span>
+                        <span>Setores</span>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn-icon" onclick="window.location.href='notificacoes.html'" aria-label="Notificações" style="position:relative;">
+                        [[icone:notificacao]]
+                        <span id="notificacoes-badge" class="badge badge-danger" style="position:absolute;top:-4px;right:-8px;font-size:10px;padding:2px 6px;min-width:18px;justify-content:center;">0</span>
+                    </button>
+                    <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema">[[icone:lua]]</button>
+                    <button class="btn btn-primary" onclick="abrirModalNovoSetor()">
+                        [[icone:adicionar]] Novo Setor
+                    </button>
+                </div>
+            </header>
+
+            <!-- STATS CLICÁVEIS -->
+            <div class="stats-setores">
+                <div class="stat-setor-card active" data-filter="todos" onclick="filtrarPorTipo('todos', this)">
+                    <div class="stat-setor-icon">[[icone:setores]]</div>
+                    <div class="stat-setor-info">
+                        <span class="stat-setor-label">Total</span>
+                        <span class="stat-setor-value" id="count-todos">—</span>
+                    </div>
+                </div>
+                <div class="stat-setor-card" data-filter="ativos" onclick="filtrarPorTipo('ativos', this)">
+                    <div class="stat-setor-icon">[[icone:confirmar]]</div>
+                    <div class="stat-setor-info">
+                        <span class="stat-setor-label">Ativos</span>
+                        <span class="stat-setor-value" id="count-ativos">—</span>
+                    </div>
+                </div>
+                <div class="stat-setor-card" data-filter="inativos" onclick="filtrarPorTipo('inativos', this)">
+                    <div class="stat-setor-icon">[[icone:bloquear]]</div>
+                    <div class="stat-setor-info">
+                        <span class="stat-setor-label">Inativos</span>
+                        <span class="stat-setor-value" id="count-inativos">—</span>
+                    </div>
+                </div>
+                <div class="stat-setor-card" data-filter="com-gestor" onclick="filtrarPorTipo('com-gestor', this)">
+                    <div class="stat-setor-icon">[[icone:usuario]]</div>
+                    <div class="stat-setor-info">
+                        <span class="stat-setor-label">Com Gestor</span>
+                        <span class="stat-setor-value" id="count-com-gestor">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filters">
+                <div class="filters-header">
+                    <span class="filters-title">[[icone:buscar]] Filtros</span>
+                    <button class="filters-clear" onclick="limparFiltros()">
+                        ✕ Limpar filtros
+                    </button>
+                </div>
+
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+                    <input 
+                        type="text" 
+                        id="search-setor" 
+                        placeholder="Buscar por nome do setor..."
+                        oninput="aplicarFiltros()"
+                    >
+                    
+                    <select id="filter-status" onchange="aplicarFiltros()">
+                        <option value="">Todos os status</option>
+                        <option value="ativo">Ativos</option>
+                        <option value="inativo">Inativos</option>
+                    </select>
+
+                    <select id="filter-gestor" onchange="aplicarFiltros()">
+                        <option value="">Com ou sem gestor</option>
+                        <option value="com-gestor">Com gestor</option>
+                        <option value="sem-gestor">Sem gestor</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- INFO -->
+            <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <span style="font-size:0.8125rem; color:var(--text-muted);" id="info-resultados">
+                    Carregando...
+                </span>
+            </div>
+
+            <!-- GRID DE CARDS DE SETORES -->
+            <div class="setores-grid" id="setores-grid">
+                <div class="empty-grid">
+                    <div class="empty-state">
+                        <span class="empty-icon">[[icone:relogio]]</span>
+                        <h3>Carregando setores...</h3>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ============================================
+         MODAL - NOVO/EDITAR SETOR
+         ============================================ -->
+    <div id="setor-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-setor-title">[[icone:adicionar]] Novo Setor</h2>
+                <button class="close" onclick="fecharModalSetor()">&times;</button>
+            </div>
+
+            <form id="setor-form">
+                <input type="hidden" id="setor-id">
+
+                <div class="form-group">
+                    <label for="setor-nome">Nome do Setor <span style="color:var(--danger);">*</span></label>
+                    <input 
+                        type="text" 
+                        id="setor-nome" 
+                        required 
+                        placeholder="Ex: Marketing, Vendas, Atendimento..."
+                        maxlength="60"
+                        autocomplete="off"
+                    >
+                    <small>Nome que aparecerá nos formulários e relatórios</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="setor-descricao">Descrição</label>
+                    <textarea 
+                        id="setor-descricao" 
+                        placeholder="Descreva as funções e responsabilidades deste setor..."
+                        maxlength="300"
+                    ></textarea>
+                    <small><span id="desc-char">0</span>/300 caracteres</small>
+                </div>
+
+                <div class="form-group" id="status-group">
+                    <label for="setor-status">Status do Setor</label>
+                    <select id="setor-status">
+                        <option value="true">Ativo</option>
+                        <option value="false">Inativo</option>
+                    </select>
+                    <small>Setores inativos não aparecem em novos cadastros de OS</small>
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top:24px; justify-content:flex-end; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModalSetor()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btn-salvar-setor">
+                        Criar Setor
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL - CONFIRMAR DESATIVAÇÃO
+         ============================================ -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content" style="max-width: 460px;">
+            <div class="modal-header">
+                <h2>[[icone:alerta]] Desativar Setor</h2>
+                <button class="close" onclick="fecharModalDelete()">&times;</button>
+            </div>
+
+            <div style="text-align:center; padding:16px 0;">
+                <div style="font-size:3rem; margin-bottom:12px;">[[icone:bloquear]]</div>
+                <p style="color:var(--text-secondary); margin-bottom:16px;">
+                    Tem certeza que deseja <strong>desativar</strong> o setor:
+                </p>
+                <p style="font-size:1.125rem; font-weight:700; color:var(--text); margin-bottom:8px;" id="delete-setor-name">
+                    —
+                </p>
+            </div>
+
+            <div style="background:#fef3c7; border:1px solid #fcd34d; border-radius:10px; padding:12px 16px; display:flex; align-items:flex-start; gap:10px; font-size:0.8125rem; color:#78350f; line-height:1.5;">
+                <span>[[icone:alerta]]</span>
+                <div>
+                    <strong>Atenção</strong>
+                    <div style="margin-top:4px; font-size:0.75rem;">
+                        Ordens de serviço existentes deste setor permanecerão no sistema. 
+                        Novas OS não poderão ser direcionadas para ele.
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:24px; justify-content:flex-end; flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary" onclick="fecharModalDelete()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btn-confirmar-delete">
+                    [[icone:bloquear]] Desativar Setor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <script>
+        // ==========================================
+        // PROTEÇÃO
+        // ==========================================
+        const usuarioAtual = getUsuario();
+
+        if (!protegerPagina(['administrador_principal', 'administrador_setor'])) {
+            throw new Error('Acesso negado');
+        }
+
+        const isAdminPrincipal = usuarioAtual.role === 'administrador_principal';
+
+        // ==========================================
+        // ESTADO
+        // ==========================================
+        let setores = [];
+        let usuarios = [];
+        let ordens = [];
+        let filtroTipoAtual = 'todos';
+        let setorParaDeletar = null;
+
+        // ==========================================
+        // ICONES POR SETOR (baseado no nome)
+        // ==========================================
+        const ICONES_SETOR = {
+            'RH': '[[icone:equipe]]',
+            'Recursos Humanos': '[[icone:equipe]]',
+            'Administração': '[[icone:ordens]]',
+            'Documentação Técnica': '[[icone:pasta]]',
+            'Produção': '[[icone:setores]]',
+            'Controle de Qualidade': '[[icone:confirmar]]',
+            'Qualidade': '[[icone:confirmar]]',
+            'TI / Sistemas': '[[icone:computador]]',
+            'TI': '[[icone:computador]]',
+            'Sistemas': '[[icone:computador]]',
+            'Manutenção': '[[icone:ferramenta]]',
+            'Financeiro': '[[icone:caixa]]',
+            'Compras': '[[icone:caixa]]',
+            'Logística': '[[icone:caixa]]',
+            'Marketing': '[[icone:notificacao]]',
+            'Vendas': '[[icone:caixa]]',
+            'Atendimento': '[[icone:caixa]]',
+            'Suporte': '[[icone:ferramenta]]',
+            'Jurídico': '[[icone:seguranca]]',
+            'Segurança': '[[icone:cadeado]]'
+        };
+
+        function getIconeSetor(nome) {
+            if (!nome) return '[[icone:setores]]';
+            
+            // Busca exata
+            if (ICONES_SETOR[nome]) return ICONES_SETOR[nome];
+            
+            // Busca parcial
+            for (const [key, icon] of Object.entries(ICONES_SETOR)) {
+                if (nome.toLowerCase().includes(key.toLowerCase())) {
+                    return icon;
+                }
+            }
+            
+            return '[[icone:setores]]';
+        }
+
+        // ==========================================
+        // CARREGAR USUÁRIO
+        // ==========================================
+        function carregarInfoUsuario() {
+    // Busca direto do localStorage (mais garantido)
+    var user = null;
+    try {
+        user = JSON.parse(localStorage.getItem('usuario') || '{}');
+    } catch (e) {
+        user = {};
+    }
+
+    console.log('[[icone:usuario]] Carregando usuário:', user);
+
+    // Se não tem nome, tenta pegar do usuarioAtual
+    if (!user || !user.nome) {
+        user = usuarioAtual || {};
+    }
+
+    // Nome
+    var nomeEl = document.getElementById('user-name');
+    if (nomeEl && user.nome) {
+        nomeEl.textContent = user.nome;
+    }
+
+    // Role
+    var roleEl = document.getElementById('user-role');
+    if (roleEl) {
+        var roleLabels = {
+            'administrador_principal': 'Admin Principal',
+            'administrador_setor': 'Admin de Setor',
+            'gestor': 'Gestor',
+            'colaborador': 'Colaborador'
+        };
+        roleEl.textContent = roleLabels[user.role] || 'Admin';
+    }
+
+    // Avatar
+    var avatarEl = document.getElementById('sidebar-avatar');
+    if (avatarEl) {
+        if (user.avatar) {
+            // Tem avatar customizado
+            avatarEl.innerHTML = '<img src="' + window.avatarURL(user.avatar) + '" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">';
+        } else if (user.nome) {
+            // Gera a partir do nome
+            var inicial = user.nome.trim().charAt(0).toUpperCase();
+            avatarEl.textContent = inicial;
+            avatarEl.innerHTML = inicial; // força atualizar
+        } else {
+            // Fallback
+            avatarEl.textContent = '[[icone:usuario]]';
+        }
+    }
+}
+
+        // ==========================================
+        // CARREGAR DADOS
+        // ==========================================
+        async function carregarDados() {
+            try {
+                const [setoresData, usuariosData, ordensData] = await Promise.all([
+                    apiRequest('/setores'),
+                    apiRequest('/usuarios'),
+                    apiRequest('/ordens')
+                ]);
+
+                setores = setoresData || [];
+                usuarios = usuariosData || [];
+                ordens = ordensData || [];
+
+                renderizarSetores();
+                atualizarStats();
+                carregarNotificacoes();
+
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showToast('Erro ao carregar setores', 'error');
+            }
+        }
+
+        // ==========================================
+        // BUSCAR GESTORES DO SETOR
+        // ==========================================
+        function getGestoresDoSetor(setorId) {
+            return usuarios.filter(u => 
+                u.setorId === setorId && 
+                (u.role === 'gestor' || u.role === 'administrador_setor') &&
+                u.ativo !== false
+            );
+        }
+
+        // ==========================================
+        // CONTAR OS DO SETOR
+        // ==========================================
+        function contarOSDoSetor(setorId) {
+            return ordens.filter(o => o.setorResponsavelId === setorId).length;
+        }
+
+        // ==========================================
+        // ATUALIZAR STATS
+        // ==========================================
+        function atualizarStats() {
+            const total = setores.length;
+            const ativos = setores.filter(s => s.ativo !== false).length;
+            const inativos = total - ativos;
+            const comGestor = setores.filter(s => getGestoresDoSetor(s.id).length > 0).length;
+
+            document.getElementById('count-todos').textContent = total;
+            document.getElementById('count-ativos').textContent = ativos;
+            document.getElementById('count-inativos').textContent = inativos;
+            document.getElementById('count-com-gestor').textContent = comGestor;
+        }
+
+        // ==========================================
+        // FILTRAR POR TIPO
+        // ==========================================
+        function filtrarPorTipo(tipo, element) {
+            filtroTipoAtual = tipo;
+
+            document.querySelectorAll('.stat-setor-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            aplicarFiltros();
+        }
+
+        // ==========================================
+        // APLICAR FILTROS
+        // ==========================================
+        function aplicarFiltros() {
+            renderizarSetores();
+        }
+
+        // ==========================================
+        // LIMPAR FILTROS
+        // ==========================================
+        function limparFiltros() {
+            document.getElementById('search-setor').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-gestor').value = '';
+            filtroTipoAtual = 'todos';
+
+            document.querySelectorAll('.stat-setor-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector('[data-filter="todos"]').classList.add('active');
+
+            renderizarSetores();
+        }
+
+        // ==========================================
+        // RENDERIZAR SETORES
+        // ==========================================
+        function renderizarSetores() {
+            const search = document.getElementById('search-setor').value.toLowerCase().trim();
+            const status = document.getElementById('filter-status').value;
+            const gestorFiltro = document.getElementById('filter-gestor').value;
+
+            let filtrados = setores.filter(s => {
+                const matchSearch = !search || 
+                    (s.nome || '').toLowerCase().includes(search) ||
+                    (s.descricao || '').toLowerCase().includes(search);
+
+                const matchStatus = !status || 
+                    (status === 'ativo' ? s.ativo !== false : s.ativo === false);
+
+                const gestores = getGestoresDoSetor(s.id);
+                const matchGestor = !gestorFiltro || 
+                    (gestorFiltro === 'com-gestor' ? gestores.length > 0 : gestores.length === 0);
+
+                return matchSearch && matchStatus && matchGestor;
+            });
+
+            // Filtro dos cards
+            if (filtroTipoAtual !== 'todos') {
+                if (filtroTipoAtual === 'ativos') {
+                    filtrados = filtrados.filter(s => s.ativo !== false);
+                } else if (filtroTipoAtual === 'inativos') {
+                    filtrados = filtrados.filter(s => s.ativo === false);
+                } else if (filtroTipoAtual === 'com-gestor') {
+                    filtrados = filtrados.filter(s => getGestoresDoSetor(s.id).length > 0);
+                }
+            }
+
+            // Ordenar: ativos primeiro, depois alfabético
+            filtrados.sort((a, b) => {
+                const aAtivo = a.ativo !== false;
+                const bAtivo = b.ativo !== false;
+                if (aAtivo !== bAtivo) return aAtivo ? -1 : 1;
+                return (a.nome || '').localeCompare(b.nome || '');
+            });
+
+            // Info
+            const infoEl = document.getElementById('info-resultados');
+            if (filtrados.length === 0) {
+                infoEl.textContent = 'Nenhum resultado';
+            } else {
+                infoEl.textContent = `Mostrando ${filtrados.length} de ${setores.length} setor(es)`;
+            }
+
+            // Renderizar
+            const grid = document.getElementById('setores-grid');
+
+            if (filtrados.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-grid">
+                        <div class="empty-state">
+                            <span class="empty-icon">[[icone:setores]]</span>
+                            <h3>Nenhum setor encontrado</h3>
+                            <p>Tente ajustar os filtros ou criar um novo setor</p>
+                            <button class="btn btn-primary" onclick="abrirModalNovoSetor()" style="margin-top:12px;">
+                                [[icone:adicionar]] Novo Setor
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtrados.map(setor => {
+                const isAtivo = setor.ativo !== false;
+                const gestores = getGestoresDoSetor(setor.id);
+                const totalOS = contarOSDoSetor(setor.id);
+                const icone = getIconeSetor(setor.nome);
+
+                // Avatares dos gestores (máx 4)
+                let gestoresHTML = '';
+                if (gestores.length === 0) {
+                    gestoresHTML = `
+                        <div class="gestor-info">
+                            [[icone:alerta]] <strong>Sem gestor</strong><br>
+                            <span style="font-size:0.6875rem;">Nenhum responsável atribuído</span>
+                        </div>
+                    `;
+                } else {
+                    const avatarsHTML = gestores.slice(0, 4).map(g => {
+                        const inicial = (g.nome || '?').charAt(0).toUpperCase();
+                        const primeiroNome = g.nome.split(' ')[0];
+                        if (g.avatar) {
+                            return `<div class="gestor-avatar" title="${g.nome}">
+                                <img src="${window.avatarURL(g.avatar)}" alt="${g.nome}">
+                            </div>`;
+                        }
+                        return `<div class="gestor-avatar" title="${g.nome}">${inicial}</div>`;
+                    }).join('');
+
+                    const maisHTML = gestores.length > 4 
+                        ? `<div class="gestor-avatar mais" title="+${gestores.length - 4} gestor(es)">+${gestores.length - 4}</div>` 
+                        : '';
+
+                    gestoresHTML = `
+                        <div class="gestor-avatars">
+                            ${avatarsHTML}
+                            ${maisHTML}
+                        </div>
+                        <div class="gestor-info">
+                            <strong>${gestores.length}</strong> gestor${gestores.length !== 1 ? 'es' : ''}<br>
+                            <span style="font-size:0.6875rem;">${gestores[0].nome.split(' ')[0]}${gestores.length > 1 ? ' e outros' : ''}</span>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="setor-card ${isAtivo ? '' : 'inativo'}">
+                        <div class="setor-card-header">
+                            <div class="setor-card-icon">${icone}</div>
+                            <div class="setor-card-status ${isAtivo ? 'ativo' : 'inativo'}">
+                                ${isAtivo ? 'Ativo' : 'Inativo'}
+                            </div>
+                        </div>
+
+                        <h3 class="setor-card-title">${setor.nome}</h3>
+                        <p class="setor-card-desc ${setor.descricao ? '' : 'empty'}">
+                            ${setor.descricao || 'Sem descrição'}
+                        </p>
+
+                        <div class="setor-gestores">
+                            ${gestoresHTML}
+                        </div>
+
+                        <div style="display:flex; gap:16px; margin-bottom:12px; font-size:0.75rem; color:var(--text-muted);">
+                            <span>[[icone:ordens]] <strong style="color:var(--text);">${totalOS}</strong> OS</span>
+                            <span>[[icone:calendario]] Criado ${setor.dataCriacao ? timeAgo(setor.dataCriacao) : '—'}</span>
+                        </div>
+
+                        <div class="setor-card-actions">
+                            <button 
+                                class="setor-action-btn" 
+                                onclick="abrirModalEditarSetor('${setor.id}')"
+                                title="Editar setor"
+                            >
+                                [[icone:editar]] Editar
+                            </button>
+                            <button 
+                                class="setor-action-btn ${isAtivo ? 'danger' : 'success'}" 
+                                onclick="${isAtivo ? `abrirModalDelete('${setor.id}')` : `reativarSetor('${setor.id}')`}"
+                                title="${isAtivo ? 'Desativar' : 'Reativar'}"
+                            >
+                                ${isAtivo ? '[[icone:bloquear]] Desativar' : '[[icone:confirmar]] Reativar'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // ABRIR MODAL NOVO SETOR
+        // ==========================================
+        function abrirModalNovoSetor() {
+            document.getElementById('modal-setor-title').textContent = '[[icone:adicionar]] Novo Setor';
+            document.getElementById('setor-form').reset();
+            document.getElementById('setor-id').value = '';
+            document.getElementById('desc-char').textContent = '0';
+            document.getElementById('status-group').style.display = 'none';
+            document.getElementById('btn-salvar-setor').textContent = 'Criar Setor';
+
+            document.getElementById('setor-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => document.getElementById('setor-nome').focus(), 100);
+        }
+
+        // ==========================================
+        // ABRIR MODAL EDITAR SETOR
+        // ==========================================
+        function abrirModalEditarSetor(id) {
+            const setor = setores.find(s => s.id === id);
+            if (!setor) return;
+
+            document.getElementById('modal-setor-title').textContent = '[[icone:editar]] Editar Setor';
+            document.getElementById('setor-id').value = setor.id;
+            document.getElementById('setor-nome').value = setor.nome || '';
+            document.getElementById('setor-descricao').value = setor.descricao || '';
+            document.getElementById('setor-status').value = setor.ativo !== false ? 'true' : 'false';
+            document.getElementById('desc-char').textContent = (setor.descricao || '').length;
+            document.getElementById('status-group').style.display = 'block';
+            document.getElementById('btn-salvar-setor').textContent = 'Salvar Alterações';
+
+            document.getElementById('setor-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ==========================================
+        // FECHAR MODAL
+        // ==========================================
+        function fecharModalSetor() {
+            document.getElementById('setor-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // ==========================================
+        // CONTADOR DE CARACTERES
+        // ==========================================
+        document.getElementById('setor-descricao').addEventListener('input', (e) => {
+            document.getElementById('desc-char').textContent = e.target.value.length;
+        });
+
+        // ==========================================
+        // SUBMIT DO FORMULÁRIO
+        // ==========================================
+        document.getElementById('setor-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('setor-id').value;
+            const nome = document.getElementById('setor-nome').value.trim();
+            const descricao = document.getElementById('setor-descricao').value.trim();
+            const ativo = document.getElementById('setor-status').value === 'true';
+
+            // Validações
+            if (!nome || nome.length < 2) {
+                showToast('Nome do setor deve ter no mínimo 2 caracteres', 'error');
+                return;
+            }
+
+            // Verificar duplicidade (case-insensitive)
+            const duplicado = setores.find(s => 
+                s.id !== id && 
+                s.nome.toLowerCase() === nome.toLowerCase()
+            );
+
+            if (duplicado) {
+                showToast(`Já existe um setor com o nome "${nome}"`, 'error');
+                return;
+            }
+
+            const btnSalvar = document.getElementById('btn-salvar-setor');
+            btnSalvar.disabled = true;
+            btnSalvar.innerHTML = '[[icone:relogio]] Salvando...';
+
+            try {
+                if (id) {
+                    // Editar
+                    await apiRequest(`/setores/${id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ nome, descricao, ativo })
+                    });
+
+                    showToast('[[icone:confirmar]] Setor atualizado com sucesso!', 'success');
+                } else {
+                    // Criar
+                    await apiRequest('/setores', {
+                        method: 'POST',
+                        body: JSON.stringify({ nome, descricao })
+                    });
+
+                    showToast('[[icone:confirmar]] Setor criado com sucesso!', 'success');
+                }
+
+                fecharModalSetor();
+                await carregarDados();
+
+            } catch (error) {
+                console.error('Erro ao salvar setor:', error);
+                showToast(error.message, 'error');
+            } finally {
+                btnSalvar.disabled = false;
+                btnSalvar.textContent = id ? 'Salvar Alterações' : 'Criar Setor';
+            }
+        });
+
+        // ==========================================
+        // ABRIR MODAL DELETE
+        // ==========================================
+        function abrirModalDelete(id) {
+            const setor = setores.find(s => s.id === id);
+            if (!setor) return;
+
+            setorParaDeletar = id;
+            document.getElementById('delete-setor-name').textContent = setor.nome;
+            document.getElementById('delete-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModalDelete() {
+            document.getElementById('delete-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            setorParaDeletar = null;
+        }
+
+        // ==========================================
+        // CONFIRMAR DESATIVAÇÃO
+        // ==========================================
+        document.getElementById('btn-confirmar-delete').addEventListener('click', async () => {
+            if (!setorParaDeletar) return;
+
+            const btn = document.getElementById('btn-confirmar-delete');
+            btn.disabled = true;
+            btn.innerHTML = '[[icone:relogio]] Desativando...';
+
+            try {
+                await apiRequest(`/setores/${setorParaDeletar}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ ativo: false })
+                });
+
+                showToast('[[icone:confirmar]] Setor desativado com sucesso', 'success');
+                fecharModalDelete();
+                await carregarDados();
+
+            } catch (error) {
+                console.error('Erro ao desativar:', error);
+                showToast(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '[[icone:bloquear]] Desativar Setor';
+            }
+        });
+
+        // ==========================================
+        // REATIVAR SETOR
+        // ==========================================
+        async function reativarSetor(id) {
+            const setor = setores.find(s => s.id === id);
+            if (!setor) return;
+
+            if (!confirm(`Reativar o setor "${setor.nome}"?`)) return;
+
+            try {
+                await apiRequest(`/setores/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ ativo: true })
+                });
+
+                showToast('[[icone:confirmar]] Setor reativado com sucesso', 'success');
+                await carregarDados();
+
+            } catch (error) {
+                console.error('Erro ao reativar:', error);
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ==========================================
+        // NOTIFICAÇÕES
+        // ==========================================
+        async function carregarNotificacoes() {
+            try {
+                const data = await apiRequest('/notificacoes');
+                const badge = document.getElementById('notificacoes-badge');
+                if (badge) {
+                    const naoLidas = data.naoLidas || 0;
+                    badge.textContent = naoLidas;
+                    badge.style.display = naoLidas > 0 ? 'inline-flex' : 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar notificações:', error);
+            }
+        }
+
+        // ==========================================
+        // FECHAR MODAIS
+        // ==========================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('setor-modal').style.display === 'flex') {
+                    fecharModalSetor();
+                }
+                if (document.getElementById('delete-modal').style.display === 'flex') {
+                    fecharModalDelete();
+                }
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            const modalSetor = document.getElementById('setor-modal');
+            const modalDelete = document.getElementById('delete-modal');
+            if (e.target === modalSetor) fecharModalSetor();
+            if (e.target === modalDelete) fecharModalDelete();
+        });
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+    carregarInfoUsuario();
+    carregarDados();
+
+    document.getElementById('logout').addEventListener('click', (e) => {
+        e.preventDefault();
+        logout();
+    });
+
+    const menuToggle = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+        });
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth > 768) return;
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    }
+});
+    </script>
+
+<script src="../js/icones.js"></script>
+</body>
+</html>

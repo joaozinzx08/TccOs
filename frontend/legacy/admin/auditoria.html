@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoria - Gestão OS</title>
+    <script src="../js/i18n.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+<link rel="icon" type="image/png" href="../assets/logo.png">    <style>
+        .audit-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .audit-stat-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+        }
+        [data-theme="dark"] .audit-stat-card { border-color: #2d3748; }
+        .audit-stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--blue-200); }
+        .audit-stat-card.active { background: var(--gradient-primary); color: #fff; border-color: transparent; }
+        .audit-stat-card.active .audit-stat-label { color: rgba(255,255,255,0.9); }
+
+        .audit-stat-icon {
+            width: 48px; height: 48px;
+            border-radius: var(--radius);
+            background: var(--blue-50);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.375rem; flex-shrink: 0;
+        }
+        [data-theme="dark"] .audit-stat-icon { background: #1e3a8a; }
+        .audit-stat-card.active .audit-stat-icon { background: rgba(255,255,255,0.2); }
+
+        .audit-stat-info { flex: 1; min-width: 0; }
+        .audit-stat-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+        .audit-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--text);
+        }
+        .audit-stat-card.active .audit-stat-value { color: #fff; }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .filters-title { font-size: 0.875rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+        .filters-clear {
+            font-size: 0.8125rem;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .filters-clear:hover { background: var(--blue-50); }
+        [data-theme="dark"] .filters-clear:hover { background: #1e3a8a; }
+
+        .audit-container {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            overflow: hidden;
+        }
+        [data-theme="dark"] .audit-container { border-color: #2d3748; }
+
+        .audit-list { display: flex; flex-direction: column; }
+
+        .audit-item {
+            display: flex;
+            gap: 16px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            transition: var(--transition);
+            position: relative;
+        }
+        [data-theme="dark"] .audit-item { border-bottom-color: #2d3748; }
+        .audit-item:last-child { border-bottom: none; }
+        .audit-item:hover { background: var(--gray-50); }
+        [data-theme="dark"] .audit-item:hover { background: #1a2332; }
+
+        .audit-avatar-col {
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .audit-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 700;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+            z-index: 1;
+        }
+        .audit-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .audit-avatar.system { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); box-shadow: 0 4px 12px rgba(107,114,128,0.2); }
+
+        .audit-content { flex: 1; min-width: 0; }
+
+        .audit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .audit-action-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .action-create { background: #d1fae5; color: #065f46; }
+        .action-update { background: #dbeafe; color: #1e40af; }
+        .action-delete { background: #fee2e2; color: #991b1b; }
+        .action-login { background: #dbeafe; color: #1e40af; }
+        .action-status { background: #fef3c7; color: #92400e; }
+        .action-other { background: var(--gray-200); color: var(--gray-700); }
+
+        [data-theme="dark"] .action-create { background: #064e3b; color: #6ee7b7; }
+        [data-theme="dark"] .action-update { background: #1e3a8a; color: #93c5fd; }
+        [data-theme="dark"] .action-delete { background: #7f1d1d; color: #fca5a5; }
+        [data-theme="dark"] .action-login { background: #172554; color: #93c5fd; }
+        [data-theme="dark"] .action-status { background: #78350f; color: #fcd34d; }
+        [data-theme="dark"] .action-other { background: #374151; color: #9ca3af; }
+
+        .audit-date { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+        .audit-user-name {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .audit-user-email { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
+
+        .audit-details {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .audit-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .audit-os-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            background: var(--blue-50);
+            color: var(--blue-700);
+            border-radius: 12px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-family: var(--font);
+        }
+        [data-theme="dark"] .audit-os-link { background: #1e3a8a; color: #93c5fd; }
+        .audit-os-link:hover { transform: translateY(-1px); background: var(--primary); color: #fff; }
+
+        .audit-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .audit-empty-icon { font-size: 3rem; margin-bottom: 12px; display: block; opacity: 0.5; }
+
+        .audit-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            background: var(--gray-50);
+        }
+        [data-theme="dark"] .audit-footer { border-top-color: #2d3748; background: #1a2332; }
+
+        .btn-load-more {
+            padding: 8px 20px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .btn-load-more:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-load-more:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        @media (max-width: 1024px) { .audit-stats { grid-template-columns: repeat(2, 1fr); } }
+
+        @media (max-width: 768px) {
+            .audit-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .audit-stat-card { padding: 14px; gap: 10px; }
+            .audit-stat-icon { width: 40px; height: 40px; font-size: 1.125rem; }
+            .audit-stat-value { font-size: 1.25rem; }
+            .audit-item { padding: 14px 16px; gap: 12px; }
+            .audit-avatar { width: 36px; height: 36px; font-size: 0.875rem; }
+            .audit-user-name { font-size: 0.875rem; }
+            .audit-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .audit-footer { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR (MENU FIXO) -->
+        <nav class="sidebar">
+    <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px;">
+        <img src="../assets/logo.png" alt="Gestão OS" style="height: 32px; width: auto;">
+        <span class="brand">Gestão OS</span>
+    </div>
+    
+
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">[[icone:usuario]]</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Carregando...</span>
+                    <span class="user-role" id="user-role">Admin</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                <li><a href="usuarios.html"><span class="menu-icon">[[icone:equipe]]</span> Usuários</a></li>
+                <li><a href="setores.html"><span class="menu-icon">[[icone:setores]]</span> Setores</a></li>
+                <li><a href="ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                <li><a href="kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                <li><a href="calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                <li><a href="relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
+                <li class="active"><a href="auditoria.html"><span class="menu-icon">[[icone:buscar]]</span> Auditoria</a></li>
+                <li class="divider"></li>
+                <li><a href="empresa.html"><span class="menu-icon">[[icone:empresa]]</span> Minha Empresa</a></li>
+                <li><a href="conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
+                <li><a href="chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                <li class="divider"></li>
+                <li><a href="perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                <li><a href="configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
+                <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle">[[icone:menu]]</button>
+                    <h1>Auditoria</h1>
+                    <div class="breadcrumb">
+                        <span>Admin</span>
+                        <span>/</span>
+                        <span>Auditoria</span>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn-icon" onclick="window.location.href='notificacoes.html'" style="position:relative;">
+                        [[icone:notificacao]]
+                        <span id="notificacoes-badge" class="badge badge-danger" style="position:absolute;top:-4px;right:-8px;font-size:10px;padding:2px 6px;min-width:18px;justify-content:center;">0</span>
+                    </button>
+                    <button id="theme-toggle" class="btn-icon">[[icone:lua]]</button>
+                    <button class="btn btn-outline" onclick="exportarLog()">[[icone:baixar]] Exportar</button>
+                </div>
+            </header>
+
+            <!-- STATS -->
+            <div class="audit-stats">
+                <div class="audit-stat-card active" data-filter="todas" onclick="filtrarPorTipo('todas', this)">
+                    <div class="audit-stat-icon">[[icone:ordens]]</div>
+                    <div class="audit-stat-info">
+                        <div class="audit-stat-label">Total de Ações</div>
+                        <div class="audit-stat-value" id="stat-total">—</div>
+                    </div>
+                </div>
+                <div class="audit-stat-card" data-filter="criacao" onclick="filtrarPorTipo('criacao', this)">
+                    <div class="audit-stat-icon">[[icone:adicionar]]</div>
+                    <div class="audit-stat-info">
+                        <div class="audit-stat-label">Criações</div>
+                        <div class="audit-stat-value" id="stat-criacoes">—</div>
+                    </div>
+                </div>
+                <div class="audit-stat-card" data-filter="alteracao" onclick="filtrarPorTipo('alteracao', this)">
+                    <div class="audit-stat-icon">[[icone:editar]]</div>
+                    <div class="audit-stat-info">
+                        <div class="audit-stat-label">Alterações</div>
+                        <div class="audit-stat-value" id="stat-alteracoes">—</div>
+                    </div>
+                </div>
+                <div class="audit-stat-card" data-filter="exclusao" onclick="filtrarPorTipo('exclusao', this)">
+                    <div class="audit-stat-icon">[[icone:excluir]]</div>
+                    <div class="audit-stat-info">
+                        <div class="audit-stat-label">Exclusões</div>
+                        <div class="audit-stat-value" id="stat-exclusoes">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filters">
+                <div class="filters-header">
+                    <span class="filters-title">[[icone:buscar]] Filtros</span>
+                    <button class="filters-clear" onclick="limparFiltros()">✕ Limpar filtros</button>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+                    <input type="text" id="search-audit" placeholder="Buscar por usuário ou detalhes..." oninput="aplicarFiltros()">
+                    <select id="filter-acao" onchange="aplicarFiltros()">
+                        <option value="">Todas as ações</option>
+                        <option value="Empresa criada">Empresa criada</option>
+                        <option value="Novo usuário">Novo usuário</option>
+                        <option value="Criou usuário">Criou usuário</option>
+                        <option value="Atualizou usuário">Atualizou usuário</option>
+                        <option value="Criou setor">Criou setor</option>
+                        <option value="Atualizou setor">Atualizou setor</option>
+                        <option value="Removeu setor">Removeu setor</option>
+                        <option value="Criou OS">Criou OS</option>
+                        <option value="Atualizou OS">Atualizou OS</option>
+                        <option value="Status alterado">Status alterado</option>
+                        <option value="Observação">Observação</option>
+                        <option value="Login">Login</option>
+                        <option value="Renovou código">Renovou código</option>
+                        <option value="Criou artigo">Criou artigo</option>
+                        <option value="Atualizou artigo">Atualizou artigo</option>
+                        <option value="Removeu artigo">Removeu artigo</option>
+                    </select>
+                    <select id="filter-usuario" onchange="aplicarFiltros()">
+                        <option value="">Todos os usuários</option>
+                    </select>
+                    <input type="date" id="filter-data" onchange="aplicarFiltros()">
+                </div>
+            </div>
+
+            <!-- INFO -->
+            <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <span style="font-size:0.8125rem; color:var(--text-muted);" id="info-resultados">Carregando...</span>
+            </div>
+
+            <!-- LISTA -->
+            <div class="audit-container">
+                <div class="audit-list" id="audit-list">
+                    <div class="audit-empty">
+                        <span class="audit-empty-icon">[[icone:relogio]]</span>
+                        <h3>Carregando log de auditoria...</h3>
+                    </div>
+                </div>
+                <div class="audit-footer" id="audit-footer" style="display:none;">
+                    <span id="footer-info">—</span>
+                    <button class="btn-load-more" id="btn-load-more" onclick="carregarMais()">Carregar mais</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <script>
+        // ==========================================
+        // PROTEÇÃO
+        // ==========================================
+        const usuarioAtual = getUsuario();
+
+        if (!protegerPagina(['administrador_principal', 'administrador_setor'])) {
+            throw new Error('Acesso negado');
+        }
+
+        // ==========================================
+        // ESTADO
+        // ==========================================
+        let auditoria = [];
+        let usuarios = [];
+        let filtroTipoAtual = 'todas';
+        let paginaAtual = 1;
+        const ITEMS_POR_PAGINA = 20;
+
+        // ==========================================
+        // USUÁRIO
+        // ==========================================
+        function carregarInfoUsuario() {
+            if (!usuarioAtual) return;
+            const primeiroNome = usuarioAtual.nome.split(' ')[0];
+            document.getElementById('user-name').textContent = usuarioAtual.nome;
+            const roleLabels = {
+                'administrador_principal': 'Admin Principal',
+                'administrador_setor': 'Admin de Setor'
+            };
+            document.getElementById('user-role').textContent = roleLabels[usuarioAtual.role] || 'Admin';
+
+            const avatarEl = document.getElementById('sidebar-avatar');
+            if (usuarioAtual.avatar) {
+                avatarEl.innerHTML = `<img src="${window.avatarURL(usuarioAtual.avatar)}" alt="Avatar">`;
+            } else {
+                avatarEl.textContent = primeiroNome.charAt(0).toUpperCase();
+            }
+        }
+
+        // ==========================================
+        // DADOS
+        // ==========================================
+        async function carregarDados() {
+            try {
+                const [a, u] = await Promise.all([
+                    apiRequest('/auditoria'),
+                    apiRequest('/usuarios').catch(() => [])
+                ]);
+                auditoria = a || [];
+                usuarios = u || [];
+
+                preencherSelectUsuarios();
+                atualizarStats();
+                renderizarAuditoria();
+                carregarNotificacoes();
+            } catch (e) {
+                console.error(e);
+                showToast('Erro ao carregar auditoria', 'error');
+            }
+        }
+
+        function preencherSelectUsuarios() {
+            const s = document.getElementById('filter-usuario');
+            s.innerHTML = '<option value="">Todos os usuários</option>';
+            s.innerHTML += '<option value="sistema">Sistema</option>';
+            usuarios.forEach(u => {
+                s.innerHTML += `<option value="${u.id}">${u.nome}</option>`;
+            });
+        }
+
+        // ==========================================
+        // CLASSIFICAR AÇÃO
+        // ==========================================
+        function classificarAcao(acao) {
+            if (!acao) return 'other';
+            const a = acao.toLowerCase();
+            if (a.includes('criou') || a.includes('criad') || a.includes('novo') || a.includes('entrou')) return 'create';
+            if (a.includes('atualizou') || a.includes('alterou') || a.includes('renovou')) return 'update';
+            if (a.includes('removeu') || a.includes('excluiu') || a.includes('deletou')) return 'delete';
+            if (a.includes('login') || a.includes('acessou') || a.includes('saiu')) return 'login';
+            if (a.includes('status') || a.includes('observação') || a.includes('movida')) return 'status';
+            return 'other';
+        }
+
+        function getIconeAcao(tipo) {
+            const icones = {
+                'create': '[[icone:adicionar]]',
+                'update': '[[icone:editar]]',
+                'delete': '[[icone:excluir]]',
+                'login': '[[icone:cadeado]]',
+                'status': '[[icone:alvo]]',
+                'other': '[[icone:kanban]]'
+            };
+            return icones[tipo] || '[[icone:kanban]]';
+        }
+
+        // ==========================================
+        // STATS
+        // ==========================================
+        function atualizarStats() {
+            const total = auditoria.length;
+            let criacoes = 0, alteracoes = 0, exclusoes = 0;
+
+            auditoria.forEach(item => {
+                const tipo = classificarAcao(item.acao);
+                if (tipo === 'create') criacoes++;
+                else if (tipo === 'update') alteracoes++;
+                else if (tipo === 'delete') exclusoes++;
+            });
+
+            animar('stat-total', total);
+            animar('stat-criacoes', criacoes);
+            animar('stat-alteracoes', alteracoes);
+            animar('stat-exclusoes', exclusoes);
+        }
+
+        function animar(id, v) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const dur = 600;
+            const ini = performance.now();
+            function a(t) {
+                const p = Math.min((t - ini) / dur, 1);
+                el.textContent = Math.floor(v * p);
+                if (p < 1) requestAnimationFrame(a);
+                else el.textContent = v;
+            }
+            requestAnimationFrame(a);
+        }
+
+        // ==========================================
+        // FILTROS
+        // ==========================================
+        function filtrarPorTipo(tipo, element) {
+            filtroTipoAtual = tipo;
+            document.querySelectorAll('.audit-stat-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            paginaAtual = 1;
+            renderizarAuditoria();
+        }
+
+        function aplicarFiltros() {
+            paginaAtual = 1;
+            renderizarAuditoria();
+        }
+
+        function limparFiltros() {
+            document.getElementById('search-audit').value = '';
+            document.getElementById('filter-acao').value = '';
+            document.getElementById('filter-usuario').value = '';
+            document.getElementById('filter-data').value = '';
+            filtroTipoAtual = 'todas';
+
+            document.querySelectorAll('.audit-stat-card').forEach(c => c.classList.remove('active'));
+            document.querySelector('[data-filter="todas"]').classList.add('active');
+
+            paginaAtual = 1;
+            renderizarAuditoria();
+        }
+
+        function filtrarAuditoria() {
+            const search = document.getElementById('search-audit').value.toLowerCase().trim();
+            const acaoFiltro = document.getElementById('filter-acao').value;
+            const usuarioFiltro = document.getElementById('filter-usuario').value;
+            const dataFiltro = document.getElementById('filter-data').value;
+
+            let filtradas = auditoria.filter(item => {
+                let matchSearch = true;
+                if (search) {
+                    const u = usuarios.find(x => x.id === item.usuarioId);
+                    const nome = u ? u.nome.toLowerCase() : 'sistema';
+                    const detalhes = (item.detalhes || '').toLowerCase();
+                    const acao = (item.acao || '').toLowerCase();
+                    matchSearch = nome.includes(search) || detalhes.includes(search) || acao.includes(search);
+                }
+
+                const matchAcao = !acaoFiltro || item.acao === acaoFiltro;
+
+                let matchUsuario = true;
+                if (usuarioFiltro) {
+                    if (usuarioFiltro === 'sistema') matchUsuario = !item.usuarioId;
+                    else matchUsuario = item.usuarioId === usuarioFiltro;
+                }
+
+                let matchData = true;
+                if (dataFiltro && item.data) {
+                    matchData = item.data.split('T')[0] === dataFiltro;
+                }
+
+                return matchSearch && matchAcao && matchUsuario && matchData;
+            });
+
+            if (filtroTipoAtual !== 'todas') {
+                const map = { 'criacao': 'create', 'alteracao': 'update', 'exclusao': 'delete' };
+                const tipo = map[filtroTipoAtual];
+                filtradas = filtradas.filter(i => classificarAcao(i.acao) === tipo);
+            }
+
+            return filtradas;
+        }
+
+        // ==========================================
+        // RENDERIZAR
+        // ==========================================
+        function renderizarAuditoria() {
+            const filtradas = filtrarAuditoria();
+            const container = document.getElementById('audit-list');
+            const footer = document.getElementById('audit-footer');
+            const info = document.getElementById('info-resultados');
+
+            if (filtradas.length === 0) {
+                info.textContent = 'Nenhum resultado';
+                container.innerHTML = `
+                    <div class="audit-empty">
+                        <span class="audit-empty-icon">[[icone:buscar]]</span>
+                        <h3>Nenhum registro encontrado</h3>
+                        <p>Tente ajustar os filtros ou período</p>
+                    </div>
+                `;
+                footer.style.display = 'none';
+                return;
+            }
+
+            info.textContent = `Mostrando ${Math.min(paginaAtual * ITEMS_POR_PAGINA, filtradas.length)} de ${filtradas.length} registro(s)`;
+
+            const fim = paginaAtual * ITEMS_POR_PAGINA;
+            const paraMostrar = filtradas.slice(0, fim);
+
+            container.innerHTML = paraMostrar.map(i => criarItemHTML(i)).join('');
+
+            footer.style.display = 'flex';
+            document.getElementById('footer-info').textContent = `Exibindo ${paraMostrar.length} de ${filtradas.length} registro(s)`;
+
+            const btn = document.getElementById('btn-load-more');
+            if (fim >= filtradas.length) btn.style.display = 'none';
+            else {
+                btn.style.display = 'block';
+                btn.textContent = `Carregar mais (${filtradas.length - fim} restantes)`;
+            }
+        }
+
+        function criarItemHTML(item) {
+            const u = usuarios.find(x => x.id === item.usuarioId);
+            const tipo = classificarAcao(item.acao);
+            const icone = getIconeAcao(tipo);
+
+            let avatarHTML = '[[icone:caixa]]';
+            let nome = 'Sistema';
+            let email = 'Ação automática';
+
+            if (u) {
+                nome = u.nome;
+                email = u.email;
+                const ini = (u.nome || '?').charAt(0).toUpperCase();
+                avatarHTML = u.avatar 
+                    ? `<img src="${window.avatarURL(u.avatar)}" alt="${u.nome}">` 
+                    : ini;
+            }
+
+            let osLink = '';
+            const match = (item.detalhes || '').match(/#([a-f0-9]{8})/i);
+            if (match) {
+                osLink = `<button class="audit-os-link" onclick="window.location.href='ordens.html?id=${match[1]}'">[[icone:link]] Ver OS</button>`;
+            }
+
+            const classes = {
+                'create': 'action-create',
+                'update': 'action-update',
+                'delete': 'action-delete',
+                'login': 'action-login',
+                'status': 'action-status',
+                'other': 'action-other'
+            };
+
+            return `
+                <div class="audit-item">
+                    <div class="audit-avatar-col">
+                        <div class="audit-avatar ${u ? '' : 'system'}">${avatarHTML}</div>
+                    </div>
+                    <div class="audit-content">
+                        <div class="audit-header">
+                            <span class="audit-action-badge ${classes[tipo]}">${icone} ${item.acao || 'Ação'}</span>
+                            <span class="audit-date">[[icone:relogio]] ${formatDate(item.data)}</span>
+                        </div>
+                        <div class="audit-user-name">
+                            ${nome}
+                            <span class="audit-user-email">${email}</span>
+                        </div>
+                        ${item.detalhes ? `<div class="audit-details">${item.detalhes}</div>` : ''}
+                        ${osLink ? `<div class="audit-meta">${osLink}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function carregarMais() {
+            paginaAtual++;
+            renderizarAuditoria();
+        }
+
+        // ==========================================
+        // EXPORTAR
+        // ==========================================
+        function exportarLog() {
+            const f = filtrarAuditoria();
+            if (f.length === 0) { showToast('Nenhum dado para exportar', 'warning'); return; }
+
+            const headers = ['Data/Hora', 'Usuário', 'E-mail', 'Ação', 'Detalhes'];
+            const rows = f.map(item => {
+                const u = usuarios.find(x => x.id === item.usuarioId);
+                return [
+                    item.data ? new Date(item.data).toLocaleString('pt-BR') : '',
+                    u ? u.nome : 'Sistema',
+                    u ? u.email : '',
+                    item.acao || '',
+                    item.detalhes || ''
+                ];
+            });
+
+            const csv = [headers.join(';'), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';'))].join('\n');
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `auditoria-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('[[icone:confirmar]] Log exportado!', 'success');
+        }
+
+        // ==========================================
+        // NOTIFICAÇÕES
+        // ==========================================
+        async function carregarNotificacoes() {
+            try {
+                const d = await apiRequest('/notificacoes');
+                const b = document.getElementById('notificacoes-badge');
+                if (b) {
+                    const n = d.naoLidas || 0;
+                    b.textContent = n;
+                    b.style.display = n > 0 ? 'inline-flex' : 'none';
+                }
+            } catch (e) {}
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarInfoUsuario();
+            carregarDados();
+
+            document.getElementById('logout').addEventListener('click', e => { e.preventDefault(); logout(); });
+
+            const mt = document.querySelector('.menu-toggle');
+            const sb = document.querySelector('.sidebar');
+            if (mt && sb) {
+                mt.addEventListener('click', () => sb.classList.toggle('show'));
+                document.addEventListener('click', e => {
+                    if (window.innerWidth > 768) return;
+                    if (!sb.contains(e.target) && !mt.contains(e.target)) sb.classList.remove('show');
+                });
+            }
+        });
+    </script>
+
+<script src="../js/icones.js"></script>
+</body>
+</html>

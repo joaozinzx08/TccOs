@@ -1,0 +1,25 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> gestao-os@4.0.0 test
+> npm test -w backend
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> @gestao-os/backend@4.0.0 test
+> node --test test/*.test.js
+
+✔ Fluxo completo, isolamento, autorização, persistência e logout (493.800919ms)
+✔ Migração JSON para tabelas relacionais, preservação de senha e UNIQUE no banco (189.893155ms)
+✔ Recuperação e confirmação de e-mail: código único, expiração, tentativas e revogação (527.540722ms)
+✔ Perfis separados, sigilo em detalhe/histórico e bloqueio de atendimento da própria OS (506.350512ms)
+✔ JWT adulterado, expirado, algoritmo/issuer/audience inválidos e revogação total após senha (248.474465ms)
+✔ Isolamento transversal, chat privado, UNIQUE permanente e exportação protegida (581.711231ms)
+✔ Rate limit real do login retorna 429 com JSON (23.039591ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1582.329466

@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dashboard do Administrador - Gestão OS" />
+    <title>Dashboard - Admin | Gestão OS</title>
+    <script src="../js/i18n.js"></script>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/dark-mode.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/png" href="../assets/logo.png" />
+    <style>
+      /* ==========================================
+           CARD DE CÓDIGO DA EMPRESA
+           ========================================== */
+      .empresa-code-card {
+        background: var(--gradient-primary);
+        color: #fff;
+        border-radius: var(--radius-lg);
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .empresa-code-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .empresa-code-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+      }
+
+      .empresa-code-info {
+        flex: 1;
+        min-width: 240px;
+      }
+
+      .empresa-code-label {
+        font-size: 0.75rem;
+        opacity: 0.85;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+
+      .empresa-code-value {
+        font-size: 2rem;
+        font-weight: 800;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 3px;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 6px 18px;
+        border-radius: 10px;
+        display: inline-block;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        margin-bottom: 6px;
+      }
+
+      .empresa-code-nome {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .empresa-code-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .empresa-code-actions .btn {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        font-size: 0.8125rem;
+        padding: 10px 18px;
+      }
+
+      .empresa-code-actions .btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+      }
+
+      /* ==========================================
+           BOAS-VINDAS
+           ========================================== */
+      .welcome-banner {
+        background: var(--bg-card);
+        padding: 20px 24px;
+        border-radius: var(--radius-lg);
+        margin-bottom: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .welcome-text h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+
+      .welcome-text p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin: 0;
+      }
+
+      .welcome-date {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      /* ==========================================
+           CHARTS - TAMANHOS
+           ========================================== */
+      .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .chart-card-full {
+        grid-column: 1 / -1;
+      }
+
+      .chart-card canvas {
+        max-height: 280px;
+      }
+
+      /* ==========================================
+           AÇÕES RÁPIDAS
+           ========================================== */
+      .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .quick-action-card {
+        background: var(--bg-card);
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        transition: var(--transition);
+        text-align: center;
+        text-decoration: none;
+        color: var(--text);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .quick-action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--blue-200);
+        color: var(--primary);
+      }
+
+      .quick-action-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius);
+        background: var(--blue-50);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+      }
+
+      [data-theme='dark'] .quick-action-icon {
+        background: #1e3a8a;
+      }
+
+      .quick-action-card:hover .quick-action-icon {
+        background: var(--gradient-primary);
+        transform: scale(1.1);
+      }
+
+      .quick-action-label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+      }
+
+      /* ==========================================
+           GRID INFERIOR
+           ========================================== */
+      .bottom-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 20px;
+        margin-top: 24px;
+      }
+
+      /* Timeline */
+      .activity-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .activity-item-timeline {
+        display: flex;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--gray-100);
+        transition: var(--transition);
+      }
+
+      [data-theme='dark'] .activity-item-timeline {
+        border-bottom-color: #2d3748;
+      }
+
+      .activity-item-timeline:last-child {
+        border-bottom: none;
+      }
+
+      .activity-dot-timeline {
+        flex-shrink: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--primary);
+        margin-top: 6px;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+
+      .activity-dot-timeline.success {
+        background: var(--success);
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+      }
+      .activity-dot-timeline.warning {
+        background: var(--warning);
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+      }
+      .activity-dot-timeline.danger {
+        background: var(--danger);
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+      }
+
+      .activity-content-timeline {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .activity-title-timeline {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 2px;
+      }
+
+      .activity-desc-timeline {
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+        line-height: 1.5;
+      }
+
+      .activity-time-timeline {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      /* ==========================================
+           RESPONSIVO
+           ========================================== */
+      @media (max-width: 1024px) {
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .quick-actions {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .bottom-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .empresa-code-value {
+          font-size: 1.5rem;
+          letter-spacing: 2px;
+        }
+
+        .empresa-code-content {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .empresa-code-actions {
+          width: 100%;
+        }
+
+        .empresa-code-actions .btn {
+          flex: 1;
+        }
+
+        .quick-actions {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+
+        .quick-action-card {
+          padding: 16px;
+        }
+
+        .welcome-text h2 {
+          font-size: 1.125rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .quick-actions {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .quick-action-label {
+          font-size: 0.75rem;
+        }
+
+        .empresa-code-actions {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- ============================================
+             SIDEBAR
+             ============================================ -->
+      <nav class="sidebar">
+        <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px">
+          <img src="../assets/logo.png" alt="Gestão OS" style="height: 32px; width: auto" />
+          <span class="brand">Gestão OS</span>
+        </div>
+
+        <div class="sidebar-user">
+          <div class="user-avatar" id="sidebar-avatar">[[icone:usuario]]</div>
+          <div class="user-info">
+            <span class="user-name" id="user-name">Carregando...</span>
+            <span class="user-role" id="user-role">Admin</span>
+          </div>
+        </div>
+
+        <ul class="sidebar-menu">
+          <li class="active">
+            <a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a>
+          </li>
+          <li>
+            <a href="usuarios.html"><span class="menu-icon">[[icone:equipe]]</span> Usuários</a>
+          </li>
+          <li>
+            <a href="setores.html"><span class="menu-icon">[[icone:setores]]</span> Setores</a>
+          </li>
+          <li>
+            <a href="ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a>
+          </li>
+          <li>
+            <a href="kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a>
+          </li>
+          <li>
+            <a href="calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a>
+          </li>
+          <li>
+            <a href="relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a>
+          </li>
+          <li>
+            <a href="auditoria.html"><span class="menu-icon">[[icone:buscar]]</span> Auditoria</a>
+          </li>
+          <li class="divider"></li>
+          <li>
+            <a href="empresa.html"><span class="menu-icon">[[icone:empresa]]</span> Minha Empresa</a>
+          </li>
+          <li>
+            <a href="conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a>
+          </li>
+          <li>
+            <a href="chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a>
+          </li>
+          <li class="divider"></li>
+          <li>
+            <a href="perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a>
+          </li>
+          <li>
+            <a href="configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a>
+          </li>
+          <li>
+            <a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- ============================================
+             CONTEÚDO PRINCIPAL
+             ============================================ -->
+      <main class="main-content">
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="menu-toggle">[[icone:menu]]</button>
+            <h1>Dashboard</h1>
+            <div class="breadcrumb">
+              <span>Admin</span>
+              <span>/</span>
+              <span>Dashboard</span>
+            </div>
+          </div>
+          <div class="topbar-actions">
+            <button
+              class="btn-icon"
+              onclick="window.location.href = 'notificacoes.html'"
+              aria-label="Notificações"
+              style="position: relative"
+            >
+              [[icone:notificacao]]
+              <span
+                id="notificacoes-badge"
+                class="badge badge-danger"
+                style="
+                  position: absolute;
+                  top: -4px;
+                  right: -8px;
+                  font-size: 10px;
+                  padding: 2px 6px;
+                  min-width: 18px;
+                  justify-content: center;
+                "
+                >0</span
+              >
+            </button>
+            <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema">[[icone:lua]]</button>
+          </div>
+        </header>
+
+        <!-- CARD - CÓDIGO DA EMPRESA -->
+        <div class="empresa-code-card">
+          <div class="empresa-code-content">
+            <div class="empresa-code-info">
+              <div class="empresa-code-label">[[icone:chave]] Código da Empresa</div>
+              <div class="empresa-code-value" id="empresa-code">GEST-XXXXXX</div>
+              <div class="empresa-code-nome">
+                <span>[[icone:empresa]]</span>
+                <span id="empresa-nome">Carregando...</span>
+              </div>
+            </div>
+            <div class="empresa-code-actions">
+              <button class="btn" onclick="copiarCodigo()">[[icone:ordens]] Copiar</button>
+              <button class="btn" onclick="window.location.href = 'empresa.html'">
+                [[icone:empresa]] Ver Empresa
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOAS-VINDAS -->
+        <div class="welcome-banner">
+          <div class="welcome-text">
+            <h2 id="welcome-title">Bem-vindo(a)! [[icone:usuario]]</h2>
+            <p id="welcome-subtitle">Aqui está o resumo da sua empresa hoje</p>
+          </div>
+          <div class="welcome-date">
+            <span>[[icone:calendario]]</span>
+            <span id="current-date">—</span>
+          </div>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card primary">
+            <span class="stat-icon">[[icone:ordens]]</span>
+            <span class="stat-label">Total de OS</span>
+            <span class="stat-value" id="total-os">—</span>
+          </div>
+          <div class="stat-card warning">
+            <span class="stat-icon">[[icone:email]]</span>
+            <span class="stat-label">Abertas</span>
+            <span class="stat-value" id="abertas-os">—</span>
+          </div>
+          <div class="stat-card info">
+            <span class="stat-icon">[[icone:prioridade]]</span>
+            <span class="stat-label">Em Atendimento</span>
+            <span class="stat-value" id="atendimento-os">—</span>
+          </div>
+          <div class="stat-card success">
+            <span class="stat-icon">[[icone:confirmar]]</span>
+            <span class="stat-label">Concluídas</span>
+            <span class="stat-value" id="concluidas-os">—</span>
+          </div>
+          <div class="stat-card danger">
+            <span class="stat-icon">[[icone:status]]</span>
+            <span class="stat-label">Urgentes</span>
+            <span class="stat-value" id="urgentes-os">—</span>
+          </div>
+          <div class="stat-card danger">
+            <span class="stat-icon">[[icone:relogio]]</span>
+            <span class="stat-label">Atrasadas</span>
+            <span class="stat-value" id="atrasadas-os">—</span>
+          </div>
+        </div>
+
+        <!-- AÇÕES RÁPIDAS -->
+        <div class="quick-actions">
+          <a href="ordens.html" class="quick-action-card">
+            <div class="quick-action-icon">[[icone:ordens]]</div>
+            <span class="quick-action-label">Ver Ordens</span>
+          </a>
+          <a href="usuarios.html" class="quick-action-card">
+            <div class="quick-action-icon">[[icone:equipe]]</div>
+            <span class="quick-action-label">Usuários</span>
+          </a>
+          <a href="setores.html" class="quick-action-card">
+            <div class="quick-action-icon">[[icone:setores]]</div>
+            <span class="quick-action-label">Setores</span>
+          </a>
+          <a href="relatorios.html" class="quick-action-card">
+            <div class="quick-action-icon">[[icone:grafico]]</div>
+            <span class="quick-action-label">Relatórios</span>
+          </a>
+        </div>
+
+        <!-- GRÁFICOS -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>[[icone:painel]] OS por Setor</h3>
+            <canvas id="chart-setor"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>[[icone:alvo]] OS por Status</h3>
+            <canvas id="chart-status"></canvas>
+          </div>
+          <div class="chart-card chart-card-full">
+            <h3>[[icone:pasta]] OS por Categoria</h3>
+            <canvas id="chart-categoria"></canvas>
+          </div>
+        </div>
+
+        <!-- GRID INFERIOR -->
+        <div class="bottom-grid">
+          <!-- ÚLTIMAS OS -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">[[icone:ordens]] Últimas Ordens de Serviço</h3>
+              <a href="ordens.html" class="btn btn-sm btn-outline">Ver todas</a>
+            </div>
+            <div id="recent-os-list" class="os-list"></div>
+          </div>
+
+          <!-- TIMELINE -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">[[icone:notificacao]] Atividades Recentes</h3>
+              <a href="auditoria.html" class="btn btn-sm btn-outline">Ver log</a>
+            </div>
+            <div id="activity-timeline" class="activity-timeline">
+              <div class="empty-state">
+                <span class="empty-icon">[[icone:relogio]]</span>
+                <h3>Carregando...</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/icones.js"></script>
+
+    <script>
+      // ==========================================
+      // PROTEÇÃO DA PÁGINA
+      // ==========================================
+      if (!protegerPagina(['administrador_principal', 'administrador_setor'])) {
+        throw new Error('Acesso negado');
+      }
+
+      // ==========================================
+      // ESTADO
+      // ==========================================
+      let chartSetor = null;
+      let chartStatus = null;
+      let chartCategoria = null;
+
+      // ==========================================
+      // COPIAR CÓDIGO DA EMPRESA
+      // ==========================================
+      function copiarCodigo() {
+        const code = document.getElementById('empresa-code').textContent;
+        if (!code || code === 'GEST-XXXXXX') {
+          showToast('Aguarde o carregamento do código...', 'warning');
+          return;
+        }
+        copiarTexto(code);
+      }
+
+      // ==========================================
+      // DATA ATUAL
+      // ==========================================
+      function atualizarDataAtual() {
+        const data = new Date();
+        const opcoes = {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        };
+        const dataFormatada = data.toLocaleDateString('pt-BR', opcoes);
+        document.getElementById('current-date').textContent =
+          dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
+      }
+
+      // ==========================================
+      // CARREGAR EMPRESA
+      // ==========================================
+      async function carregarEmpresa() {
+        try {
+          const empresa = await apiRequest('/empresa');
+
+          const codeEl = document.getElementById('empresa-code');
+          const nomeEl = document.getElementById('empresa-nome');
+
+          if (codeEl) codeEl.textContent = empresa.codigo || 'GEST-XXXXXX';
+          if (nomeEl) nomeEl.textContent = empresa.nome || 'Sem nome';
+        } catch (error) {
+          console.error('Erro ao carregar empresa:', error);
+        }
+      }
+
+      // ==========================================
+      // CARREGAR USUÁRIO
+      // ==========================================
+      function carregarUsuario() {
+        const usuario = getUsuario();
+        if (!usuario) return;
+
+        const primeiroNome = usuario.nome.split(' ')[0];
+
+        document.getElementById('welcome-title').textContent = `Olá, ${primeiroNome}! [[icone:usuario]]`;
+
+        document.getElementById('welcome-subtitle').textContent =
+          'Aqui está o resumo da sua empresa hoje';
+
+        // Avatar
+        const avatarEl = document.getElementById('sidebar-avatar');
+        if (usuario.avatar) {
+          avatarEl.innerHTML = `<img src="${window.avatarURL(usuario.avatar)}" alt="Avatar">`;
+        } else {
+          avatarEl.textContent = primeiroNome.charAt(0).toUpperCase();
+        }
+      }
+
+      // ==========================================
+      // CARREGAR DASHBOARD
+      // ==========================================
+      async function carregarDashboard() {
+        try {
+          const data = await apiRequest('/dashboard');
+
+          // ===== STATS =====
+          animarNumero('total-os', data.stats.total || 0);
+          animarNumero('abertas-os', data.stats.abertas || 0);
+          animarNumero('atendimento-os', data.stats.emAtendimento || 0);
+          animarNumero('concluidas-os', data.stats.concluidas || 0);
+          animarNumero('urgentes-os', data.stats.urgentes || 0);
+          animarNumero('atrasadas-os', data.stats.atrasadas || 0);
+
+          // ===== GRÁFICOS =====
+          atualizarGraficos(data.charts);
+
+          // ===== ÚLTIMAS OS =====
+          atualizarUltimasOS(data.ultimasOS);
+
+          // ===== NOTIFICAÇÕES =====
+          carregarNotificacoes();
+        } catch (error) {
+          console.error('Erro ao carregar dashboard:', error);
+          showToast('Erro ao carregar dados do dashboard', 'error');
+        }
+      }
+
+      // ==========================================
+      // ANIMAR NÚMEROS
+      // ==========================================
+      function animarNumero(elementId, valorFinal) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        const duracao = 800;
+        const inicio = performance.now();
+        const valorInicial = 0;
+
+        function animar(tempo) {
+          const progresso = Math.min((tempo - inicio) / duracao, 1);
+          const valorAtual = Math.floor(valorInicial + (valorFinal - valorInicial) * progresso);
+          el.textContent = valorAtual;
+
+          if (progresso < 1) {
+            requestAnimationFrame(animar);
+          } else {
+            el.textContent = valorFinal;
+          }
+        }
+
+        requestAnimationFrame(animar);
+      }
+
+      // ==========================================
+      // ATUALIZAR GRÁFICOS
+      // ==========================================
+      function atualizarGraficos(charts) {
+        // ===== CORES DO TEMA =====
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+        const textColor = isDark ? '#94a3b8' : '#475569';
+
+        // ===== GRÁFICO DE SETOR =====
+        if (chartSetor) chartSetor.destroy();
+        const ctxSetor = document.getElementById('chart-setor').getContext('2d');
+        const setorData = charts.porSetor || [];
+
+        chartSetor = new Chart(ctxSetor, {
+          type: 'bar',
+          data: {
+            labels: setorData.length > 0 ? setorData.map((d) => d.label) : ['Sem dados'],
+            datasets: [
+              {
+                label: 'OS por Setor',
+                data: setorData.length > 0 ? setorData.map((d) => d.value) : [0],
+                backgroundColor: 'rgba(37, 99, 235, 0.75)',
+                borderColor: 'rgba(37, 99, 235, 1)',
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: isDark ? '#1e293b' : '#fff',
+                titleColor: isDark ? '#f1f5f9' : '#0f172a',
+                bodyColor: isDark ? '#94a3b8' : '#475569',
+                borderColor: isDark ? '#334155' : '#e2e8f0',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 8,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                  color: textColor,
+                  font: { size: 11 },
+                },
+                grid: { color: gridColor, drawBorder: false },
+              },
+              x: {
+                ticks: {
+                  color: textColor,
+                  font: { size: 11 },
+                },
+                grid: { display: false },
+              },
+            },
+          },
+        });
+
+        // ===== GRÁFICO DE STATUS =====
+        if (chartStatus) chartStatus.destroy();
+        const ctxStatus = document.getElementById('chart-status').getContext('2d');
+        const statusData = charts.porStatus || [];
+
+        const statusColors = {
+          Aberta: '#3b82f6',
+          Encaminhada: '#f59e0b',
+          'Em atendimento': '#8b5cf6',
+          'Aguardando informação': '#ef4444',
+          Concluída: '#10b981',
+          Cancelada: '#6b7280',
+        };
+
+        const statusLabels = statusData.length > 0 ? statusData.map((d) => d.label) : ['Sem dados'];
+        const statusValues = statusData.length > 0 ? statusData.map((d) => d.value) : [0];
+        const statusColorsArr = statusLabels.map((label) => statusColors[label] || '#6b7280');
+
+        chartStatus = new Chart(ctxStatus, {
+          type: 'doughnut',
+          data: {
+            labels: statusLabels,
+            datasets: [
+              {
+                data: statusValues,
+                backgroundColor: statusColorsArr,
+                borderWidth: 0,
+                hoverOffset: 8,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  padding: 14,
+                  color: textColor,
+                  font: { size: 12 },
+                },
+              },
+              tooltip: {
+                backgroundColor: isDark ? '#1e293b' : '#fff',
+                titleColor: isDark ? '#f1f5f9' : '#0f172a',
+                bodyColor: isDark ? '#94a3b8' : '#475569',
+                borderColor: isDark ? '#334155' : '#e2e8f0',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 8,
+              },
+            },
+          },
+        });
+
+        // ===== GRÁFICO DE CATEGORIA =====
+        if (chartCategoria) chartCategoria.destroy();
+        const ctxCategoria = document.getElementById('chart-categoria').getContext('2d');
+        const catData = charts.porCategoria || [];
+
+        chartCategoria = new Chart(ctxCategoria, {
+          type: 'bar',
+          data: {
+            labels: catData.length > 0 ? catData.map((d) => d.label) : ['Sem dados'],
+            datasets: [
+              {
+                label: 'OS por Categoria',
+                data: catData.length > 0 ? catData.map((d) => d.value) : [0],
+                backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: isDark ? '#1e293b' : '#fff',
+                titleColor: isDark ? '#f1f5f9' : '#0f172a',
+                bodyColor: isDark ? '#94a3b8' : '#475569',
+                borderColor: isDark ? '#334155' : '#e2e8f0',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 8,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                  color: textColor,
+                  font: { size: 11 },
+                },
+                grid: { color: gridColor, drawBorder: false },
+              },
+              x: {
+                ticks: {
+                  color: textColor,
+                  font: { size: 11 },
+                },
+                grid: { display: false },
+              },
+            },
+          },
+        });
+      }
+
+      // ==========================================
+      // ATUALIZAR ÚLTIMAS OS
+      // ==========================================
+      function atualizarUltimasOS(ordens) {
+        const container = document.getElementById('recent-os-list');
+
+        if (!ordens || ordens.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="empty-icon">[[icone:pasta]]</span>
+                        <h3>Nenhuma OS recente</h3>
+                        <p>Comece criando sua primeira ordem de serviço</p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = ordens
+          .map((os) => {
+            const statusClass = (os.status || 'Aberta').toLowerCase().replace(/\s+/g, '-');
+            const prioridadeClass = (os.prioridade || 'Média').toLowerCase();
+
+            return `
+                    <div class="os-item" onclick="window.location.href='ordens.html'" style="cursor:pointer;">
+                        <div class="os-header">
+                            <span class="os-id">#${shortId(os.id)}</span>
+                            <span class="os-status status-${statusClass}">${os.status || 'Aberta'}</span>
+                        </div>
+                        <h4 class="os-title">${os.titulo || 'Sem título'}</h4>
+                        <div class="os-meta">
+                            <span>Prioridade: <span class="priority-${prioridadeClass}">${os.prioridade || 'Média'}</span></span>
+                            <span>[[icone:calendario]] ${timeAgo(os.dataAbertura)}</span>
+                        </div>
+                    </div>
+                `;
+          })
+          .join('');
+      }
+
+      // ==========================================
+      // CARREGAR NOTIFICAÇÕES
+      // ==========================================
+      async function carregarNotificacoes() {
+        try {
+          const data = await apiRequest('/notificacoes');
+
+          const badge = document.getElementById('notificacoes-badge');
+          if (badge) {
+            const naoLidas = data.naoLidas || 0;
+            badge.textContent = naoLidas;
+            badge.style.display = naoLidas > 0 ? 'inline-flex' : 'none';
+          }
+
+          // Atualizar timeline de atividades com as notificações
+          atualizarTimeline(data.notificacoes || []);
+        } catch (error) {
+          console.error('Erro ao carregar notificações:', error);
+        }
+      }
+
+      // ==========================================
+      // ATUALIZAR TIMELINE
+      // ==========================================
+      function atualizarTimeline(notificacoes) {
+        const container = document.getElementById('activity-timeline');
+
+        if (!notificacoes || notificacoes.length === 0) {
+          // Tentar carregar auditoria como fallback
+          carregarAuditoriaTimeline();
+          return;
+        }
+
+        const items = notificacoes.slice(0, 6);
+
+        container.innerHTML = items
+          .map((notif) => {
+            let tipo = 'primary';
+            const titulo = (notif.titulo || '').toLowerCase();
+
+            if (titulo.includes('concluí')) tipo = 'success';
+            else if (titulo.includes('atras') || titulo.includes('urgent')) tipo = 'danger';
+            else if (titulo.includes('nova') || titulo.includes('criad')) tipo = 'warning';
+
+            return `
+                    <div class="activity-item-timeline">
+                        <div class="activity-dot-timeline ${tipo}"></div>
+                        <div class="activity-content-timeline">
+                            <div class="activity-title-timeline">${notif.titulo || 'Notificação'}</div>
+                            <div class="activity-desc-timeline">${notif.mensagem || ''}</div>
+                            <div class="activity-time-timeline">[[icone:relogio]] ${timeAgo(notif.data)}</div>
+                        </div>
+                    </div>
+                `;
+          })
+          .join('');
+      }
+
+      // ==========================================
+      // CARREGAR AUDITORIA (FALLBACK)
+      // ==========================================
+      async function carregarAuditoriaTimeline() {
+        try {
+          const auditoria = await apiRequest('/auditoria');
+          const container = document.getElementById('activity-timeline');
+
+          if (!auditoria || auditoria.length === 0) {
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <span class="empty-icon">[[icone:pasta]]</span>
+                            <h3>Nenhuma atividade</h3>
+                            <p>As ações aparecerão aqui</p>
+                        </div>
+                    `;
+            return;
+          }
+
+          const items = auditoria.slice(0, 6);
+
+          container.innerHTML = items
+            .map((log) => {
+              let tipo = 'primary';
+              const acao = (log.acao || '').toLowerCase();
+
+              if (acao.includes('criou')) tipo = 'success';
+              else if (acao.includes('removeu') || acao.includes('excluiu')) tipo = 'danger';
+              else if (acao.includes('atualizou') || acao.includes('alterou')) tipo = 'warning';
+
+              return `
+                        <div class="activity-item-timeline">
+                            <div class="activity-dot-timeline ${tipo}"></div>
+                            <div class="activity-content-timeline">
+                                <div class="activity-title-timeline">${log.acao || 'Ação'}</div>
+                                <div class="activity-desc-timeline">${log.detalhes || ''}</div>
+                                <div class="activity-time-timeline">[[icone:relogio]] ${timeAgo(log.data)}</div>
+                            </div>
+                        </div>
+                    `;
+            })
+            .join('');
+        } catch (error) {
+          console.error('Erro ao carregar auditoria:', error);
+        }
+      }
+
+      // ==========================================
+      // INICIALIZAÇÃO
+      // ==========================================
+      document.addEventListener('DOMContentLoaded', () => {
+        // Data
+        atualizarDataAtual();
+
+        // Usuário
+        carregarUsuario();
+
+        // Empresa
+        carregarEmpresa();
+
+        // Dashboard
+        carregarDashboard();
+
+        // Logout
+        const logoutBtn = document.getElementById('logout');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+          });
+        }
+
+        // Menu mobile
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        if (menuToggle && sidebar) {
+          menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+          });
+
+          // Fechar ao clicar fora
+          document.addEventListener('click', (e) => {
+            if (window.innerWidth > 768) return;
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+              sidebar.classList.remove('show');
+            }
+          });
+        }
+      });
+
+      // ==========================================
+      // RECARREGAR GRÁFICOS AO MUDAR TEMA
+      // ==========================================
+      const themeToggle = document.getElementById('theme-toggle');
+      if (themeToggle) {
+        const observer = new MutationObserver(() => {
+          // Recarregar gráficos com as cores do tema atual
+          apiRequest('/dashboard')
+            .then((data) => {
+              atualizarGraficos(data.charts);
+            })
+            .catch(() => {});
+        });
+
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['data-theme'],
+        });
+      }
+    </script>
+  </body>
+</html>

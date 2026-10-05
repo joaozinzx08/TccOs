@@ -1,0 +1,76 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> gestao-os@4.0.0 test:e2e:production
+> npm run build && node scripts/test-production.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> gestao-os@4.0.0 build
+> npm run build -w frontend
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> @gestao-os/frontend@4.0.0 build
+> vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 71 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                       0.40 kB │ gzip:   0.27 kB
+dist/assets/login-C1gWF2se.js                         3.32 kB │ gzip:   1.15 kB
+dist/assets/admin__empresa-meLV102M.js               14.46 kB │ gzip:   2.76 kB
+dist/assets/index-C3ajkAvm.js                        14.96 kB │ gzip:   2.58 kB
+dist/assets/admin__kanban-Bfu8kbtg.js                17.54 kB │ gzip:   3.59 kB
+dist/assets/gestor__kanban-CDZryv0P.js               17.54 kB │ gzip:   3.59 kB
+dist/assets/entrar-empresa-BHZ36RGU.js               18.07 kB │ gzip:   3.69 kB
+dist/assets/criar-empresa-CF3VEX_t.js                18.63 kB │ gzip:   3.73 kB
+dist/assets/admin__auditoria-CcFS4O_k.js             19.37 kB │ gzip:   3.82 kB
+dist/assets/colaborador__dashboard-Iwbaw6A7.js       19.96 kB │ gzip:   3.68 kB
+dist/assets/admin__dashboard-BGVtTLMN.js             19.97 kB │ gzip:   3.64 kB
+dist/assets/gestor__dashboard-Dsr-1ZxR.js            20.04 kB │ gzip:   3.55 kB
+dist/assets/admin__notificacoes-CAsUHLB2.js          20.07 kB │ gzip:   3.67 kB
+dist/assets/gestor__notificacoes-CrcFZwFs.js         20.07 kB │ gzip:   3.67 kB
+dist/assets/colaborador__notificacoes-xeYaE3Uq.js    20.08 kB │ gzip:   3.67 kB
+dist/assets/recursos-DqIUkHgG.js                     22.63 kB │ gzip:   4.51 kB
+dist/assets/gestor__chat-D_pXGsF7.js                 22.64 kB │ gzip:   4.11 kB
+dist/assets/colaborador__chat-BjNeRGss.js            22.65 kB │ gzip:   4.11 kB
+dist/assets/admin__chat-QbaUMGsl.js                  22.80 kB │ gzip:   4.12 kB
+dist/assets/admin__relatorios-C4-mLG7S.js            24.38 kB │ gzip:   3.96 kB
+dist/assets/gestor__relatorios-DlNhno-L.js           24.38 kB │ gzip:   3.97 kB
+dist/assets/admin__calendario-Bu4DxFAj.js            24.80 kB │ gzip:   4.48 kB
+dist/assets/gestor__calendario-HxLLi4yC.js           24.80 kB │ gzip:   4.48 kB
+dist/assets/como-funciona-DqH-xN86.js                25.07 kB │ gzip:   4.66 kB
+dist/assets/admin__setores-CY6NJF1_.js               25.08 kB │ gzip:   4.63 kB
+dist/assets/admin__usuarios-Gb30v_b9.js              26.07 kB │ gzip:   5.07 kB
+dist/assets/contato-reWLqoSM.js                      27.18 kB │ gzip:   4.98 kB
+dist/assets/admin__perfil-hAfSCAPy.js                27.25 kB │ gzip:   4.61 kB
+dist/assets/gestor__perfil-CPfWiLtM.js               27.25 kB │ gzip:   4.61 kB
+dist/assets/colaborador__perfil-eVj-6Erk.js          27.26 kB │ gzip:   4.61 kB
+dist/assets/sobre-DE7KbJfI.js                        28.79 kB │ gzip:   4.91 kB
+dist/assets/admin__ordens-B2WrekoS.js                30.17 kB │ gzip:   5.81 kB
+dist/assets/gestor__ordens-DZ70mY4a.js               30.17 kB │ gzip:   5.82 kB
+dist/assets/admin__configuracoes-D_osYYGk.js         31.51 kB │ gzip:   5.03 kB
+dist/assets/colaborador__minhas-ordens-rwR4Pa5j.js   31.76 kB │ gzip:   5.72 kB
+dist/assets/seguranca-CKuDZCE1.js                    33.27 kB │ gzip:   5.72 kB
+dist/assets/admin__conhecimento-Be7kXUsG.js          35.07 kB │ gzip:   6.00 kB
+dist/assets/gestor__conhecimento-BYbv7L6M.js         35.07 kB │ gzip:   6.01 kB
+dist/assets/colaborador__conhecimento-CXQPINzf.js    35.08 kB │ gzip:   6.01 kB
+dist/assets/faq-Cu3VQoYY.js                          39.98 kB │ gzip:   6.28 kB
+dist/assets/gestor__configuracoes-DQvipo4b.js        51.14 kB │ gzip:   6.87 kB
+dist/assets/index-FWWmfGfu.js                       479.46 kB │ gzip: 158.40 kB
+✓ built in 1.82s
+[WebServer] (node:128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:136) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/flows.spec.js:4:1 › Fluxo visual original: proteção, criar empresa, login, equipe, ordens, chat, artigos e navegação (10.0s)
+  ✓  2 e2e/flows.spec.js:95:1 › Colaborador e gestor: ingresso, anexo privado, atendimento, comentário, histórico e conclusão (7.2s)
+  ✓  3 e2e/flows.spec.js:189:1 › Layout em celular preserva as dimensões do legado (1.6s)
+  ✓  4 e2e/flows.spec.js:213:1 › Administrador de setor gerencia somente sua equipe e opções autorizadas (1.9s)
+
+  4 passed (21.6s)

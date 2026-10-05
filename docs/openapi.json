@@ -1,0 +1,3087 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "GestãoOS — API",
+    "version": "4.0.0",
+    "description": "Inventário das rotas implementadas. Autenticação Bearer JWT. O servidor aplica permissões e isolamento por empresa. Exemplos, regras e filtros em docs/API.md. Os schemas detalhados cobrem os fluxos de entrada; os demais corpos são descritos no código e no guia."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "security": [
+    {
+      "BearerJWT": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerJWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Erro": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "required": [
+          "email",
+          "senha"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "senha": {
+            "type": "string",
+            "format": "password"
+          },
+          "codigoEmpresa": {
+            "type": "string",
+            "description": "Necessário se as credenciais identificarem mais de uma empresa."
+          }
+        }
+      },
+      "Empresa": {
+        "type": "object",
+        "required": [
+          "nome",
+          "responsavel",
+          "email",
+          "senha"
+        ],
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "responsavel": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "senha": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        }
+      },
+      "Ingresso": {
+        "type": "object",
+        "required": [
+          "codigoEmpresa",
+          "nome",
+          "email",
+          "senha"
+        ],
+        "properties": {
+          "codigoEmpresa": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "senha": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/status": {
+      "get": {
+        "tags": [
+          "status"
+        ],
+        "summary": "GET /api/status",
+        "operationId": "get__api_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/openapi.json": {
+      "get": {
+        "tags": [
+          "openapi.json"
+        ],
+        "summary": "GET /api/openapi.json",
+        "operationId": "get__api_openapi_json",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/empresas": {
+      "post": {
+        "tags": [
+          "empresas"
+        ],
+        "summary": "POST /api/empresas",
+        "operationId": "post__api_empresas",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Empresa"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": [
+          "login"
+        ],
+        "summary": "POST /api/login",
+        "operationId": "post__api_login",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/empresas/validar-codigo": {
+      "get": {
+        "tags": [
+          "empresas"
+        ],
+        "summary": "GET /api/empresas/validar-codigo",
+        "operationId": "get__api_empresas_validar_codigo",
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/empresas/entrar": {
+      "post": {
+        "tags": [
+          "empresas"
+        ],
+        "summary": "POST /api/empresas/entrar",
+        "operationId": "post__api_empresas_entrar",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ingresso"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contato": {
+      "post": {
+        "tags": [
+          "contato"
+        ],
+        "summary": "POST /api/contato",
+        "operationId": "post__api_contato",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "tags": [
+          "logout"
+        ],
+        "summary": "POST /api/logout",
+        "operationId": "post__api_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sessoes": {
+      "get": {
+        "tags": [
+          "sessoes"
+        ],
+        "summary": "GET /api/sessoes",
+        "operationId": "get__api_sessoes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "sessoes"
+        ],
+        "summary": "DELETE /api/sessoes",
+        "operationId": "delete__api_sessoes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/sessoes/{id}": {
+      "delete": {
+        "tags": [
+          "sessoes"
+        ],
+        "summary": "DELETE /api/sessoes/{id}",
+        "operationId": "delete__api_sessoes_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/perfil": {
+      "get": {
+        "tags": [
+          "perfil"
+        ],
+        "summary": "GET /api/perfil",
+        "operationId": "get__api_perfil",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "perfil"
+        ],
+        "summary": "PUT /api/perfil",
+        "operationId": "put__api_perfil",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "perfil"
+        ],
+        "summary": "PATCH /api/perfil",
+        "operationId": "patch__api_perfil",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/empresa": {
+      "get": {
+        "tags": [
+          "empresa"
+        ],
+        "summary": "GET /api/empresa",
+        "operationId": "get__api_empresa",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "empresa"
+        ],
+        "summary": "PUT /api/empresa",
+        "operationId": "put__api_empresa",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/empresa/renovar-codigo": {
+      "post": {
+        "tags": [
+          "empresa"
+        ],
+        "summary": "POST /api/empresa/renovar-codigo",
+        "operationId": "post__api_empresa_renovar_codigo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/setores": {
+      "get": {
+        "tags": [
+          "setores"
+        ],
+        "summary": "GET /api/setores",
+        "operationId": "get__api_setores",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "setores"
+        ],
+        "summary": "POST /api/setores",
+        "operationId": "post__api_setores",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/setores/{id}": {
+      "put": {
+        "tags": [
+          "setores"
+        ],
+        "summary": "PUT /api/setores/{id}",
+        "operationId": "put__api_setores_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "setores"
+        ],
+        "summary": "PATCH /api/setores/{id}",
+        "operationId": "patch__api_setores_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "setores"
+        ],
+        "summary": "DELETE /api/setores/{id}",
+        "operationId": "delete__api_setores_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/categorias": {
+      "get": {
+        "tags": [
+          "categorias"
+        ],
+        "summary": "GET /api/categorias",
+        "operationId": "get__api_categorias",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "categorias"
+        ],
+        "summary": "POST /api/categorias",
+        "operationId": "post__api_categorias",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categorias/{id}": {
+      "put": {
+        "tags": [
+          "categorias"
+        ],
+        "summary": "PUT /api/categorias/{id}",
+        "operationId": "put__api_categorias_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "categorias"
+        ],
+        "summary": "DELETE /api/categorias/{id}",
+        "operationId": "delete__api_categorias_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/usuarios": {
+      "get": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "GET /api/usuarios",
+        "operationId": "get__api_usuarios",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "POST /api/usuarios",
+        "operationId": "post__api_usuarios",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios/{id}": {
+      "put": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "PUT /api/usuarios/{id}",
+        "operationId": "put__api_usuarios_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "PATCH /api/usuarios/{id}",
+        "operationId": "patch__api_usuarios_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ordens": {
+      "get": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "GET /api/ordens",
+        "operationId": "get__api_ordens",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "POST /api/ordens",
+        "operationId": "post__api_ordens",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ordens/{id}": {
+      "get": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "GET /api/ordens/{id}",
+        "operationId": "get__api_ordens_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "PATCH /api/ordens/{id}",
+        "operationId": "patch__api_ordens_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "PUT /api/ordens/{id}",
+        "operationId": "put__api_ordens_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ordens/{id}/cancelar": {
+      "patch": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "PATCH /api/ordens/{id}/cancelar",
+        "operationId": "patch__api_ordens_id_cancelar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ordens/{id}/comentarios": {
+      "post": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "POST /api/ordens/{id}/comentarios",
+        "operationId": "post__api_ordens_id_comentarios",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ordens/{id}/anexos": {
+      "post": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "POST /api/ordens/{id}/anexos",
+        "operationId": "post__api_ordens_id_anexos",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "arquivo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ordens/{id}/anexos/{arquivo}": {
+      "get": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "GET /api/ordens/{id}/anexos/{arquivo}",
+        "operationId": "get__api_ordens_id_anexos_arquivo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "arquivo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ordens"
+        ],
+        "summary": "DELETE /api/ordens/{id}/anexos/{arquivo}",
+        "operationId": "delete__api_ordens_id_anexos_arquivo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "arquivo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "GET /api/dashboard",
+        "operationId": "get__api_dashboard",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/relatorios": {
+      "get": {
+        "tags": [
+          "relatorios"
+        ],
+        "summary": "GET /api/relatorios",
+        "operationId": "get__api_relatorios",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/relatorios/csv": {
+      "get": {
+        "tags": [
+          "relatorios"
+        ],
+        "summary": "GET /api/relatorios/csv",
+        "operationId": "get__api_relatorios_csv",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/notificacoes": {
+      "get": {
+        "tags": [
+          "notificacoes"
+        ],
+        "summary": "GET /api/notificacoes",
+        "operationId": "get__api_notificacoes",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "notificacoes"
+        ],
+        "summary": "PATCH /api/notificacoes",
+        "operationId": "patch__api_notificacoes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notificacoes/{id}": {
+      "put": {
+        "tags": [
+          "notificacoes"
+        ],
+        "summary": "PUT /api/notificacoes/{id}",
+        "operationId": "put__api_notificacoes_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "notificacoes"
+        ],
+        "summary": "PATCH /api/notificacoes/{id}",
+        "operationId": "patch__api_notificacoes_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "notificacoes"
+        ],
+        "summary": "DELETE /api/notificacoes/{id}",
+        "operationId": "delete__api_notificacoes_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/auditoria": {
+      "get": {
+        "tags": [
+          "auditoria"
+        ],
+        "summary": "GET /api/auditoria",
+        "operationId": "get__api_auditoria",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/conhecimento/{id}/visualizacao": {
+      "post": {
+        "tags": [
+          "conhecimento"
+        ],
+        "summary": "POST /api/conhecimento/{id}/visualizacao",
+        "operationId": "post__api_conhecimento_id_visualizacao",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conhecimento/{id}/util": {
+      "post": {
+        "tags": [
+          "conhecimento"
+        ],
+        "summary": "POST /api/conhecimento/{id}/util",
+        "operationId": "post__api_conhecimento_id_util",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conhecimento": {
+      "get": {
+        "tags": [
+          "conhecimento"
+        ],
+        "summary": "GET /api/conhecimento",
+        "operationId": "get__api_conhecimento",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Opcional. Sem paginação retorna array; com paginação retorna envelope."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "conhecimento"
+        ],
+        "summary": "POST /api/conhecimento",
+        "operationId": "post__api_conhecimento",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conhecimento/{id}": {
+      "put": {
+        "tags": [
+          "conhecimento"
+        ],
+        "summary": "PUT /api/conhecimento/{id}",
+        "operationId": "put__api_conhecimento_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "conhecimento"
+        ],
+        "summary": "DELETE /api/conhecimento/{id}",
+        "operationId": "delete__api_conhecimento_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/chats": {
+      "get": {
+        "tags": [
+          "chats"
+        ],
+        "summary": "GET /api/chats",
+        "operationId": "get__api_chats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "chats"
+        ],
+        "summary": "POST /api/chats",
+        "operationId": "post__api_chats",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/{id}/leitura": {
+      "patch": {
+        "tags": [
+          "chats"
+        ],
+        "summary": "PATCH /api/chats/{id}/leitura",
+        "operationId": "patch__api_chats_id_leitura",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/{id}/mensagens": {
+      "get": {
+        "tags": [
+          "chats"
+        ],
+        "summary": "GET /api/chats/{id}/mensagens",
+        "operationId": "get__api_chats_id_mensagens",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "chats"
+        ],
+        "summary": "POST /api/chats/{id}/mensagens",
+        "operationId": "post__api_chats_id_mensagens",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/perfil/avatar": {
+      "post": {
+        "tags": [
+          "perfil"
+        ],
+        "summary": "POST /api/perfil/avatar",
+        "operationId": "post__api_perfil_avatar",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/avatares/{id}": {
+      "get": {
+        "tags": [
+          "avatares"
+        ],
+        "summary": "GET /api/avatares/{id}",
+        "operationId": "get__api_avatares_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        }
+      }
+    },
+    "/api/auth/esqueci-senha": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "POST /api/auth/esqueci-senha",
+        "operationId": "post__api_auth_esqueci_senha",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/redefinir-senha": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "POST /api/auth/redefinir-senha",
+        "operationId": "post__api_auth_redefinir_senha",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/solicitar-verificacao": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "POST /api/auth/solicitar-verificacao",
+        "operationId": "post__api_auth_solicitar_verificacao",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/confirmar-email": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "POST /api/auth/confirmar-email",
+        "operationId": "post__api_auth_confirmar_email",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação concluída. Consulte o guia para o formato da resposta."
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Token ausente, inválido, expirado ou sessão revogada"
+          },
+          "403": {
+            "description": "Perfil sem permissão"
+          },
+          "404": {
+            "description": "Registro inexistente ou fora do escopo do usuário"
+          },
+          "409": {
+            "description": "Conflito ou transição inválida"
+          },
+          "429": {
+            "description": "Limite de requisições"
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

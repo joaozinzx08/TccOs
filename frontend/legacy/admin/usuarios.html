@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários - Admin | Gestão OS</title>
+    <script src="../js/i18n.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+<link rel="icon" type="image/png" href="../assets/logo.png">    <style>
+        .stats-users {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-user-card {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+        .stat-user-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--blue-200); }
+        .stat-user-card.active { background: var(--gradient-primary); color: #fff; border-color: transparent; }
+        .stat-user-card.active .stat-user-label { color: rgba(255,255,255,0.9); }
+        .stat-user-icon {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: var(--blue-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        [data-theme="dark"] .stat-user-icon { background: #1e3a8a; }
+        .stat-user-card.active .stat-user-icon { background: rgba(255,255,255,0.2); }
+        .stat-user-info { flex: 1; min-width: 0; }
+        .stat-user-label {
+            display: block;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+        .stat-user-value { display: block; font-size: 1.375rem; font-weight: 800; line-height: 1.1; }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .filters-title { font-size: 0.875rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+        .filters-clear {
+            font-size: 0.8125rem;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font);
+        }
+        .filters-clear:hover { background: var(--blue-50); }
+        [data-theme="dark"] .filters-clear:hover { background: #1e3a8a; }
+
+        .table-container { overflow-x: auto; }
+        .table-users { width: 100%; border-collapse: collapse; font-size: 0.875rem; min-width: 900px; }
+        .table-users thead { background: var(--gray-50); }
+        [data-theme="dark"] .table-users thead { background: #1a2332; }
+        .table-users th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--gray-200);
+            white-space: nowrap;
+        }
+        [data-theme="dark"] .table-users th { border-bottom-color: #2d3748; }
+        .table-users td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--text);
+            vertical-align: middle;
+        }
+        [data-theme="dark"] .table-users td { border-bottom-color: #2d3748; }
+        .table-users tbody tr { transition: var(--transition); }
+        .table-users tbody tr:hover { background: var(--gray-50); }
+        [data-theme="dark"] .table-users tbody tr:hover { background: #1a2332; }
+        .table-users tbody tr:last-child td { border-bottom: none; }
+
+        .user-cell { display: flex; align-items: center; gap: 12px; }
+        .user-avatar-small {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            overflow: hidden;
+        }
+        .user-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
+        .user-details { display: flex; flex-direction: column; min-width: 0; }
+        .user-name-cell {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9375rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+        }
+        .user-email-cell {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .role-admin-principal { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #78350f; }
+        .role-admin-setor { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; }
+        .role-gestor { background: linear-gradient(135deg, #dbeafe 0%, #dbeafe 100%); color: #1e40af; }
+        .role-colaborador { background: var(--gray-100); color: var(--gray-700); }
+        [data-theme="dark"] .role-admin-principal { background: #78350f; color: #fcd34d; }
+        [data-theme="dark"] .role-admin-setor { background: #1e3a8a; color: #93c5fd; }
+        [data-theme="dark"] .role-gestor { background: #172554; color: #93c5fd; }
+        [data-theme="dark"] .role-colaborador { background: #2d3748; color: #cbd5e1; }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-indicator.ativo { color: var(--success); }
+        .status-indicator.ativo::before { background: var(--success); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
+        .status-indicator.inativo { color: var(--text-muted); }
+        .status-indicator.inativo::before { background: var(--gray-400); }
+
+        .setor-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: var(--blue-50);
+            color: var(--blue-700);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        [data-theme="dark"] .setor-tag { background: #1e3a8a; color: #93c5fd; }
+        .setor-tag.sem-setor { background: var(--gray-100); color: var(--text-muted); }
+        [data-theme="dark"] .setor-tag.sem-setor { background: #2d3748; color: #94a3b8; }
+
+        .table-actions { display: flex; gap: 4px; justify-content: center; }
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9375rem;
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+        .action-btn:hover { background: var(--gray-100); color: var(--primary); transform: scale(1.1); }
+        [data-theme="dark"] .action-btn:hover { background: #2d3748; }
+        .action-btn.danger:hover { color: var(--danger); }
+        .action-btn.success:hover { color: var(--success); }
+
+        .modal-content { max-width: 560px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-grid .full-width { grid-column: 1 / -1; }
+
+        .avatar-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+        .avatar-preview-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+            overflow: hidden;
+        }
+        .avatar-preview-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-preview-hint { font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+
+        .danger-box {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.8125rem;
+            color: #991b1b;
+            line-height: 1.5;
+            margin-top: 8px;
+        }
+        [data-theme="dark"] .danger-box { background: #7f1d1d; border-color: #991b1b; color: #fca5a5; }
+
+        @media (max-width: 1024px) { .stats-users { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) {
+            .stats-users { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .stat-user-card { padding: 12px; gap: 8px; }
+            .stat-user-icon { width: 36px; height: 36px; font-size: 1rem; }
+            .stat-user-value { font-size: 1.125rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .table-users { font-size: 0.75rem; }
+            .table-users th, .table-users td { padding: 10px 12px; }
+            .user-name-cell, .user-email-cell { max-width: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR (MENU FIXO) -->
+        <nav class="sidebar">
+    <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px;">
+        <img src="../assets/logo.png" alt="Gestão OS" style="height: 32px; width: auto;">
+        <span class="brand">Gestão OS</span>
+    </div>
+
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">[[icone:usuario]]</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Carregando...</span>
+                    <span class="user-role" id="user-role">Admin</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                <li class="active"><a href="usuarios.html"><span class="menu-icon">[[icone:equipe]]</span> Usuários</a></li>
+                <li><a href="setores.html"><span class="menu-icon">[[icone:setores]]</span> Setores</a></li>
+                <li><a href="ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                <li><a href="kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                <li><a href="calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                <li><a href="relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
+                <li><a href="auditoria.html"><span class="menu-icon">[[icone:buscar]]</span> Auditoria</a></li>
+                <li class="divider"></li>
+                <li><a href="empresa.html"><span class="menu-icon">[[icone:empresa]]</span> Minha Empresa</a></li>
+                <li><a href="conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
+                <li><a href="chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                <li class="divider"></li>
+                <li><a href="perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                <li><a href="configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
+                <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle">[[icone:menu]]</button>
+                    <h1>Usuários</h1>
+                    <div class="breadcrumb">
+                        <span>Admin</span>
+                        <span>/</span>
+                        <span>Usuários</span>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-outline btn-sm" onclick="carregarDados()" style="font-size:0.75rem; padding:6px 12px;">[[icone:atualizar]] Atualizar</button>
+                    <button class="btn-icon" onclick="window.location.href='notificacoes.html'" style="position:relative;">
+                        [[icone:notificacao]]
+                        <span id="notificacoes-badge" class="badge badge-danger" style="position:absolute;top:-4px;right:-8px;font-size:10px;padding:2px 6px;min-width:18px;justify-content:center;">0</span>
+                    </button>
+                    <button id="theme-toggle" class="btn-icon">[[icone:lua]]</button>
+                    <button class="btn btn-primary" onclick="abrirModalNovoUsuario()">[[icone:adicionar]] Novo Usuário</button>
+                </div>
+            </header>
+
+            <!-- STATS -->
+            <div class="stats-users">
+                <div class="stat-user-card active" data-filter="todos" onclick="filtrarPorTipo('todos', this)">
+                    <div class="stat-user-icon">[[icone:equipe]]</div>
+                    <div class="stat-user-info">
+                        <span class="stat-user-label">Total</span>
+                        <span class="stat-user-value" id="count-todos">0</span>
+                    </div>
+                </div>
+                <div class="stat-user-card" data-filter="administrador" onclick="filtrarPorTipo('administrador', this)">
+                    <div class="stat-user-icon">[[icone:estrela]]</div>
+                    <div class="stat-user-info">
+                        <span class="stat-user-label">Admins</span>
+                        <span class="stat-user-value" id="count-admins">0</span>
+                    </div>
+                </div>
+                <div class="stat-user-card" data-filter="gestor" onclick="filtrarPorTipo('gestor', this)">
+                    <div class="stat-user-icon">[[icone:usuario]]</div>
+                    <div class="stat-user-info">
+                        <span class="stat-user-label">Gestores</span>
+                        <span class="stat-user-value" id="count-gestores">0</span>
+                    </div>
+                </div>
+                <div class="stat-user-card" data-filter="colaborador" onclick="filtrarPorTipo('colaborador', this)">
+                    <div class="stat-user-icon">[[icone:usuario]]</div>
+                    <div class="stat-user-info">
+                        <span class="stat-user-label">Colaboradores</span>
+                        <span class="stat-user-value" id="count-colaboradores">0</span>
+                    </div>
+                </div>
+                <div class="stat-user-card" data-filter="inativos" onclick="filtrarPorTipo('inativos', this)">
+                    <div class="stat-user-icon">[[icone:bloquear]]</div>
+                    <div class="stat-user-info">
+                        <span class="stat-user-label">Inativos</span>
+                        <span class="stat-user-value" id="count-inativos">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filters">
+                <div class="filters-header">
+                    <span class="filters-title">[[icone:buscar]] Filtros</span>
+                    <button class="filters-clear" onclick="limparFiltros()">✕ Limpar filtros</button>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+                    <input type="text" id="search-user" placeholder="Buscar por nome ou e-mail..." oninput="aplicarFiltros()">
+                    <select id="filter-role" onchange="aplicarFiltros()">
+                        <option value="">Todos os cargos</option>
+                        <option value="administrador_principal">Administrador Principal</option>
+                        <option value="administrador_setor">Administrador de Setor</option>
+                        <option value="gestor">Gestor</option>
+                        <option value="colaborador">Colaborador</option>
+                    </select>
+                    <select id="filter-setor" onchange="aplicarFiltros()">
+                        <option value="">Todos os setores</option>
+                    </select>
+                    <select id="filter-status" onchange="aplicarFiltros()">
+                        <option value="">Todos os status</option>
+                        <option value="ativo">Ativos</option>
+                        <option value="inativo">Inativos</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- INFO -->
+            <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <span style="font-size:0.8125rem; color:var(--text-muted);" id="info-resultados">Carregando...</span>
+            </div>
+
+            <!-- TABELA -->
+            <div class="table-container">
+                <table class="table-users">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Cargo</th>
+                            <th>Setor</th>
+                            <th>Status</th>
+                            <th>Entrada</th>
+                            <th style="text-align: center;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <span class="empty-icon">[[icone:relogio]]</span>
+                                    <h3>Carregando usuários...</h3>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL USUÁRIO -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-user-title">[[icone:adicionar]] Novo Usuário</h2>
+                <button class="close" onclick="fecharModalUsuario()">&times;</button>
+            </div>
+            <form id="user-form">
+                <input type="hidden" id="user-id">
+                <div class="avatar-preview">
+                    <div class="avatar-preview-circle" id="avatar-preview">?</div>
+                    <div class="avatar-preview-hint">O avatar será gerado automaticamente com base no nome</div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="user-nome">Nome Completo <span style="color:var(--danger);">*</span></label>
+                        <input type="text" id="user-nome" required placeholder="Ex: João Silva" maxlength="100" autocomplete="off">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="user-email">E-mail <span style="color:var(--danger);">*</span></label>
+                        <input type="email" id="user-email" required placeholder="joao@empresa.com" maxlength="150" autocomplete="off">
+                    </div>
+                    <div class="form-group full-width" id="password-group">
+                        <label for="user-senha">Senha <span style="color:var(--danger);">*</span></label>
+                        <div style="position:relative;">
+                            <input type="password" id="user-senha" placeholder="Mínimo 8 caracteres" minlength="8" maxlength="100" autocomplete="new-password" style="padding-right:44px;">
+                            <button type="button" id="toggle-senha" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;padding:8px;color:var(--text-muted);border-radius:6px;">[[icone:visualizar]]</button>
+                        </div>
+                        <small id="password-hint">Mínimo 8 caracteres</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-role-input">Cargo <span style="color:var(--danger);">*</span></label>
+                        <select id="user-role-input" required>
+                            <option value="colaborador">Colaborador</option>
+                            <option value="gestor">Gestor</option>
+                            <option value="administrador_setor">Admin de Setor</option>
+                            <option value="administrador_principal">Admin Principal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-setor">Setor</label>
+                        <select id="user-setor">
+                            <option value="">Sem setor</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width" id="status-group">
+                        <label for="user-status">Status da Conta</label>
+                        <select id="user-status">
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex; gap:12px; margin-top:24px; justify-content:flex-end; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModalUsuario()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-salvar-user">Criar Usuário</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DELETE -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content" style="max-width: 460px;">
+            <div class="modal-header">
+                <h2>[[icone:alerta]] Desativar Usuário</h2>
+                <button class="close" onclick="fecharModalDelete()">&times;</button>
+            </div>
+            <div style="text-align:center; padding:16px 0;">
+                <div style="font-size:3rem; margin-bottom:12px;">[[icone:bloquear]]</div>
+                <p style="color:var(--text-secondary); margin-bottom:16px;">Tem certeza que deseja <strong>desativar</strong> o usuário:</p>
+                <p style="font-size:1.125rem; font-weight:700; color:var(--text); margin-bottom:8px;" id="delete-user-name">—</p>
+                <p style="font-size:0.8125rem; color:var(--text-muted);">O usuário não poderá mais fazer login. Você pode reativá-lo a qualquer momento.</p>
+            </div>
+            <div class="danger-box">
+                <span>[[icone:alerta]]</span>
+                <div>
+                    <strong>Ação importante</strong>
+                    <div style="margin-top:4px; font-size:0.75rem;">Todas as ordens de serviço deste usuário permanecerão no sistema.</div>
+                </div>
+            </div>
+            <div style="display:flex; gap:12px; margin-top:24px; justify-content:flex-end; flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary" onclick="fecharModalDelete()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirmar-delete">[[icone:bloquear]] Desativar Usuário</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <script>
+        // ==========================================
+        // PROTEÇÃO
+        // ==========================================
+        var usuarioAtual = getUsuario();
+
+        if (!protegerPagina(['administrador_principal', 'administrador_setor'])) {
+            throw new Error('Acesso negado');
+        }
+
+        var isAdminPrincipal = usuarioAtual.role === 'administrador_principal';
+
+        // ==========================================
+        // ESTADO
+        // ==========================================
+        var usuarios = [];
+        var setores = [];
+        var filtroTipoAtual = 'todos';
+        var userParaDeletar = null;
+
+        // ==========================================
+        // USUÁRIO NA SIDEBAR
+        // ==========================================
+        function carregarInfoUsuario() {
+            if (!usuarioAtual) return;
+            var primeiroNome = usuarioAtual.nome.split(' ')[0];
+            document.getElementById('user-name').textContent = usuarioAtual.nome;
+            document.getElementById('user-role').textContent = isAdminPrincipal ? 'Admin Principal' : 'Admin de Setor';
+
+            var avatarEl = document.getElementById('sidebar-avatar');
+            if (usuarioAtual.avatar) {
+                avatarEl.innerHTML = '<img src="' + window.avatarURL(usuarioAtual.avatar) + '" alt="Avatar">';
+            } else {
+                avatarEl.textContent = primeiroNome.charAt(0).toUpperCase();
+            }
+        }
+
+        // ==========================================
+        // CARREGAR DADOS
+        // ==========================================
+        async function carregarDados() {
+            try {
+                console.log('[[icone:atualizar]] Carregando usuários...');
+                var token = localStorage.getItem('token');
+                var headers = { 'Authorization': 'Bearer ' + token };
+
+                var results = await Promise.allSettled([
+                    fetch('http://localhost:3000/api/usuarios?gestao=1', { headers: headers }).then(function(r) { return r.json(); }),
+                    fetch('http://localhost:3000/api/setores', { headers: headers }).then(function(r) { return r.json(); })
+                ]);
+
+                usuarios = (results[0].status === 'fulfilled' ? results[0].value : []) || [];
+                setores = (results[1].status === 'fulfilled' ? results[1].value : []) || [];
+                if (!isAdminPrincipal) setores = setores.filter(function(s) { return s.id === usuarioAtual.setorId; });
+
+                console.log('[[icone:equipe]] Usuários:', usuarios.length, '| Setores:', setores.length);
+
+                preencherSelectSetores();
+                renderizarUsuarios();
+                atualizarStats();
+                carregarNotificacoes();
+
+            } catch (e) {
+                console.error('[[icone:fechar]] Erro:', e);
+            }
+        }
+
+        // ==========================================
+        // PREENCHER SELECTS
+        // ==========================================
+        function preencherSelectSetores() {
+            var selectFiltro = document.getElementById('filter-setor');
+            var selectForm = document.getElementById('user-setor');
+
+            selectFiltro.innerHTML = '<option value="">Todos os setores</option>';
+            selectForm.innerHTML = '<option value="">Sem setor</option>';
+
+            setores.filter(function(s) { return s.ativo !== false; }).forEach(function(setor) {
+                selectFiltro.innerHTML += '<option value="' + setor.id + '">' + setor.nome + '</option>';
+                selectForm.innerHTML += '<option value="' + setor.id + '">' + setor.nome + '</option>';
+            });
+            if (!isAdminPrincipal) {
+                selectForm.value = usuarioAtual.setorId;
+                selectForm.disabled = true;
+                document.querySelectorAll('#user-role-input option').forEach(function(option) {
+                    option.disabled = !['gestor', 'colaborador'].includes(option.value);
+                });
+            }
+        }
+
+        // ==========================================
+        // STATS
+        // ==========================================
+        function atualizarStats() {
+            var total = usuarios.length;
+            var admins = usuarios.filter(function(u) {
+                return u.role === 'administrador_principal' || u.role === 'administrador_setor';
+            }).length;
+            var gestores = usuarios.filter(function(u) { return u.role === 'gestor'; }).length;
+            var colaboradores = usuarios.filter(function(u) { return u.role === 'colaborador'; }).length;
+            var inativos = usuarios.filter(function(u) { return u.ativo === false; }).length;
+
+            document.getElementById('count-todos').textContent = total;
+            document.getElementById('count-admins').textContent = admins;
+            document.getElementById('count-gestores').textContent = gestores;
+            document.getElementById('count-colaboradores').textContent = colaboradores;
+            document.getElementById('count-inativos').textContent = inativos;
+        }
+
+        // ==========================================
+        // FILTROS
+        // ==========================================
+        function filtrarPorTipo(tipo, element) {
+            filtroTipoAtual = tipo;
+            document.querySelectorAll('.stat-user-card').forEach(function(card) { card.classList.remove('active'); });
+            element.classList.add('active');
+            aplicarFiltros();
+        }
+
+        function aplicarFiltros() { renderizarUsuarios(); }
+
+        function limparFiltros() {
+            document.getElementById('search-user').value = '';
+            document.getElementById('filter-role').value = '';
+            document.getElementById('filter-setor').value = '';
+            document.getElementById('filter-status').value = '';
+            filtroTipoAtual = 'todos';
+
+            document.querySelectorAll('.stat-user-card').forEach(function(card) { card.classList.remove('active'); });
+            document.querySelector('[data-filter="todos"]').classList.add('active');
+            renderizarUsuarios();
+        }
+
+        // ==========================================
+        // RENDERIZAR USUÁRIOS
+        // ==========================================
+        function renderizarUsuarios() {
+            var search = document.getElementById('search-user').value.toLowerCase().trim();
+            var role = document.getElementById('filter-role').value;
+            var setorId = document.getElementById('filter-setor').value;
+            var status = document.getElementById('filter-status').value;
+
+            var filtrados = usuarios.filter(function(u) {
+                var matchSearch = !search || 
+                    (u.nome || '').toLowerCase().includes(search) ||
+                    (u.email || '').toLowerCase().includes(search);
+                var matchRole = !role || u.role === role;
+                var matchSetor = !setorId || u.setorId === setorId;
+                var matchStatus = !status || 
+                    (status === 'ativo' ? u.ativo !== false : u.ativo === false);
+                return matchSearch && matchRole && matchSetor && matchStatus;
+            });
+
+            if (filtroTipoAtual !== 'todos') {
+                if (filtroTipoAtual === 'administrador') {
+                    filtrados = filtrados.filter(function(u) {
+                        return u.role === 'administrador_principal' || u.role === 'administrador_setor';
+                    });
+                } else if (filtroTipoAtual === 'inativos') {
+                    filtrados = filtrados.filter(function(u) { return u.ativo === false; });
+                } else {
+                    filtrados = filtrados.filter(function(u) { return u.role === filtroTipoAtual; });
+                }
+            }
+
+            var rolePeso = { 'administrador_principal': 1, 'administrador_setor': 2, 'gestor': 3, 'colaborador': 4 };
+            filtrados.sort(function(a, b) {
+                var pesoA = rolePeso[a.role] || 99;
+                var pesoB = rolePeso[b.role] || 99;
+                if (pesoA !== pesoB) return pesoA - pesoB;
+                return (a.nome || '').localeCompare(b.nome || '');
+            });
+
+            var infoEl = document.getElementById('info-resultados');
+            infoEl.textContent = filtrados.length === 0 
+                ? 'Nenhum resultado' 
+                : 'Mostrando ' + filtrados.length + ' de ' + usuarios.length + ' usuário(s)';
+
+            var tbody = document.getElementById('users-table-body');
+
+            if (filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><span class="empty-icon">[[icone:equipe]]</span><h3>Nenhum usuário encontrado</h3><p>Tente ajustar os filtros</p><button class="btn btn-primary" onclick="abrirModalNovoUsuario()" style="margin-top:12px;">[[icone:adicionar]] Novo Usuário</button></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtrados.map(function(user) {
+                var setor = setores.find(function(s) { return s.id === user.setorId; });
+                var inicial = (user.nome || '?').charAt(0).toUpperCase();
+                var isAtivo = user.ativo !== false;
+                var isMe = user.id === usuarioAtual.id;
+
+                var roleLabels = {
+                    'administrador_principal': '[[icone:estrela]] Admin Principal',
+                    'administrador_setor': '[[icone:estrela]] Admin Setor',
+                    'gestor': '[[icone:usuario]] Gestor',
+                    'colaborador': '[[icone:usuario]] Colaborador'
+                };
+                var roleClasses = {
+                    'administrador_principal': 'role-admin-principal',
+                    'administrador_setor': 'role-admin-setor',
+                    'gestor': 'role-gestor',
+                    'colaborador': 'role-colaborador'
+                };
+
+                var podeEditar = isAdminPrincipal || (user.setorId === usuarioAtual.setorId && ['gestor', 'colaborador'].includes(user.role));
+                var podeDeletar = !isMe;
+
+                return '<tr>' +
+                    '<td>' +
+                        '<div class="user-cell">' +
+                            '<div class="user-avatar-small">' + 
+                                (user.avatar ? '<img src="' + window.avatarURL(user.avatar) + '" alt="' + user.nome + '">' : inicial) +
+                            '</div>' +
+                            '<div class="user-details">' +
+                                '<span class="user-name-cell">' + user.nome + (isMe ? ' <span style="color:var(--primary);font-size:0.75rem;">(você)</span>' : '') + '</span>' +
+                                '<span class="user-email-cell">' + user.email + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td><span class="role-badge ' + (roleClasses[user.role] || '') + '">' + (roleLabels[user.role] || user.role) + '</span></td>' +
+                    '<td>' + (setor ? '<span class="setor-tag">[[icone:setores]] ' + setor.nome + '</span>' : '<span class="setor-tag sem-setor">— Sem setor</span>') + '</td>' +
+                    '<td><span class="status-indicator ' + (isAtivo ? 'ativo' : 'inativo') + '">' + (isAtivo ? 'Ativo' : 'Inativo') + '</span></td>' +
+                    '<td style="font-size:0.8125rem;color:var(--text-muted);">' + (user.dataCriacao ? formatDateShort(user.dataCriacao) : '—') + '</td>' +
+                    '<td><div class="table-actions">' +
+                        (podeEditar ? '<button class="action-btn" onclick="abrirModalEditarUsuario(\'' + user.id + '\')" title="Editar">[[icone:editar]]</button>' : '') +
+                        (podeDeletar ? '<button class="action-btn ' + (isAtivo ? 'danger' : 'success') + '" onclick="' + (isAtivo ? 'abrirModalDelete' : 'reativarUsuario') + '(\'' + user.id + '\')" title="' + (isAtivo ? 'Desativar' : 'Reativar') + '">' + (isAtivo ? '[[icone:bloquear]]' : '[[icone:confirmar]]') + '</button>' : '') +
+                    '</div></td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        // ==========================================
+        // MODAL NOVO USUÁRIO
+        // ==========================================
+        function abrirModalNovoUsuario() {
+            document.getElementById('modal-user-title').textContent = '[[icone:adicionar]] Novo Usuário';
+            document.getElementById('user-form').reset();
+            if (!isAdminPrincipal) {
+                document.getElementById('user-setor').value = usuarioAtual.setorId;
+                document.getElementById('user-role-input').value = 'colaborador';
+            }
+            document.getElementById('user-id').value = '';
+            document.getElementById('avatar-preview').textContent = '?';
+            document.getElementById('password-group').style.display = 'block';
+            document.getElementById('password-hint').textContent = 'Mínimo 8 caracteres';
+            document.getElementById('user-senha').required = true;
+            document.getElementById('user-senha').placeholder = 'Mínimo 8 caracteres';
+            document.getElementById('status-group').style.display = 'none';
+            document.getElementById('btn-salvar-user').textContent = 'Criar Usuário';
+            document.getElementById('user-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ==========================================
+        // MODAL EDITAR USUÁRIO
+        // ==========================================
+        function abrirModalEditarUsuario(id) {
+            var user = usuarios.find(function(u) { return u.id === id; });
+            if (!user) return;
+
+            document.getElementById('modal-user-title').textContent = '[[icone:editar]] Editar Usuário';
+            document.getElementById('user-id').value = user.id;
+            document.getElementById('user-nome').value = user.nome || '';
+            document.getElementById('user-email').value = user.email || '';
+            document.getElementById('user-role-input').value = user.role || 'colaborador';
+            document.getElementById('user-setor').value = user.setorId || '';
+            document.getElementById('user-status').value = user.ativo !== false ? 'true' : 'false';
+            document.getElementById('user-senha').value = '';
+            document.getElementById('user-senha').required = false;
+            document.getElementById('user-senha').placeholder = 'Deixe em branco para não alterar';
+            document.getElementById('password-hint').textContent = 'Deixe em branco para manter a senha atual';
+            document.getElementById('status-group').style.display = 'block';
+            document.getElementById('btn-salvar-user').textContent = 'Salvar Alterações';
+
+            var preview = document.getElementById('avatar-preview');
+            if (user.avatar) {
+                preview.innerHTML = '<img src="' + window.avatarURL(user.avatar) + '" alt="' + user.nome + '">';
+            } else {
+                preview.textContent = (user.nome || '?').charAt(0).toUpperCase();
+            }
+
+            document.getElementById('user-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModalUsuario() {
+            document.getElementById('user-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // ==========================================
+        // TOGGLE SENHA
+        // ==========================================
+        document.getElementById('toggle-senha').addEventListener('click', function() {
+            var input = document.getElementById('user-senha');
+            var isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? '[[icone:ocultar]]' : '[[icone:visualizar]]';
+        });
+
+        // ==========================================
+        // PREVIEW AVATAR EM TEMPO REAL
+        // ==========================================
+        document.getElementById('user-nome').addEventListener('input', function() {
+            var preview = document.getElementById('avatar-preview');
+            if (preview.querySelector('img')) return;
+            preview.textContent = this.value ? this.value.charAt(0).toUpperCase() : '?';
+        });
+
+        // ==========================================
+        // SUBMIT FORM
+        // ==========================================
+        document.getElementById('user-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            var id = document.getElementById('user-id').value;
+            var nome = document.getElementById('user-nome').value.trim();
+            var email = document.getElementById('user-email').value.trim();
+            var senha = document.getElementById('user-senha').value;
+            var role = document.getElementById('user-role-input').value;
+            var setorId = document.getElementById('user-setor').value || null;
+            var ativo = document.getElementById('user-status').value === 'true';
+
+            if (!nome || nome.length < 2) { showToast('Nome muito curto', 'error'); return; }
+            if (!email || !validarEmail(email)) { showToast('E-mail inválido', 'error'); return; }
+            if (!id && (!senha || senha.length < 8)) { showToast('Senha deve ter no mínimo 8 caracteres', 'error'); return; }
+            if (id && senha && senha.length < 8) { showToast('Nova senha muito curta', 'error'); return; }
+            if ((role === 'gestor' || role === 'administrador_setor') && !setorId) {
+                showToast('Gestores e Admins de Setor precisam estar em um setor', 'error');
+                return;
+            }
+
+            var btnSalvar = document.getElementById('btn-salvar-user');
+            btnSalvar.disabled = true;
+            btnSalvar.innerHTML = '[[icone:relogio]] Salvando...';
+
+            try {
+                if (id) {
+                    var body = { nome: nome, email: email, role: role, setorId: setorId, ativo: ativo };
+                    if (senha) body.senha = senha;
+                    await apiRequest('/usuarios/' + id, {
+                        method: 'PUT',
+                        body: JSON.stringify(body)
+                    });
+                    showToast('[[icone:confirmar]] Usuário atualizado!', 'success');
+                } else {
+                    await apiRequest('/usuarios', {
+                        method: 'POST',
+                        body: JSON.stringify({ nome: nome, email: email, senha: senha, role: role, setorId: setorId })
+                    });
+                    showToast('[[icone:confirmar]] Usuário criado!', 'success');
+                }
+
+                fecharModalUsuario();
+                await carregarDados();
+
+            } catch (error) {
+                var msg = error.message;
+                if (msg.includes('já está cadastrado') || msg.includes('duplicate')) msg = 'Este e-mail já está cadastrado';
+                showToast(msg, 'error');
+            } finally {
+                btnSalvar.disabled = false;
+                btnSalvar.textContent = id ? 'Salvar Alterações' : 'Criar Usuário';
+            }
+        });
+
+        // ==========================================
+        // MODAL DELETE
+        // ==========================================
+        function abrirModalDelete(id) {
+            var user = usuarios.find(function(u) { return u.id === id; });
+            if (!user) return;
+            userParaDeletar = id;
+            document.getElementById('delete-user-name').textContent = user.nome;
+            document.getElementById('delete-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModalDelete() {
+            document.getElementById('delete-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            userParaDeletar = null;
+        }
+
+        document.getElementById('btn-confirmar-delete').addEventListener('click', async function() {
+            if (!userParaDeletar) return;
+            var btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '[[icone:relogio]] Desativando...';
+
+            try {
+                await apiRequest('/usuarios/' + userParaDeletar, {
+                    method: 'PUT',
+                    body: JSON.stringify({ ativo: false })
+                });
+                showToast('[[icone:confirmar]] Usuário desativado', 'success');
+                fecharModalDelete();
+                await carregarDados();
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '[[icone:bloquear]] Desativar Usuário';
+            }
+        });
+
+        // ==========================================
+        // REATIVAR USUÁRIO
+        // ==========================================
+        async function reativarUsuario(id) {
+            var user = usuarios.find(function(u) { return u.id === id; });
+            if (!user) return;
+            if (!confirm('Reativar o usuário "' + user.nome + '"?')) return;
+
+            try {
+                await apiRequest('/usuarios/' + id, {
+                    method: 'PUT',
+                    body: JSON.stringify({ ativo: true })
+                });
+                showToast('[[icone:confirmar]] Usuário reativado', 'success');
+                await carregarDados();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // ==========================================
+        // NOTIFICAÇÕES
+        // ==========================================
+        async function carregarNotificacoes() {
+            try {
+                var token = localStorage.getItem('token');
+                var r = await fetch('http://localhost:3000/api/notificacoes', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                var d = await r.json();
+                var b = document.getElementById('notificacoes-badge');
+                if (b) {
+                    var n = d.naoLidas || 0;
+                    b.textContent = n;
+                    b.style.display = n > 0 ? 'inline-flex' : 'none';
+                }
+            } catch (e) {}
+        }
+
+        // ==========================================
+        // FECHAR MODAIS
+        // ==========================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('user-modal').style.display === 'flex') fecharModalUsuario();
+                if (document.getElementById('delete-modal').style.display === 'flex') fecharModalDelete();
+            }
+        });
+
+        window.addEventListener('click', function(e) {
+            var mu = document.getElementById('user-modal');
+            var md = document.getElementById('delete-modal');
+            if (e.target === mu) fecharModalUsuario();
+            if (e.target === md) fecharModalDelete();
+        });
+
+        // ==========================================
+        // INICIALIZAÇÃO (executa direto)
+        // ==========================================
+        console.log('[[icone:estrela]] Usuários iniciando...');
+
+        carregarInfoUsuario();
+        carregarDados();
+
+        var logoutBtn = document.getElementById('logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.clear();
+                window.location.href = '../login.html';
+            });
+        }
+
+        var mt = document.querySelector('.menu-toggle');
+        var sb = document.querySelector('.sidebar');
+        if (mt && sb) {
+            mt.addEventListener('click', function() { sb.classList.toggle('show'); });
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth > 768) return;
+                if (!sb.contains(e.target) && !mt.contains(e.target)) sb.classList.remove('show');
+            });
+        }
+
+        // ==========================================
+        // AUTO-REFRESH A CADA 30 SEGUNDOS
+        // ==========================================
+        setInterval(function() {
+            console.log('[[icone:atualizar]] Auto-refresh usuários...');
+            carregarDados();
+        }, 30000);
+
+        console.log('[[icone:confirmar]] Usuários pronto!');
+    </script>
+
+<script src="../js/icones.js"></script>
+</body>
+</html>

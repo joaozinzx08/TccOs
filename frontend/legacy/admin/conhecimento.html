@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Base de Conhecimento - Gestão OS">
+    <title>Base de Conhecimento - Gestão OS</title>
+    <script src="../js/i18n.js"></script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+<link rel="icon" type="image/png" href="../assets/logo.png">
+    <style>
+        /* ==========================================
+           HERO
+           ========================================== */
+        .kb-hero {
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            margin-bottom: 24px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
+            text-align: center;
+        }
+
+        .kb-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .kb-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .kb-hero-icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .kb-hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .kb-hero p {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 520px;
+            margin: 0 auto 24px;
+            line-height: 1.6;
+        }
+
+        .kb-search-hero {
+            max-width: 560px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .kb-search-hero input {
+            width: 100%;
+            padding: 16px 52px 16px 52px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-size: 1rem;
+            font-family: var(--font);
+            transition: var(--transition);
+        }
+
+        .kb-search-hero input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .kb-search-hero input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .kb-search-hero .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+            pointer-events: none;
+        }
+
+        /* ==========================================
+           STATS
+           ========================================== */
+        .kb-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .kb-stat-card {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: var(--radius);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        [data-theme="dark"] .kb-stat-card {
+            border-color: #2d3748;
+        }
+
+        .kb-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--blue-200);
+        }
+
+        .kb-stat-card.active {
+            background: var(--gradient-primary);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .kb-stat-card.active .kb-stat-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .kb-stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: var(--blue-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .kb-stat-icon {
+            background: #1e3a8a;
+        }
+
+        .kb-stat-card.active .kb-stat-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .kb-stat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .kb-stat-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+
+        .kb-stat-value {
+            font-size: 1.25rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        /* ==========================================
+           TOOLBAR
+           ========================================== */
+        .kb-toolbar {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        [data-theme="dark"] .kb-toolbar {
+            border-color: #2d3748;
+        }
+
+        .kb-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .kb-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .kb-filter-select {
+            padding: 8px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-family: var(--font);
+            font-size: 0.8125rem;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .kb-filter-select {
+            border-color: #2d3748;
+        }
+
+        .kb-filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .kb-view-toggle {
+            display: flex;
+            background: var(--gray-100);
+            padding: 4px;
+            border-radius: var(--radius);
+            gap: 2px;
+        }
+
+        [data-theme="dark"] .kb-view-toggle {
+            background: #1a2332;
+        }
+
+        .kb-view-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+
+        .kb-view-btn.active {
+            background: var(--bg-card);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ==========================================
+           GRID DE ARTIGOS
+           ========================================== */
+        .kb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kb-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        .kb-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        [data-theme="dark"] .kb-card {
+            border-color: #2d3748;
+        }
+
+        .kb-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--blue-200);
+        }
+
+        .kb-card.pinned::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .kb-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .kb-card-category {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 10px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .kb-card-pin {
+            font-size: 0.875rem;
+            color: #d97706;
+            flex-shrink: 0;
+        }
+
+        .kb-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .kb-card-summary {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .kb-card-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .kb-tag {
+            font-size: 0.6875rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: var(--gray-100);
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .kb-tag {
+            background: #2d3748;
+        }
+
+        .kb-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding-top: 12px;
+            border-top: 1px solid var(--gray-100);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        [data-theme="dark"] .kb-card-footer {
+            border-top-color: #2d3748;
+        }
+
+        .kb-card-footer-left,
+        .kb-card-footer-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .kb-card-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kb-card-author-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 700;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .kb-card-author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ==========================================
+           EMPTY STATE
+           ========================================== */
+        .kb-empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+
+        .kb-empty-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            display: block;
+            opacity: 0.5;
+        }
+
+        .kb-empty h3 {
+            font-size: 1.25rem;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        /* ==========================================
+           MODAL DE LEITURA
+           ========================================== */
+        .kb-modal-read {
+            max-width: 800px;
+            padding: 0;
+        }
+
+        .kb-read-header {
+            padding: 32px 32px 24px;
+            border-bottom: 1px solid var(--gray-100);
+            position: relative;
+        }
+
+        [data-theme="dark"] .kb-read-header {
+            border-bottom-color: #2d3748;
+        }
+
+        .kb-read-category {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .kb-read-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+
+        .kb-read-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .kb-read-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kb-read-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .kb-read-close {
+            background: #2d3748;
+        }
+
+        .kb-read-close:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .kb-read-body {
+            padding: 32px;
+            font-size: 0.9375rem;
+            line-height: 1.75;
+            color: var(--text);
+        }
+
+        .kb-read-body h1,
+        .kb-read-body h2,
+        .kb-read-body h3 {
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .kb-read-body h1 { font-size: 1.5rem; }
+        .kb-read-body h2 { font-size: 1.25rem; }
+        .kb-read-body h3 { font-size: 1.125rem; }
+
+        .kb-read-body p {
+            margin-bottom: 16px;
+        }
+
+        .kb-read-body ul,
+        .kb-read-body ol {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        .kb-read-body li {
+            margin-bottom: 8px;
+        }
+
+        .kb-read-body code {
+            background: var(--blue-50);
+            color: var(--blue-700);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+
+        [data-theme="dark"] .kb-read-body code {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .kb-read-body blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 16px;
+            margin: 16px 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .kb-read-body strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .kb-read-tags {
+            padding: 0 32px 24px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .kb-read-tag {
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: var(--blue-50);
+            color: var(--blue-700);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .kb-read-tag {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .kb-read-footer {
+            padding: 20px 32px;
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        [data-theme="dark"] .kb-read-footer {
+            border-top-color: #2d3748;
+        }
+
+        .kb-read-helpful {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .kb-helpful-btn {
+            padding: 6px 14px;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            font-family: var(--font);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kb-helpful-btn:hover {
+            background: var(--blue-50);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* ==========================================
+           MODAL DE EDIÇÃO
+           ========================================== */
+        .kb-modal-edit {
+            max-width: 700px;
+        }
+
+        .kb-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .kb-form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .kb-form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 4px;
+        }
+
+        .kb-form-group label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .kb-form-group input,
+        .kb-form-group select,
+        .kb-form-group textarea {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .kb-form-group input,
+        [data-theme="dark"] .kb-form-group select,
+        [data-theme="dark"] .kb-form-group textarea {
+            border-color: #2d3748;
+        }
+
+        .kb-form-group input:focus,
+        .kb-form-group select:focus,
+        .kb-form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .kb-form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.6;
+        }
+
+        .kb-form-group textarea.content-editor {
+            min-height: 250px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8125rem;
+        }
+
+        .kb-form-hint {
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ==========================================
+           CATEGORIAS (cores)
+           ========================================== */
+        .cat-ti { background: #dbeafe; color: #1e40af; }
+        .cat-rh { background: #dbeafe; color: #1e40af; }
+        .cat-producao { background: #d1fae5; color: #065f46; }
+        .cat-manutencao { background: #fef3c7; color: #92400e; }
+        .cat-qualidade { background: #dbeafe; color: #1e40af; }
+        .cat-administracao { background: #e0e7ff; color: #3730a3; }
+        .cat-outros { background: var(--gray-200); color: var(--gray-700); }
+
+        [data-theme="dark"] .cat-ti { background: #1e3a8a; color: #93c5fd; }
+        [data-theme="dark"] .cat-rh { background: #172554; color: #93c5fd; }
+        [data-theme="dark"] .cat-producao { background: #064e3b; color: #6ee7b7; }
+        [data-theme="dark"] .cat-manutencao { background: #78350f; color: #fcd34d; }
+        [data-theme="dark"] .cat-qualidade { background: #172554; color: #bfdbfe; }
+        [data-theme="dark"] .cat-administracao { background: #312e81; color: #a5b4fc; }
+        [data-theme="dark"] .cat-outros { background: #374151; color: #9ca3af; }
+
+        /* ==========================================
+           RESPONSIVO
+           ========================================== */
+        @media (max-width: 1024px) {
+            .kb-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kb-hero {
+                padding: 28px 20px;
+            }
+
+            .kb-hero h1 {
+                font-size: 1.375rem;
+            }
+
+            .kb-hero p {
+                font-size: 0.875rem;
+            }
+
+            .kb-search-hero input {
+                padding: 12px 44px 12px 44px;
+                font-size: 0.875rem;
+            }
+
+            .kb-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .kb-stat-card {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .kb-stat-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .kb-stat-value {
+                font-size: 1rem;
+            }
+
+            .kb-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kb-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kb-read-header,
+            .kb-read-body,
+            .kb-read-tags,
+            .kb-read-footer {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .kb-read-title {
+                font-size: 1.25rem;
+                padding-right: 40px;
+            }
+
+            .kb-read-close {
+                top: 12px;
+                right: 12px;
+                width: 32px;
+                height: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- ============================================
+             SIDEBAR
+             ============================================ -->
+        <nav class="sidebar">
+    <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px;">
+        <img src="../assets/logo.png" alt="Gestão OS" style="height: 32px; width: auto;">
+        <span class="brand">Gestão OS</span>
+    </div>
+
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">[[icone:usuario]]</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Carregando...</span>
+                    <span class="user-role" id="user-role">Admin</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu" id="sidebar-menu">
+                <!-- Preenchido via JS -->
+            </ul>
+        </nav>
+
+        <!-- ============================================
+             CONTEÚDO PRINCIPAL
+             ============================================ -->
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle">[[icone:menu]]</button>
+                    <h1>Base de Conhecimento</h1>
+                    <div class="breadcrumb">
+                        <span id="breadcrumb-tipo">Admin</span>
+                        <span>/</span>
+                        <span>Conhecimento</span>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn-icon" onclick="window.location.href='notificacoes.html'" aria-label="Notificações" style="position:relative;">
+                        [[icone:notificacao]]
+                        <span id="notificacoes-badge" class="badge badge-danger" style="position:absolute;top:-4px;right:-8px;font-size:10px;padding:2px 6px;min-width:18px;justify-content:center;">0</span>
+                    </button>
+                    <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema">[[icone:lua]]</button>
+                    <button class="btn btn-primary" id="btn-novo-artigo" onclick="abrirModalEditar()" style="display:none;">
+                        [[icone:adicionar]] Novo Artigo
+                    </button>
+                </div>
+            </header>
+
+            <!-- HERO -->
+            <div class="kb-hero">
+                <div class="kb-hero-content">
+                    <span class="kb-hero-icon">[[icone:conhecimento]]</span>
+                    <h1>Base de Conhecimento</h1>
+                    <p>Encontre respostas, tutoriais e boas práticas para o dia a dia da sua empresa</p>
+
+                    <div class="kb-search-hero">
+                        <span class="search-icon">[[icone:buscar]]</span>
+                        <input 
+                            type="text" 
+                            id="search-kb" 
+                            placeholder="Buscar artigos, tutoriais, soluções..."
+                            oninput="aplicarFiltros()"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="kb-stats">
+                <div class="kb-stat-card active" data-filter="todos" onclick="filtrarPorTipo('todos', this)">
+                    <div class="kb-stat-icon">[[icone:documento]]</div>
+                    <div class="kb-stat-info">
+                        <div class="kb-stat-label">Total</div>
+                        <div class="kb-stat-value" id="stat-total">0</div>
+                    </div>
+                </div>
+                <div class="kb-stat-card" data-filter="fixados" onclick="filtrarPorTipo('fixados', this)">
+                    <div class="kb-stat-icon">[[icone:kanban]]</div>
+                    <div class="kb-stat-info">
+                        <div class="kb-stat-label">Fixados</div>
+                        <div class="kb-stat-value" id="stat-fixados">0</div>
+                    </div>
+                </div>
+                <div class="kb-stat-card" data-filter="meus" onclick="filtrarPorTipo('meus', this)">
+                    <div class="kb-stat-icon">[[icone:usuario]]</div>
+                    <div class="kb-stat-info">
+                        <div class="kb-stat-label">Meus</div>
+                        <div class="kb-stat-value" id="stat-meus">0</div>
+                    </div>
+                </div>
+                <div class="kb-stat-card" data-filter="recentes" onclick="filtrarPorTipo('recentes', this)">
+                    <div class="kb-stat-icon">[[icone:relogio]]</div>
+                    <div class="kb-stat-info">
+                        <div class="kb-stat-label">Recentes</div>
+                        <div class="kb-stat-value" id="stat-recentes">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOOLBAR -->
+            <div class="kb-toolbar">
+                <div class="kb-toolbar-left">
+                    <select id="filter-categoria" class="kb-filter-select" onchange="aplicarFiltros()">
+                        <option value="">Todas as categorias</option>
+                        <option value="TI">TI / Sistemas</option>
+                        <option value="RH">RH</option>
+                        <option value="Produção">Produção</option>
+                        <option value="Manutenção">Manutenção</option>
+                        <option value="Qualidade">Qualidade</option>
+                        <option value="Administração">Administração</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+
+                    <select id="filter-ordem" class="kb-filter-select" onchange="aplicarFiltros()">
+                        <option value="recentes">Mais recentes</option>
+                        <option value="antigos">Mais antigos</option>
+                        <option value="visualizados">Mais visualizados</option>
+                        <option value="uteis">Mais úteis</option>
+                        <option value="alfabetica">A-Z</option>
+                    </select>
+                </div>
+
+                <div class="kb-toolbar-right">
+                    <div class="kb-view-toggle">
+                        <button class="kb-view-btn active" data-view="grid" onclick="mudarView('grid', this)" title="Grade">
+                            ▦
+                        </button>
+                        <button class="kb-view-btn" data-view="list" onclick="mudarView('list', this)" title="Lista">
+                            [[icone:menu]]
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFO -->
+            <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <span style="font-size:0.8125rem; color:var(--text-muted);" id="info-resultados">
+                    Carregando...
+                </span>
+            </div>
+
+            <!-- GRID -->
+            <div class="kb-grid" id="kb-grid">
+                <div class="kb-empty">
+                    <span class="kb-empty-icon">[[icone:relogio]]</span>
+                    <h3>Carregando artigos...</h3>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ============================================
+         MODAL - LER ARTIGO
+         ============================================ -->
+    <div id="modal-ler" class="modal">
+        <div class="modal-content kb-modal-read">
+            <div id="read-content">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL - CRIAR/EDITAR ARTIGO
+         ============================================ -->
+    <div id="modal-editar" class="modal">
+        <div class="modal-content kb-modal-edit">
+            <div class="modal-header">
+                <h2 id="edit-modal-title">[[icone:adicionar]] Novo Artigo</h2>
+                <button class="close" onclick="fecharModalEditar()">&times;</button>
+            </div>
+
+            <form id="form-artigo" style="padding: 24px;">
+                <input type="hidden" id="artigo-id">
+
+                <div class="kb-form-grid">
+                    <div class="kb-form-group full-width">
+                        <label for="artigo-titulo">Título <span style="color:var(--danger);">*</span></label>
+                        <input 
+                            type="text" 
+                            id="artigo-titulo" 
+                            required 
+                            maxlength="150"
+                            placeholder="Ex: Como configurar a impressora de rede"
+                        >
+                    </div>
+
+                    <div class="kb-form-group">
+                        <label for="artigo-categoria">Categoria <span style="color:var(--danger);">*</span></label>
+                        <select id="artigo-categoria" required>
+                            <option value="TI">TI / Sistemas</option>
+                            <option value="RH">RH</option>
+                            <option value="Produção">Produção</option>
+                            <option value="Manutenção">Manutenção</option>
+                            <option value="Qualidade">Qualidade</option>
+                            <option value="Administração">Administração</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+
+                    <div class="kb-form-group">
+                        <label for="artigo-tags">Tags</label>
+                        <input 
+                            type="text" 
+                            id="artigo-tags" 
+                            placeholder="Ex: impressora, rede, configurar"
+                            maxlength="200"
+                        >
+                        <div class="kb-form-hint">Separe por vírgula</div>
+                    </div>
+
+                    <div class="kb-form-group full-width">
+                        <label for="artigo-resumo">Resumo <span style="color:var(--danger);">*</span></label>
+                        <textarea 
+                            id="artigo-resumo" 
+                            required 
+                            maxlength="300"
+                            rows="2"
+                            placeholder="Um breve resumo do artigo (aparece na listagem)"
+                        ></textarea>
+                        <div class="kb-form-hint"><span id="resumo-char">0</span>/300 caracteres</div>
+                    </div>
+
+                    <div class="kb-form-group full-width">
+                        <label for="artigo-conteudo">Conteúdo <span style="color:var(--danger);">*</span></label>
+                        <textarea 
+                            id="artigo-conteudo" 
+                            required 
+                            class="content-editor"
+                            placeholder="# Título&#10;&#10;Escreva o conteúdo aqui...&#10;&#10;## Passo a passo&#10;1. Primeiro passo&#10;2. Segundo passo&#10;&#10;**Importante:** ..."
+                        ></textarea>
+                        <div class="kb-form-hint">
+                            Dica: Use # para títulos, ## para subtítulos, - para listas, **negrito** para destaque
+                        </div>
+                    </div>
+
+                    <div class="kb-form-group full-width" style="flex-direction: row; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="artigo-fixado" style="width:auto;">
+                        <label for="artigo-fixado" style="margin: 0; cursor: pointer;">
+                            [[icone:kanban]] Fixar no topo da listagem
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top:24px; justify-content:flex-end; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModalEditar()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btn-salvar-artigo">
+                        Salvar Artigo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <script>
+        // ==========================================
+        // PROTEÇÃO
+        // ==========================================
+        const usuarioAtual = getUsuario();
+
+        if (!protegerPagina(['administrador_principal', 'administrador_setor', 'gestor', 'colaborador'])) {
+            throw new Error('Acesso negado');
+        }
+
+        const isGestor = usuarioAtual.role === 'gestor';
+        const isColaborador = usuarioAtual.role === 'colaborador';
+        const isAdmin = usuarioAtual.role === 'administrador_principal' || usuarioAtual.role === 'administrador_setor';
+
+        // Apenas admins e gestores podem criar/editar
+        const podeEditar = isAdmin || isGestor;
+
+        if (podeEditar) {
+            document.getElementById('btn-novo-artigo').style.display = 'inline-flex';
+        }
+
+        document.getElementById('breadcrumb-tipo').textContent = 
+            isAdmin ? 'Admin' : (isGestor ? 'Gestor' : 'Colaborador');
+
+        // ==========================================
+        // ESTADO
+        // ==========================================
+        let artigos = [];
+        let usuarios = [];
+        let filtroTipoAtual = 'todos';
+        let viewAtual = 'grid';
+        let artigoLido = null;
+
+        // ==========================================
+        // CORES DAS CATEGORIAS
+        // ==========================================
+        const CATEGORIAS = {
+            'TI': { icon: '[[icone:computador]]', class: 'cat-ti' },
+            'RH': { icon: '[[icone:equipe]]', class: 'cat-rh' },
+            'Produção': { icon: '[[icone:setores]]', class: 'cat-producao' },
+            'Manutenção': { icon: '[[icone:ferramenta]]', class: 'cat-manutencao' },
+            'Qualidade': { icon: '[[icone:confirmar]]', class: 'cat-qualidade' },
+            'Administração': { icon: '[[icone:ordens]]', class: 'cat-administracao' },
+            'Outros': { icon: '[[icone:kanban]]', class: 'cat-outros' }
+        };
+
+        // ==========================================
+        // MENU LATERAL
+        // ==========================================
+        function renderizarMenuLateral() {
+            const menu = document.getElementById('sidebar-menu');
+            let html = '';
+
+            if (isAdmin) {
+                html = `
+                    <li><a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                    <li><a href="usuarios.html"><span class="menu-icon">[[icone:equipe]]</span> Usuários</a></li>
+                    <li><a href="setores.html"><span class="menu-icon">[[icone:setores]]</span> Setores</a></li>
+                    <li><a href="ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                    <li><a href="kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                    <li><a href="calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                    <li><a href="relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
+                    <li><a href="auditoria.html"><span class="menu-icon">[[icone:buscar]]</span> Auditoria</a></li>
+                    <li class="divider"></li>
+                    <li><a href="empresa.html"><span class="menu-icon">[[icone:empresa]]</span> Minha Empresa</a></li>
+                    <li class="active"><a href="conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
+                    <li><a href="chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                    <li class="divider"></li>
+                    <li><a href="perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                    <li><a href="configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
+                    <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+                `;
+            } else if (isGestor) {
+                html = `
+                    <li><a href="../gestor/dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                    <li><a href="../gestor/ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                    <li><a href="../gestor/kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                    <li><a href="../gestor/calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                    <li><a href="../gestor/relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
+                    <li class="divider"></li>
+                    <li class="active"><a href="../gestor/conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
+                    <li><a href="../gestor/chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                    <li class="divider"></li>
+                    <li><a href="../gestor/perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                    <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+                `;
+            } else {
+                html = `
+                    <li><a href="../colaborador/dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                    <li><a href="../colaborador/minhas-ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Minhas Ordens</a></li>
+                    <li><a href="../colaborador/minhas-ordens.html?acao=nova"><span class="menu-icon">[[icone:adicionar]]</span> Nova OS</a></li>
+                    <li class="divider"></li>
+                    <li class="active"><a href="../colaborador/conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
+                    <li><a href="../colaborador/chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                    <li><a href="../colaborador/perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                    <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+                `;
+            }
+
+            menu.innerHTML = html;
+
+            const logoutBtn = document.getElementById('logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+        }
+
+        // ==========================================
+        // CARREGAR USUÁRIO
+        // ==========================================
+        function carregarInfoUsuario() {
+            if (!usuarioAtual) return;
+            const primeiroNome = usuarioAtual.nome.split(' ')[0];
+
+            document.getElementById('user-name').textContent = usuarioAtual.nome;
+            
+            const roleLabels = {
+                'administrador_principal': 'Admin Principal',
+                'administrador_setor': 'Admin de Setor',
+                'gestor': 'Gestor',
+                'colaborador': 'Colaborador'
+            };
+            document.getElementById('user-role').textContent = roleLabels[usuarioAtual.role] || 'Admin';
+
+            const avatarEl = document.getElementById('sidebar-avatar');
+            if (usuarioAtual.avatar) {
+                avatarEl.innerHTML = `<img src="${window.avatarURL(usuarioAtual.avatar)}" alt="Avatar">`;
+            } else {
+                avatarEl.textContent = primeiroNome.charAt(0).toUpperCase();
+            }
+        }
+
+        // ==========================================
+        // CARREGAR DADOS
+        // ==========================================
+        async function carregarDados() {
+            try { artigos=await apiRequest('/conhecimento');usuarios=await apiRequest('/usuarios');renderizarArtigos();atualizarStats();carregarNotificacoes(); }
+            catch(e){showToast(e.message,'error');}
+        }
+
+        // ==========================================
+        // ARTIGOS PADRÃO
+        // ==========================================
+        function criarArtigosPadrao() { /* Não fabricar artigos nem indicadores. */
+        }
+
+        // ==========================================
+        // SALVAR ARTIGOS
+        // ==========================================
+        function salvarArtigos() { /* Alterações persistem explicitamente na API. */
+        }
+
+        // ==========================================
+        // ATUALIZAR STATS
+        // ==========================================
+        function atualizarStats() {
+            const total = artigos.length;
+            const fixados = artigos.filter(a => a.fixado).length;
+            const meus = artigos.filter(a => a.autorId === usuarioAtual.id).length;
+            
+            // Recentes: últimos 7 dias
+            const seteDias = new Date();
+            seteDias.setDate(seteDias.getDate() - 7);
+            const recentes = artigos.filter(a => new Date(a.criadoEm) >= seteDias).length;
+
+            animarNumero('stat-total', total);
+            animarNumero('stat-fixados', fixados);
+            animarNumero('stat-meus', meus);
+            animarNumero('stat-recentes', recentes);
+        }
+
+        // ==========================================
+        // ANIMAR NÚMERO
+        // ==========================================
+        function animarNumero(elementId, valorFinal) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            const duracao = 600;
+            const inicio = performance.now();
+
+            function animar(tempo) {
+                const progresso = Math.min((tempo - inicio) / duracao, 1);
+                const valorAtual = Math.floor(valorFinal * progresso);
+                el.textContent = valorAtual;
+
+                if (progresso < 1) {
+                    requestAnimationFrame(animar);
+                } else {
+                    el.textContent = valorFinal;
+                }
+            }
+
+            requestAnimationFrame(animar);
+        }
+
+        // ==========================================
+        // FILTRAR POR TIPO
+        // ==========================================
+        function filtrarPorTipo(tipo, element) {
+            filtroTipoAtual = tipo;
+
+            document.querySelectorAll('.kb-stat-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            aplicarFiltros();
+        }
+
+        // ==========================================
+        // MUDAR VIEW
+        // ==========================================
+        function mudarView(view, btn) {
+            viewAtual = view;
+
+            document.querySelectorAll('.kb-view-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const grid = document.getElementById('kb-grid');
+            grid.classList.toggle('list-view', view === 'list');
+        }
+
+        // ==========================================
+        // APLICAR FILTROS
+        // ==========================================
+        function aplicarFiltros() {
+            renderizarArtigos();
+        }
+
+        // ==========================================
+        // RENDERIZAR ARTIGOS
+        // ==========================================
+        function renderizarArtigos() {
+            const search = document.getElementById('search-kb').value.toLowerCase().trim();
+            const categoria = document.getElementById('filter-categoria').value;
+            const ordem = document.getElementById('filter-ordem').value;
+
+            let filtrados = artigos.filter(a => {
+                // Busca
+                if (search) {
+                    const matchTitulo = a.titulo.toLowerCase().includes(search);
+                    const matchResumo = a.resumo.toLowerCase().includes(search);
+                    const matchConteudo = (a.conteudo || '').toLowerCase().includes(search);
+                    const matchTags = (a.tags || []).some(t => t.toLowerCase().includes(search));
+                    
+                    if (!matchTitulo && !matchResumo && !matchConteudo && !matchTags) return false;
+                }
+
+                // Categoria
+                if (categoria && a.categoria !== categoria) return false;
+
+                return true;
+            });
+
+            // Filtro por tipo (card)
+            if (filtroTipoAtual !== 'todos') {
+                if (filtroTipoAtual === 'fixados') {
+                    filtrados = filtrados.filter(a => a.fixado);
+                } else if (filtroTipoAtual === 'meus') {
+                    filtrados = filtrados.filter(a => a.autorId === usuarioAtual.id);
+                } else if (filtroTipoAtual === 'recentes') {
+                    const seteDias = new Date();
+                    seteDias.setDate(seteDias.getDate() - 7);
+                    filtrados = filtrados.filter(a => new Date(a.criadoEm) >= seteDias);
+                }
+            }
+
+            // Ordenar
+            filtrados.sort((a, b) => {
+                // Sempre: fixados primeiro
+                if (a.fixado !== b.fixado) return a.fixado ? -1 : 1;
+
+                switch (ordem) {
+                    case 'recentes':
+                        return new Date(b.criadoEm) - new Date(a.criadoEm);
+                    case 'antigos':
+                        return new Date(a.criadoEm) - new Date(b.criadoEm);
+                    case 'visualizados':
+                        return (b.visualizacoes || 0) - (a.visualizacoes || 0);
+                    case 'uteis':
+                        return (b.uteis || 0) - (a.uteis || 0);
+                    case 'alfabetica':
+                        return a.titulo.localeCompare(b.titulo);
+                    default:
+                        return 0;
+                }
+            });
+
+            // Info
+            const infoEl = document.getElementById('info-resultados');
+            if (filtrados.length === 0) {
+                infoEl.textContent = 'Nenhum resultado';
+            } else {
+                infoEl.textContent = `Mostrando ${filtrados.length} de ${artigos.length} artigo(s)`;
+            }
+
+            // Render
+            const grid = document.getElementById('kb-grid');
+
+            if (filtrados.length === 0) {
+                grid.innerHTML = `
+                    <div class="kb-empty">
+                        <span class="kb-empty-icon">[[icone:conhecimento]]</span>
+                        <h3>Nenhum artigo encontrado</h3>
+                        <p>Tente ajustar os filtros ${podeEditar ? 'ou criar um novo artigo' : ''}</p>
+                        ${podeEditar ? `
+                            <button class="btn btn-primary" onclick="abrirModalEditar()" style="margin-top:12px;">
+                                [[icone:adicionar]] Criar Artigo
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtrados.map(a => criarCardHTML(a)).join('');
+        }
+
+        // ==========================================
+        // CRIAR CARD HTML
+        // ==========================================
+        function criarCardHTML(artigo) {
+            const catInfo = CATEGORIAS[artigo.categoria] || CATEGORIAS['Outros'];
+            const autor = usuarios.find(u => u.id === artigo.autorId);
+            const autorNome = autor ? autor.nome : 'Sistema';
+            const inicial = autorNome.charAt(0).toUpperCase();
+
+            // Avatar do autor
+            let avatarHTML = inicial;
+            if (autor && autor.avatar) {
+                avatarHTML = `<img src="${window.avatarURL(autor.avatar)}" alt="${autorNome}">`;
+            }
+
+            // Tags (máx 3)
+            const tags = (artigo.tags || []).slice(0, 3);
+            const maisTags = (artigo.tags || []).length - 3;
+
+            return `
+                <div class="kb-card ${artigo.fixado ? 'pinned' : ''}" onclick="abrirArtigo('${artigo.id}')">
+                    <div class="kb-card-header">
+                        <span class="kb-card-category ${catInfo.class}">
+                            ${catInfo.icon} ${artigo.categoria}
+                        </span>
+                        ${artigo.fixado ? '<span class="kb-card-pin">[[icone:kanban]]</span>' : ''}
+                    </div>
+
+                    <h3 class="kb-card-title">${artigo.titulo}</h3>
+                    <p class="kb-card-summary">${artigo.resumo}</p>
+
+                    ${tags.length > 0 ? `
+                        <div class="kb-card-tags">
+                            ${tags.map(t => `<span class="kb-tag">#${t}</span>`).join('')}
+                            ${maisTags > 0 ? `<span class="kb-tag">+${maisTags}</span>` : ''}
+                        </div>
+                    ` : ''}
+
+                    <div class="kb-card-footer">
+                        <div class="kb-card-footer-left">
+                            <div class="kb-card-author-avatar">${avatarHTML}</div>
+                            <span>${autorNome.split(' ')[0]}</span>
+                        </div>
+                        <div class="kb-card-footer-right">
+                            <span class="kb-card-meta">[[icone:visualizar]] ${artigo.visualizacoes || 0}</span>
+                            <span class="kb-card-meta">[[icone:confirmar]] ${artigo.uteis || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // ABRIR ARTIGO
+        // ==========================================
+        function abrirArtigo(id) {
+            const artigo = artigos.find(a => a.id === id);
+            if (!artigo) return;
+
+            artigoLido = artigo;
+
+            // Incrementar visualizações
+            artigo.visualizacoes = (artigo.visualizacoes || 0) + 1;
+            apiRequest('/conhecimento/'+id+'/visualizacao',{method:'POST'}).catch(()=>{});
+            salvarArtigos();
+
+            const catInfo = CATEGORIAS[artigo.categoria] || CATEGORIAS['Outros'];
+            const autor = usuarios.find(u => u.id === artigo.autorId);
+            const autorNome = autor ? autor.nome : 'Sistema';
+
+            const content = document.getElementById('read-content');
+            content.innerHTML = `
+                <div class="kb-read-header">
+                    <button class="kb-read-close" onclick="fecharModalLer()">✕</button>
+                    <span class="kb-read-category ${catInfo.class}">
+                        ${catInfo.icon} ${artigo.categoria}
+                    </span>
+                    <h1 class="kb-read-title">
+                        ${artigo.fixado ? '[[icone:kanban]] ' : ''}${artigo.titulo}
+                    </h1>
+                    <div class="kb-read-meta">
+                        <span>[[icone:usuario]] ${autorNome}</span>
+                        <span>[[icone:calendario]] ${formatDateShort(artigo.criadoEm)}</span>
+                        <span>[[icone:visualizar]] ${artigo.visualizacoes} visualizações</span>
+                        <span>[[icone:confirmar]] ${artigo.uteis || 0} úteis</span>
+                    </div>
+                </div>
+
+                <div class="kb-read-body">
+                    ${renderMarkdown(artigo.conteudo)}
+                </div>
+
+                ${(artigo.tags || []).length > 0 ? `
+                    <div class="kb-read-tags">
+                        ${artigo.tags.map(t => `<span class="kb-read-tag">#${t}</span>`).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="kb-read-footer">
+                    <div class="kb-read-helpful">
+                        <span>Este artigo foi útil?</span>
+                        <button class="kb-helpful-btn" onclick="marcarUtil('${artigo.id}', true)">
+                            [[icone:confirmar]] Sim
+                        </button>
+                        <button class="kb-helpful-btn" onclick="showToast('Obrigado pelo feedback!', 'info')">
+                            [[icone:bloquear]] Não
+                        </button>
+                    </div>
+
+                    ${podeEditar ? `
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-outline btn-sm" onclick="editarArtigo('${artigo.id}')">
+                                [[icone:editar]] Editar
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao('${artigo.id}')">
+                                [[icone:excluir]] Excluir
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            document.getElementById('modal-ler').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ==========================================
+        // RENDER MARKDOWN SIMPLES
+        // ==========================================
+        function renderMarkdown(texto) {
+            if (!texto) return '';
+
+            let html = texto;
+
+            // Escapar HTML básico primeiro
+            html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            // Blockquote
+            html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+
+            // Headers
+            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+            // Código inline
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // Negrito
+            html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+            // Itálico
+            html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+            // Listas (não ordenadas)
+            html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+
+            // Listas ordenadas
+            html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+
+            // Checkboxes
+            html = html.replace(/\[ \]/g, '☐');
+            html = html.replace(/\[x\]/gi, '[[icone:confirmar]]');
+
+            // Parágrafos
+            html = html.split('\n\n').map(p => {
+                p = p.trim();
+                if (!p) return '';
+                if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<ol') || p.startsWith('<blockquote')) {
+                    return p;
+                }
+                return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+            }).join('\n');
+
+            return html;
+        }
+
+        // ==========================================
+        // FECHAR MODAL LER
+        // ==========================================
+        function fecharModalLer() {
+            document.getElementById('modal-ler').style.display = 'none';
+            document.body.style.overflow = '';
+
+            // Re-renderizar para atualizar contador
+            renderizarArtigos();
+            atualizarStats();
+        }
+
+        // ==========================================
+        // MARCAR COMO ÚTIL
+        // ==========================================
+        async function marcarUtil(id,util) {
+            try {await apiRequest('/conhecimento/'+id+'/util',{method:'POST'});await carregarDados();showToast('Obrigado pelo feedback!','success');}
+            catch(e){showToast(e.message,'error');}
+        }
+
+        // ==========================================
+        // MODAL EDITAR
+        // ==========================================
+        function abrirModalEditar(artigoId = null) {
+            if (!podeEditar) {
+                showToast('Você não tem permissão para criar artigos', 'error');
+                return;
+            }
+
+            const form = document.getElementById('form-artigo');
+            form.reset();
+            document.getElementById('artigo-id').value = '';
+            document.getElementById('resumo-char').textContent = '0';
+
+            if (artigoId) {
+                const artigo = artigos.find(a => a.id === artigoId);
+                if (!artigo) return;
+
+                document.getElementById('edit-modal-title').textContent = '[[icone:editar]] Editar Artigo';
+                document.getElementById('artigo-id').value = artigo.id;
+                document.getElementById('artigo-titulo').value = artigo.titulo;
+                document.getElementById('artigo-categoria').value = artigo.categoria;
+                document.getElementById('artigo-tags').value = (artigo.tags || []).join(', ');
+                document.getElementById('artigo-resumo').value = artigo.resumo;
+                document.getElementById('artigo-conteudo').value = artigo.conteudo;
+                document.getElementById('artigo-fixado').checked = !!artigo.fixado;
+                document.getElementById('resumo-char').textContent = artigo.resumo.length;
+                document.getElementById('btn-salvar-artigo').textContent = 'Salvar Alterações';
+            } else {
+                document.getElementById('edit-modal-title').textContent = '[[icone:adicionar]] Novo Artigo';
+                document.getElementById('btn-salvar-artigo').textContent = 'Criar Artigo';
+            }
+
+            document.getElementById('modal-editar').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => document.getElementById('artigo-titulo').focus(), 100);
+        }
+
+        function fecharModalEditar() {
+            document.getElementById('modal-editar').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // ==========================================
+        // EDITAR ARTIGO
+        // ==========================================
+        function editarArtigo(id) {
+            fecharModalLer();
+            setTimeout(() => abrirModalEditar(id), 200);
+        }
+
+        // ==========================================
+        // SUBMIT FORM
+        // ==========================================
+        document.getElementById('form-artigo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const val=id=>document.getElementById(id).value.trim(),id=val('artigo-id');
+            const body={titulo:val('artigo-titulo'),categoria:val('artigo-categoria'),tags:val('artigo-tags').split(',').map(t=>t.trim()).filter(Boolean),resumo:val('artigo-resumo'),conteudo:val('artigo-conteudo'),fixado:document.getElementById('artigo-fixado').checked};
+            const btn=document.getElementById('btn-salvar-artigo');btn.disabled=true;
+            try {await apiRequest('/conhecimento'+(id?'/'+id:''),{method:id?'PUT':'POST',body:JSON.stringify(body)});fecharModalEditar();await carregarDados();showToast('Artigo salvo','success');}
+            catch(error){showToast(error.message,'error');}finally{btn.disabled=false;}
+        });
+
+        // ==========================================
+        // CONFIRMAR EXCLUSÃO
+        // ==========================================
+        async function confirmarExclusao(id) {
+            if(!confirm('Excluir este artigo?'))return;
+            try{await apiRequest('/conhecimento/'+id,{method:'DELETE'});fecharModalLer();await carregarDados();showToast('Artigo excluído','success');}catch(e){showToast(e.message,'error');}
+        }
+
+        // ==========================================
+        // CONTADOR DO RESUMO
+        // ==========================================
+        document.getElementById('artigo-resumo').addEventListener('input', function() {
+            document.getElementById('resumo-char').textContent = this.value.length;
+        });
+
+        // ==========================================
+        // NOTIFICAÇÕES
+        // ==========================================
+        async function carregarNotificacoes() {
+            try {
+                const data = await apiRequest('/notificacoes');
+                const badge = document.getElementById('notificacoes-badge');
+                if (badge) {
+                    const naoLidas = data.naoLidas || 0;
+                    badge.textContent = naoLidas;
+                    badge.style.display = naoLidas > 0 ? 'inline-flex' : 'none';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar notificações:', error);
+            }
+        }
+
+        // ==========================================
+        // FECHAR MODAIS (ESC)
+        // ==========================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('modal-ler').style.display === 'flex') fecharModalLer();
+                if (document.getElementById('modal-editar').style.display === 'flex') fecharModalEditar();
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            const modalLer = document.getElementById('modal-ler');
+            const modalEditar = document.getElementById('modal-editar');
+            if (e.target === modalLer) fecharModalLer();
+            if (e.target === modalEditar) fecharModalEditar();
+        });
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarMenuLateral();
+            carregarInfoUsuario();
+            carregarDados();
+
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('show');
+                });
+                document.addEventListener('click', (e) => {
+                    if (window.innerWidth > 768) return;
+                    if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+
+<script src="../js/icones.js"></script>
+</body>
+</html>

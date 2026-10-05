@@ -1,0 +1,32 @@
+{
+  "name": "gestao-os",
+  "version": "4.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build -w frontend",
+    "start": "npm start -w backend",
+    "test": "npm test -w backend",
+    "migrate:legacy": "node scripts/migrate.mjs",
+    "test:e2e": "playwright test",
+    "legacy:generate": "node scripts/legacy-to-react.mjs",
+    "backup": "node scripts/backup.mjs",
+    "format": "prettier --write \"backend/src/*.js\" \"backend/test/*.js\" \"frontend/src/*.js\" \"frontend/src/main.jsx\" \"scripts/*.mjs\" \"e2e/*.js\"",
+    "docs:api": "node scripts/api-docs.mjs",
+    "test:e2e:production": "npm run build && node scripts/test-production.mjs"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "parse5": "^8.0.1",
+    "prettier": "^3.9.9"
+  },
+  "type": "module"
+}

@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Gestão OS</title>
+    <script src="../js/i18n.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dark-mode.css">
+<link rel="icon" type="image/png" href="../assets/logo.png">    <style>
+        .settings-tabs {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 8px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+        [data-theme="dark"] .settings-tabs { border-color: #2d3748; }
+
+        .settings-tab {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .settings-tab:hover:not(.active) { background: var(--gray-100); color: var(--text); }
+        [data-theme="dark"] .settings-tab:hover:not(.active) { background: #2d3748; }
+        .settings-tab.active {
+            background: var(--gradient-primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .settings-panel { display: none; }
+        .settings-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .settings-section { border-color: #2d3748; }
+
+        .settings-section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        [data-theme="dark"] .settings-section-header { border-bottom-color: #2d3748; }
+
+        .settings-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .settings-section-subtitle {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .settings-section-body { padding: 0; }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        [data-theme="dark"] .setting-item { border-bottom-color: #2d3748; }
+        .setting-item:last-child { border-bottom: none; }
+        .setting-item:hover { background: var(--gray-50); }
+        [data-theme="dark"] .setting-item:hover { background: #1a2332; }
+
+        .setting-info { flex: 1; min-width: 0; }
+        .setting-label {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .setting-description {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .setting-control { flex-shrink: 0; }
+
+        /* SWITCH */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 28px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--gray-300);
+            border-radius: 28px;
+            transition: var(--transition);
+        }
+        .switch-slider::before {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+        .switch input:checked + .switch-slider {
+            background: var(--gradient-primary);
+        }
+        .switch input:checked + .switch-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* THEME SELECTOR */
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 20px 24px;
+        }
+        .theme-option {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            background: var(--bg);
+        }
+        [data-theme="dark"] .theme-option { border-color: #2d3748; }
+        .theme-option:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .theme-option.active {
+            border-color: var(--primary);
+            background: var(--blue-50);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        [data-theme="dark"] .theme-option.active { background: #1e3a8a; }
+
+        .theme-option-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+        .theme-option-label { font-size: 0.875rem; font-weight: 700; color: var(--text); }
+        .theme-option-hint { font-size: 0.6875rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* FORM */
+        .form-row-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 20px 24px;
+        }
+        .setting-form-group { display: flex; flex-direction: column; }
+        .setting-form-group label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .setting-form-group select,
+        .setting-form-group input {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+        [data-theme="dark"] .setting-form-group select,
+        [data-theme="dark"] .setting-form-group input { border-color: #2d3748; }
+        .setting-form-group select:focus,
+        .setting-form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* DANGER ZONE */
+        .danger-zone {
+            border: 2px solid var(--danger-light);
+        }
+        [data-theme="dark"] .danger-zone { border-color: #7f1d1d; }
+        .danger-zone .settings-section-header {
+            background: var(--danger-light);
+        }
+        [data-theme="dark"] .danger-zone .settings-section-header { background: #7f1d1d; }
+        .danger-zone .settings-section-title { color: var(--danger); }
+        [data-theme="dark"] .danger-zone .settings-section-title { color: #fca5a5; }
+
+        .info-box {
+            background: var(--blue-50);
+            border: 1px solid #93c5fd;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.8125rem;
+            color: #1e40af;
+            line-height: 1.6;
+            margin: 16px 24px;
+        }
+        [data-theme="dark"] .info-box {
+            background: #1e3a8a;
+            border-color: #2563eb;
+            color: #93c5fd;
+        }
+
+        .session-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 24px;
+            align-items: center;
+        }
+        .session-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius);
+            background: var(--blue-50);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem;
+        }
+        [data-theme="dark"] .session-icon { background: #1e3a8a; }
+
+        .settings-actions {
+            padding: 16px 24px;
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        [data-theme="dark"] .settings-actions { border-top-color: #2d3748; }
+
+        @media (max-width: 768px) {
+            .settings-tab { padding: 10px 14px; font-size: 0.75rem; }
+            .settings-tab span:not(.tab-icon) { display: none; }
+            .settings-tab .tab-icon { font-size: 1.25rem; }
+            .setting-item { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
+            .setting-control { width: 100%; }
+            .switch { margin-left: auto; }
+            .theme-selector { grid-template-columns: 1fr; padding: 16px; }
+            .form-row-settings { grid-template-columns: 1fr; padding: 16px; }
+            .settings-actions { padding: 16px; flex-direction: column; }
+            .settings-actions button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR (MENU FIXO) -->
+        <nav class="sidebar">
+    <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px;">
+        <img src="../assets/logo.png" alt="Gestão OS" style="height: 32px; width: auto;">
+        <span class="brand">Gestão OS</span>
+    </div>
+
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">[[icone:usuario]]</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Carregando...</span>
+                    <span class="user-role" id="user-role">Admin</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                <li><a href="usuarios.html"><span class="menu-icon">[[icone:equipe]]</span> Usuários</a></li>
+                <li><a href="setores.html"><span class="menu-icon">[[icone:setores]]</span> Setores</a></li>
+                <li><a href="ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                <li><a href="kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                <li><a href="calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                <li><a href="relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
+                <li><a href="auditoria.html"><span class="menu-icon">[[icone:buscar]]</span> Auditoria</a></li>
+                <li class="divider"></li>
+                <li><a href="empresa.html"><span class="menu-icon">[[icone:empresa]]</span> Minha Empresa</a></li>
+                <li><a href="conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
+                <li><a href="chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
+                <li class="divider"></li>
+                <li><a href="perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                <li class="active"><a href="configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
+                <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle">[[icone:menu]]</button>
+                    <h1>Configurações</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn-icon" onclick="window.location.href='notificacoes.html'" style="position:relative;">
+                        [[icone:notificacao]]
+                        <span id="notificacoes-badge" class="badge badge-danger" style="position:absolute;top:-4px;right:-8px;font-size:10px;padding:2px 6px;">0</span>
+                    </button>
+                    <button id="theme-toggle" class="btn-icon">[[icone:lua]]</button>
+                </div>
+            </header>
+
+            <!-- TABS -->
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="geral" onclick="mudarTab('geral', this)">
+                    <span class="tab-icon">[[icone:configuracoes]]</span><span>Geral</span>
+                </button>
+                <button class="settings-tab" data-tab="notificacoes" onclick="mudarTab('notificacoes', this)">
+                    <span class="tab-icon">[[icone:notificacao]]</span><span>Notificações</span>
+                </button>
+                <button class="settings-tab" data-tab="seguranca" onclick="mudarTab('seguranca', this)">
+                    <span class="tab-icon">[[icone:cadeado]]</span><span>Segurança</span>
+                </button>
+                <button class="settings-tab" data-tab="sistema" onclick="mudarTab('sistema', this)">
+                    <span class="tab-icon">[[icone:salvar]]</span><span>Sistema</span>
+                </button>
+            </div>
+
+            <!-- TAB GERAL -->
+            <div class="settings-panel active" id="panel-geral">
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:configuracoes]] Aparência</div>
+                        <div class="settings-section-subtitle">Escolha o tema da interface</div>
+                    </div>
+                    <div class="theme-selector">
+                        <div class="theme-option" data-theme-value="light" onclick="mudarTema('light')">
+                            <span class="theme-option-icon">[[icone:sol]]</span>
+                            <div class="theme-option-label">Claro</div>
+                            <div class="theme-option-hint">Fundo branco</div>
+                        </div>
+                        <div class="theme-option" data-theme-value="dark" onclick="mudarTema('dark')">
+                            <span class="theme-option-icon">[[icone:lua]]</span>
+                            <div class="theme-option-label">Escuro</div>
+                            <div class="theme-option-hint">Fundo escuro</div>
+                        </div>
+                        <div class="theme-option" data-theme-value="system" onclick="mudarTema('system')">
+                            <span class="theme-option-icon">[[icone:computador]]</span>
+                            <div class="theme-option-label">Sistema</div>
+                            <div class="theme-option-hint">Automático</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:empresa]] Idioma e Região</div>
+                        <div class="settings-section-subtitle">Configure suas preferências regionais</div>
+                    </div>
+                    <div class="form-row-settings">
+                        <div class="setting-form-group">
+                            <label>Idioma</label>
+                            <select id="select-idioma" onchange="salvarConfig('idioma', this.value)">
+                                <option value="pt-BR">PT-BR Português (Brasil)</option>
+                                <option value="en-US">EN English (US)</option>
+                                <option value="es-ES">ES Español</option>
+                            </select>
+                        </div>
+                        <div class="setting-form-group">
+                            <label>Formato de Data</label>
+                            <select id="select-data" onchange="salvarConfig('formatoData', this.value)">
+                                <option value="DD/MM/YYYY">DD/MM/AAAA</option>
+                                <option value="MM/DD/YYYY">MM/DD/AAAA</option>
+                                <option value="YYYY-MM-DD">AAAA-MM-DD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:caixa]] Densidade</div>
+                        <div class="settings-section-subtitle">Ajuste o espaçamento dos elementos</div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">[[icone:buscar]] Modo Compacto</div>
+                            <div class="setting-description">Reduz espaçamentos para exibir mais conteúdo</div>
+                        </div>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-compacto" onchange="salvarConfig('compacto', this.checked)">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB NOTIFICAÇÕES -->
+            <div class="settings-panel" id="panel-notificacoes">
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:ordens]] Ordens de Serviço</div>
+                        <div class="settings-section-subtitle">Notificações relacionadas a OS</div>
+                    </div>
+                    <div class="settings-section-body">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:email]] Nova OS criada</div>
+                                <div class="setting-description">Receber quando uma nova OS for criada</div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-nova-os" onchange="salvarNotif('novaOS', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:atualizar]] Atualizações de status</div>
+                                <div class="setting-description">Notificar quando o status mudar</div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-atualizacoes" onchange="salvarNotif('atualizacoes', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:relogio]] Prazos próximos</div>
+                                <div class="setting-description">Avisar quando uma OS estiver próxima do prazo</div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-prazos" onchange="salvarNotif('prazos', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:status]] OS urgentes</div>
+                                <div class="setting-description">Notificação especial para OS urgentes</div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-urgentes" onchange="salvarNotif('urgentes', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:chat]] Mensagens do chat</div>
+                                <div class="setting-description">Notificar sobre novas mensagens no chat</div>
+                            </div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="notif-chat" onchange="salvarNotif('chat', this.checked)">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB SEGURANÇA -->
+            <div class="settings-panel" id="panel-seguranca">
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:chave]] Senha</div>
+                        <div class="settings-section-subtitle">Mantenha sua conta segura</div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="window.location.href='perfil.html'">[[icone:cadeado]] Alterar Senha</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:computador]] Sessões Ativas</div>
+                        <div class="settings-section-subtitle">Dispositivos conectados à sua conta</div>
+                    </div>
+                    <div class="session-item">
+                        <div class="session-icon">[[icone:computador]]</div>
+                        <div class="setting-info">
+                            <div class="setting-label">Navegador Atual <span style="font-size:0.6875rem; padding:2px 8px; border-radius:12px; background:var(--success-light); color:var(--success); text-transform:uppercase; letter-spacing:0.05em; margin-left:8px;">Atual</span></div>
+                            <div class="setting-description" id="sessao-info">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section danger-zone">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:sair]] Sair</div>
+                        <div class="settings-section-subtitle">Encerrar sua sessão atual</div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-danger" onclick="fazerLogout()">[[icone:sair]] Sair da Conta</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB SISTEMA -->
+            <div class="settings-panel" id="panel-sistema">
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:informacao]] Informações do Sistema</div>
+                        <div class="settings-section-subtitle">Detalhes técnicos da plataforma</div>
+                    </div>
+                    <div class="settings-section-body">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:ordens]] Versão</div>
+                                <div class="setting-description">Versão atual da plataforma</div>
+                            </div>
+                            <div class="setting-control" style="font-family:monospace; font-weight:700; color:var(--primary);">v1.0.0</div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:caixa]] Status da API</div>
+                                <div class="setting-description">Conexão com o servidor</div>
+                            </div>
+                            <div class="setting-control">
+                                <span id="status-api" style="font-size:0.8125rem; font-weight:700; color:var(--text-muted);">Verificando...</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:salvar]] Armazenamento</div>
+                                <div class="setting-description">Uso do localStorage</div>
+                            </div>
+                            <div class="setting-control" style="font-family:monospace; font-weight:700;" id="storage-usage">—</div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-label">[[icone:empresa]] Navegador</div>
+                                <div class="setting-description">Informações do navegador</div>
+                            </div>
+                            <div class="setting-control" style="font-size:0.75rem; color:var(--text-muted); max-width:200px; text-align:right; word-break:break-word;" id="browser-info">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:excluir]] Manutenção</div>
+                        <div class="settings-section-subtitle">Limpar dados temporários</div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">[[icone:excluir]] Limpar Cache</div>
+                            <div class="setting-description">Remove dados temporários (você permanece logado)</div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn btn-outline btn-sm" onclick="limparCache()">Limpar</button>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">[[icone:atualizar]] Restaurar Padrões</div>
+                            <div class="setting-description">Reverter todas as preferências</div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn btn-outline btn-sm" onclick="restaurarPadroes()">Restaurar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <div class="settings-section-title">[[icone:conhecimento]] Sobre o Projeto</div>
+                        <div class="settings-section-subtitle">Informações acadêmicas</div>
+                    </div>
+                    <div class="info-box">
+                        <span>[[icone:ordens]]</span>
+                        <div>
+                            <strong>Gestão de Ordens de Serviço Empresarial</strong>
+                            <div style="margin-top:6px;">Trabalho de Conclusão de Curso — Análise e Desenvolvimento de Sistemas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <script>
+               // ==========================================
+        // CONFIGURAÇÕES
+        // ==========================================
+        var config = {
+            tema: 'light',
+            idioma: 'pt-BR',
+            formatoData: 'DD/MM/YYYY',
+            compacto: false,
+            notificacoes: {
+                novaOS: true,
+                atualizacoes: true,
+                prazos: true,
+                urgentes: true,
+                chat: true
+            }
+        };
+
+        // ==========================================
+        // TRADUÇÕES
+        // ==========================================
+        var TRADUCOES = {
+            'pt-BR': {
+                titulo: 'Configurações',
+                tabGeral: 'Geral',
+                tabNotif: 'Notificações',
+                tabSeg: 'Segurança',
+                tabSis: 'Sistema',
+                aparencia: 'Aparência',
+                aparenciaDesc: 'Escolha o tema da interface',
+                claro: 'Claro',
+                escuro: 'Escuro',
+                sistema: 'Sistema',
+                claroDesc: 'Fundo branco',
+                escuroDesc: 'Fundo escuro',
+                sistemaDesc: 'Automático',
+                idiomaRegiao: 'Idioma e Região',
+                idiomaRegiaoDesc: 'Configure suas preferências regionais',
+                idioma: 'Idioma',
+                formatoData: 'Formato de Data',
+                densidade: 'Densidade',
+                densidadeDesc: 'Ajuste o espaçamento dos elementos',
+                modoCompacto: 'Modo Compacto',
+                modoCompactoDesc: 'Reduz espaçamentos para exibir mais conteúdo'
+            },
+            'en-US': {
+                titulo: 'Settings',
+                tabGeral: 'General',
+                tabNotif: 'Notifications',
+                tabSeg: 'Security',
+                tabSis: 'System',
+                aparencia: 'Appearance',
+                aparenciaDesc: 'Choose the interface theme',
+                claro: 'Light',
+                escuro: 'Dark',
+                sistema: 'System',
+                claroDesc: 'Light background',
+                escuroDesc: 'Dark background',
+                sistemaDesc: 'Automatic',
+                idiomaRegiao: 'Language and Region',
+                idiomaRegiaoDesc: 'Configure your regional preferences',
+                idioma: 'Language',
+                formatoData: 'Date Format',
+                densidade: 'Density',
+                densidadeDesc: 'Adjust element spacing',
+                modoCompacto: 'Compact Mode',
+                modoCompactoDesc: 'Reduces spacing to show more content'
+            },
+            'es-ES': {
+                titulo: 'Configuración',
+                tabGeral: 'General',
+                tabNotif: 'Notificaciones',
+                tabSeg: 'Seguridad',
+                tabSis: 'Sistema',
+                aparencia: 'Apariencia',
+                aparenciaDesc: 'Elige el tema de la interfaz',
+                claro: 'Claro',
+                escuro: 'Oscuro',
+                sistema: 'Sistema',
+                claroDesc: 'Fondo blanco',
+                escuroDesc: 'Fondo oscuro',
+                sistemaDesc: 'Automático',
+                idiomaRegiao: 'Idioma y Región',
+                idiomaRegiaoDesc: 'Configura tus preferencias regionales',
+                idioma: 'Idioma',
+                formatoData: 'Formato de Fecha',
+                densidade: 'Densidad',
+                densidadeDesc: 'Ajusta el espaciado de los elementos',
+                modoCompacto: 'Modo Compacto',
+                modoCompactoDesc: 'Reduce el espaciado para mostrar más contenido'
+            }
+        };
+
+        // ==========================================
+        // CARREGAR CONFIG
+        // ==========================================
+        function carregarConfig() {
+            try {
+                var saved = localStorage.getItem('gestaoos_config');
+                if (saved) {
+                    var parsed = JSON.parse(saved);
+                    config = Object.assign(config, parsed);
+                    if (parsed.notificacoes) {
+                        config.notificacoes = Object.assign(config.notificacoes, parsed.notificacoes);
+                    }
+                }
+            } catch (e) {
+                console.warn('Erro ao carregar config:', e);
+            }
+        }
+
+        // ==========================================
+        // SALVAR CONFIG
+        // ==========================================
+        function salvarConfig(key, value) {
+            config[key] = value;
+            try {
+                localStorage.setItem('gestaoos_config', JSON.stringify(config));
+            } catch (e) {}
+
+            // Aplicar mudança na hora
+            if (key === 'idioma') {
+                aplicarIdioma();
+                mostrarToast('[[icone:confirmar]] Idioma alterado', 'success');
+            }
+            if (key === 'formatoData') {
+                aplicarFormatoData();
+                mostrarToast('[[icone:confirmar]] Formato salvo', 'success');
+            }
+            if (key === 'compacto') {
+                aplicarCompacto();
+                mostrarToast(value ? '[[icone:confirmar]] Modo compacto ativado' : '[[icone:confirmar]] Modo normal ativado', 'success');
+            }
+        }
+
+        function salvarNotif(key, value) {
+            config.notificacoes[key] = value;
+            try {
+                localStorage.setItem('gestaoos_config', JSON.stringify(config));
+            } catch (e) {}
+            mostrarToast(value ? '[[icone:confirmar]] Notificação ativada' : '[[icone:notificacao]] Notificação desativada', 'success');
+        }
+
+        // ==========================================
+        // APLICAR IDIOMA (traduz a página)
+        // ==========================================
+        function aplicarIdioma() {
+            var t = TRADUCOES[config.idioma] || TRADUCOES['pt-BR'];
+
+            // Título
+            document.querySelector('.topbar-left h1').textContent = t.titulo;
+            document.title = t.titulo + ' - Gestão OS';
+
+            // Tabs
+            var tabs = document.querySelectorAll('.settings-tab');
+            if (tabs[0]) tabs[0].querySelector('span:not(.tab-icon)').textContent = t.tabGeral;
+            if (tabs[1]) tabs[1].querySelector('span:not(.tab-icon)').textContent = t.tabNotif;
+            if (tabs[2]) tabs[2].querySelector('span:not(.tab-icon)').textContent = t.tabSeg;
+            if (tabs[3]) tabs[3].querySelector('span:not(.tab-icon)').textContent = t.tabSis;
+
+            // Seção Aparência
+            var s1 = document.querySelector('#panel-geral .settings-section:nth-child(1)');
+            if (s1) {
+                s1.querySelector('.settings-section-title').textContent = '[[icone:configuracoes]] ' + t.aparencia;
+                s1.querySelector('.settings-section-subtitle').textContent = t.aparenciaDesc;
+            }
+
+            // Theme options
+            var themeOpts = document.querySelectorAll('.theme-option');
+            if (themeOpts[0]) {
+                themeOpts[0].querySelector('.theme-option-label').textContent = t.claro;
+                themeOpts[0].querySelector('.theme-option-hint').textContent = t.claroDesc;
+            }
+            if (themeOpts[1]) {
+                themeOpts[1].querySelector('.theme-option-label').textContent = t.escuro;
+                themeOpts[1].querySelector('.theme-option-hint').textContent = t.escuroDesc;
+            }
+            if (themeOpts[2]) {
+                themeOpts[2].querySelector('.theme-option-label').textContent = t.sistema;
+                themeOpts[2].querySelector('.theme-option-hint').textContent = t.sistemaDesc;
+            }
+
+            // Seção Idioma
+            var s2 = document.querySelector('#panel-geral .settings-section:nth-child(2)');
+            if (s2) {
+                s2.querySelector('.settings-section-title').textContent = '[[icone:empresa]] ' + t.idiomaRegiao;
+                s2.querySelector('.settings-section-subtitle').textContent = t.idiomaRegiaoDesc;
+                var labels = s2.querySelectorAll('.setting-form-group label');
+                if (labels[0]) labels[0].textContent = t.idioma;
+                if (labels[1]) labels[1].textContent = t.formatoData;
+            }
+
+            // Seção Densidade
+            var s3 = document.querySelector('#panel-geral .settings-section:nth-child(3)');
+            if (s3) {
+                s3.querySelector('.settings-section-title').textContent = '[[icone:caixa]] ' + t.densidade;
+                s3.querySelector('.settings-section-subtitle').textContent = t.densidadeDesc;
+                s3.querySelector('.setting-label').textContent = '[[icone:buscar]] ' + t.modoCompacto;
+                s3.querySelector('.setting-description').textContent = t.modoCompactoDesc;
+            }
+        }
+
+        // ==========================================
+        // APLICAR FORMATO DE DATA (mostra preview)
+        // ==========================================
+        function aplicarFormatoData() {
+            var agora = new Date();
+            var dia = String(agora.getDate()).padStart(2, '0');
+            var mes = String(agora.getMonth() + 1).padStart(2, '0');
+            var ano = agora.getFullYear();
+            var preview = '';
+
+            if (config.formatoData === 'DD/MM/YYYY') {
+                preview = dia + '/' + mes + '/' + ano;
+            } else if (config.formatoData === 'MM/DD/YYYY') {
+                preview = mes + '/' + dia + '/' + ano;
+            } else if (config.formatoData === 'YYYY-MM-DD') {
+                preview = ano + '-' + mes + '-' + dia;
+            }
+
+            // Mostrar preview embaixo do select
+            var selectEl = document.getElementById('select-data');
+            if (selectEl) {
+                var parent = selectEl.parentElement;
+                var previewEl = parent.querySelector('.date-preview');
+                if (!previewEl) {
+                    previewEl = document.createElement('small');
+                    previewEl.className = 'date-preview';
+                    previewEl.style.cssText = 'display:block; margin-top:6px; font-size:0.75rem; color:var(--text-muted);';
+                    parent.appendChild(previewEl);
+                }
+                previewEl.textContent = '[[icone:visualizar]] Preview: ' + preview;
+            }
+        }
+
+        // ==========================================
+        // APLICAR MODO COMPACTO
+        // ==========================================
+        function aplicarCompacto() {
+            if (config.compacto) {
+                document.body.classList.add('modo-compacto');
+            } else {
+                document.body.classList.remove('modo-compacto');
+            }
+        }
+
+        // ==========================================
+        // APLICAR TODA A CONFIG
+        // ==========================================
+        function aplicarConfigUI() {
+            // Tema
+            document.querySelectorAll('.theme-option').forEach(function(opt) {
+                opt.classList.remove('active');
+                if (opt.dataset.themeValue === config.tema) {
+                    opt.classList.add('active');
+                }
+            });
+
+            // Idioma
+            var langEl = document.getElementById('select-idioma');
+            if (langEl) langEl.value = config.idioma || 'pt-BR';
+
+            // Formato data
+            var dataEl = document.getElementById('select-data');
+            if (dataEl) dataEl.value = config.formatoData || 'DD/MM/YYYY';
+
+            // Compacto
+            var compactoEl = document.getElementById('toggle-compacto');
+            if (compactoEl) compactoEl.checked = !!config.compacto;
+
+            // Notificações
+            var notifMap = {
+                'notif-nova-os': 'novaOS',
+                'notif-atualizacoes': 'atualizacoes',
+                'notif-prazos': 'prazos',
+                'notif-urgentes': 'urgentes',
+                'notif-chat': 'chat'
+            };
+            Object.keys(notifMap).forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.checked = config.notificacoes[notifMap[id]] !== false;
+            });
+
+            // APLICAR TUDO DE VERDADE
+            aplicarIdioma();
+            aplicarFormatoData();
+            aplicarCompacto();
+
+            // Sessão
+            atualizarInfoSessao();
+        }
+
+        // ==========================================
+        // MUDAR TEMA
+        // ==========================================
+        function mudarTema(tema) {
+            config.tema = tema;
+            try {
+                localStorage.setItem('gestaoos_config', JSON.stringify(config));
+            } catch (e) {}
+
+            document.querySelectorAll('.theme-option').forEach(function(opt) {
+                opt.classList.remove('active');
+                if (opt.dataset.themeValue === tema) {
+                    opt.classList.add('active');
+                }
+            });
+
+            if (tema === 'system') {
+                var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', tema);
+                localStorage.setItem('theme', tema);
+            }
+
+            var nomes = { 'light': 'Claro', 'dark': 'Escuro', 'system': 'Sistema' };
+            mostrarToast('[[icone:confirmar]] Tema: ' + (nomes[tema] || tema), 'success');
+        }
+
+        // ==========================================
+        // MUDAR TAB
+        // ==========================================
+        function mudarTab(tab, element) {
+            document.querySelectorAll('.settings-tab').forEach(function(t) { t.classList.remove('active'); });
+            element.classList.add('active');
+
+            document.querySelectorAll('.settings-panel').forEach(function(p) { p.classList.remove('active'); });
+            var panel = document.getElementById('panel-' + tab);
+            if (panel) panel.classList.add('active');
+        }
+
+        // ==========================================
+        // TOAST
+        // ==========================================
+        function mostrarToast(msg, tipo) {
+            var old = document.querySelector('.toast-simple');
+            if (old) old.remove();
+
+            var toast = document.createElement('div');
+            toast.className = 'toast-simple';
+            toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:' + (tipo === 'error' ? '#dc2626' : '#059669') + ';color:#fff;padding:14px 28px;border-radius:10px;font-weight:600;font-size:0.875rem;box-shadow:0 10px 30px rgba(0,0,0,0.2);z-index:9999;';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 2000);
+        }
+
+        // ==========================================
+        // INFO SESSÃO
+        // ==========================================
+        function atualizarInfoSessao() {
+            var el = document.getElementById('sessao-info');
+            if (!el) return;
+
+            var ua = navigator.userAgent;
+            var browser = 'Navegador';
+            var os = '';
+
+            if (ua.indexOf('Chrome') > -1) browser = 'Chrome';
+            else if (ua.indexOf('Firefox') > -1) browser = 'Firefox';
+            else if (ua.indexOf('Safari') > -1) browser = 'Safari';
+            else if (ua.indexOf('Edge') > -1) browser = 'Edge';
+
+            if (ua.indexOf('Windows') > -1) os = 'Windows';
+            else if (ua.indexOf('Mac') > -1) os = 'macOS';
+            else if (ua.indexOf('Linux') > -1) os = 'Linux';
+            else if (ua.indexOf('Android') > -1) os = 'Android';
+            else if (ua.indexOf('iPhone') > -1) os = 'iOS';
+
+            el.textContent = browser + ' em ' + os + ' • ' + new Date().toLocaleTimeString('pt-BR');
+
+            var bi = document.getElementById('browser-info');
+            if (bi) bi.textContent = ua.substring(0, 60) + '...';
+        }
+
+        // ==========================================
+        // LIMPAR CACHE
+        // ==========================================
+        function limparCache() {
+            if (!confirm('Limpar dados temporários? Você permanecerá logado.')) return;
+
+            var token = localStorage.getItem('token');
+            var usuario = localStorage.getItem('usuario');
+            var empresa = localStorage.getItem('empresa');
+            var configSalva = localStorage.getItem('gestaoos_config');
+            var theme = localStorage.getItem('theme');
+
+            localStorage.clear();
+
+            if (token) localStorage.setItem('token', token);
+            if (usuario) localStorage.setItem('usuario', usuario);
+            if (empresa) localStorage.setItem('empresa', empresa);
+            if (configSalva) localStorage.setItem('gestaoos_config', configSalva);
+            if (theme) localStorage.setItem('theme', theme);
+
+            mostrarToast('[[icone:confirmar]] Cache limpo', 'success');
+        }
+
+        // ==========================================
+        // RESTAURAR PADRÕES
+        // ==========================================
+        function restaurarPadroes() {
+            if (!confirm('Restaurar todas as preferências para o padrão?')) return;
+
+            localStorage.removeItem('gestaoos_config');
+            localStorage.removeItem('theme');
+
+            config = {
+                tema: 'light',
+                idioma: 'pt-BR',
+                formatoData: 'DD/MM/YYYY',
+                compacto: false,
+                notificacoes: {
+                    novaOS: true,
+                    atualizacoes: true,
+                    prazos: true,
+                    urgentes: true,
+                    chat: true
+                }
+            };
+
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+
+            aplicarConfigUI();
+            mostrarToast('[[icone:confirmar]] Preferências restauradas', 'success');
+        }
+
+        // ==========================================
+        // VERIFICAR API
+        // ==========================================
+        function verificarAPI() {
+            var el = document.getElementById('status-api');
+            if (!el) return;
+
+            fetch('http://localhost:3000/api/status')
+                .then(function(r) {
+                    if (r.ok) {
+                        el.innerHTML = '<span style="color:var(--success);">[[icone:status]] Online</span>';
+                    } else {
+                        throw new Error();
+                    }
+                })
+                .catch(function() {
+                    el.innerHTML = '<span style="color:var(--danger);">[[icone:status]] Offline</span>';
+                });
+        }
+
+        // ==========================================
+        // STORAGE
+        // ==========================================
+        function calcularStorage() {
+            var total = 0;
+            for (var key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length + key.length;
+                }
+            }
+            var kb = (total / 1024).toFixed(2);
+            var el = document.getElementById('storage-usage');
+            if (el) el.textContent = kb + ' KB';
+        }
+
+        // ==========================================
+        // LOGOUT
+        // ==========================================
+        function fazerLogout() {
+            if (!confirm('Deseja sair da conta?')) return;
+            localStorage.clear();
+            window.location.href = '../login.html';
+        }
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        console.log('[[icone:estrela]] Configurações iniciando...');
+
+        carregarConfig();
+
+        // Carregar usuário
+        try {
+            var user = JSON.parse(localStorage.getItem('usuario') || '{}');
+            if (user.nome) {
+                document.getElementById('user-name').textContent = user.nome;
+                var primeiro = user.nome.split(' ')[0];
+                document.getElementById('sidebar-avatar').textContent = primeiro.charAt(0).toUpperCase();
+                var roles = {
+                    'administrador_principal': 'Admin Principal',
+                    'administrador_setor': 'Admin de Setor',
+                    'gestor': 'Gestor',
+                    'colaborador': 'Colaborador'
+                };
+                document.getElementById('user-role').textContent = roles[user.role] || 'Admin';
+            }
+        } catch (e) {}
+
+        // APLICAR CONFIG (agora aplica de verdade)
+        aplicarConfigUI();
+
+        verificarAPI();
+        calcularStorage();
+
+        // Logout
+        var logoutBtn = document.getElementById('logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                fazerLogout();
+            });
+        }
+
+        // Menu mobile
+        var mt = document.querySelector('.menu-toggle');
+        var sb = document.querySelector('.sidebar');
+        if (mt && sb) {
+            mt.addEventListener('click', function() {
+                sb.classList.toggle('show');
+            });
+        }
+
+        // Fechar menu clicando fora
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth > 768) return;
+            if (sb && mt && !sb.contains(e.target) && !mt.contains(e.target)) {
+                sb.classList.remove('show');
+            }
+        });
+
+        console.log('[[icone:confirmar]] Configurações prontas!');
+        </script>
+
+<script src="../js/icones.js"></script>
+</body>
+</html>

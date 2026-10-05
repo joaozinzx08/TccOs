@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Entre em uma empresa na plataforma Gestão OS">
+    <title>Entrar em Empresa - Gestão OS</title>
+    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+<link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        /* ==========================================
+           HERO DA PÁGINA
+           ========================================== */
+        .auth-hero {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-hero-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            font-size: 2.25rem;
+            margin-bottom: 16px;
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.35);
+            animation: bounceIn 0.6s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* ==========================================
+           INFO BOX
+           ========================================== */
+        .info-box-code {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-left: 4px solid var(--success);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.8125rem;
+            color: #065f46;
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] .info-box-code {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            color: #6ee7b7;
+        }
+
+        .info-box-code .icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: -2px;
+        }
+
+        .info-box-code strong {
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        [data-theme="dark"] .info-box-code strong {
+            color: #a7f3d0;
+        }
+
+        /* ==========================================
+           FORMULÁRIO
+           ========================================== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+        }
+
+        .form-group label .label-icon {
+            font-size: 0.9375rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-family: var(--font);
+            font-size: 0.9375rem;
+            background: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Código da empresa destacado */
+        .codigo-input {
+            font-family: 'Courier New', monospace !important;
+            font-size: 1.25rem !important;
+            font-weight: 800 !important;
+            letter-spacing: 3px;
+            text-align: center;
+            text-transform: uppercase;
+            background: var(--blue-50) !important;
+            border-color: var(--blue-200) !important;
+            color: var(--blue-700) !important;
+        }
+
+        [data-theme="dark"] .codigo-input {
+            background: #1e3a8a !important;
+            border-color: #2563eb !important;
+            color: #93c5fd !important;
+        }
+
+        .codigo-input:focus {
+            background: var(--bg) !important;
+            border-color: var(--primary) !important;
+        }
+
+        .codigo-input.valid {
+            border-color: var(--success) !important;
+            background: var(--success-light) !important;
+            color: var(--success) !important;
+        }
+
+        [data-theme="dark"] .codigo-input.valid {
+            background: #064e3b !important;
+            color: #6ee7b7 !important;
+        }
+
+        /* Input de senha com botão */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 48px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 8px;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            line-height: 1;
+        }
+
+        .toggle-password:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        [data-theme="dark"] .toggle-password:hover {
+            background: #2d3748;
+        }
+
+        /* Força da senha */
+        .password-strength {
+            margin-top: 8px;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .strength-bar-fill {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-bar-fill.fraca {
+            width: 33%;
+            background: var(--danger);
+        }
+
+        .strength-bar-fill.media {
+            width: 66%;
+            background: var(--warning);
+        }
+
+        .strength-bar-fill.forte {
+            width: 100%;
+            background: var(--success);
+        }
+
+        .strength-text {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .strength-text.fraca { color: var(--danger); }
+        .strength-text.media { color: var(--warning); }
+        .strength-text.forte { color: var(--success); }
+
+        /* ==========================================
+           BOTÃO
+           ============================================ */
+        .btn-entrar {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-entrar:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ==========================================
+           DIVISOR
+           ============================================ */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        [data-theme="dark"] .divider::before,
+        [data-theme="dark"] .divider::after {
+            background: #2d3748;
+        }
+
+        /* ==========================================
+           PASSOS (Informativo)
+           ============================================ */
+        .steps-info {
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 24px 0;
+        }
+
+        [data-theme="dark"] .steps-info {
+            background: #1a2332;
+        }
+
+        .steps-info-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .step-info-item:not(:last-child) {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        [data-theme="dark"] .step-info-item:not(:last-child) {
+            border-bottom-color: #2d3748;
+        }
+
+        .step-info-number {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        /* ==========================================
+           FOOTER
+           ============================================ */
+        .auth-footer {
+            margin-top: 24px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        [data-theme="dark"] .auth-footer {
+            border-top-color: #2d3748;
+        }
+
+        .auth-footer p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .auth-footer a {
+            font-weight: 600;
+        }
+
+        /* ==========================================
+           ERRO/SUCESSO
+           ============================================ */
+        .error-message,
+        .success-message {
+            display: none;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            margin-top: 16px;
+            line-height: 1.5;
+            animation: slideDown 0.3s ease;
+        }
+
+        .error-message {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message.show,
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==========================================
+           RESPONSIVO
+           ============================================ */
+        @media (max-width: 480px) {
+            .auth-hero-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.875rem;
+            }
+
+            .steps-info {
+                padding: 16px;
+            }
+
+            .codigo-input {
+                font-size: 1rem !important;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+<body class="auth-page">
+
+    <div class="auth-container" style="max-width: 480px;">
+        <div class="auth-card">
+
+            <!-- ============================================
+                 BRAND
+                 ============================================ -->
+            <a href="index.html" class="auth-brand" style="text-decoration:none;">
+                <img src="assets/logo.png" alt="Gestão OS" style="height: 40px; width: auto;">
+                <h1>Gestão OS</h1>
+            </a>
+
+            <!-- ============================================
+                 HERO
+                 ============================================ -->
+            <div class="auth-hero">
+                <div class="auth-hero-icon">[[icone:sair]]</div>
+            </div>
+
+            <!-- ============================================
+                 HEADER
+                 ============================================ -->
+            <div class="auth-header">
+                <h2>Entrar em uma Empresa</h2>
+                <p>Use o código fornecido pelo administrador</p>
+            </div>
+
+            <!-- ============================================
+                 INFO BOX
+                 ============================================ -->
+            <div class="info-box-code">
+                <span class="icon">[[icone:chave]]</span>
+                <div>
+                    <strong>Precisa do código?</strong> — Solicite ao administrador da empresa. 
+                    Ele tem o formato <strong>GEST-XXXXXX</strong>.
+                </div>
+            </div>
+
+            <!-- ============================================
+                 FORMULÁRIO
+                 ============================================ -->
+            <div class="form-group">
+                <label for="codigo">
+                    <span class="label-icon">[[icone:chave]]</span>
+                    Código da Empresa
+                </label>
+                <input 
+                    type="text" 
+                    id="codigo" 
+                    class="codigo-input"
+                    placeholder="GEST-XXXXXX"
+                    maxlength="25"
+                    autocapitalize="characters"
+                    spellcheck="false"
+                    autocomplete="off"
+                    autofocus
+                >
+                <small>[[icone:ideia]] Digite apenas os caracteres — o "GEST-" é adicionado automaticamente</small>
+            </div>
+
+            <div class="form-group">
+                <label for="nome">
+                    <span class="label-icon">[[icone:usuario]]</span>
+                    Seu Nome Completo
+                </label>
+                <input 
+                    type="text" 
+                    id="nome" 
+                    placeholder="Ex: Maria Santos"
+                    autocomplete="name"
+                    maxlength="100"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">
+                    <span class="label-icon">[[icone:email]]</span>
+                    E-mail
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    placeholder="maria@email.com"
+                    autocomplete="email"
+                    maxlength="150"
+                >
+                <small>[[icone:pasta]] Usado para login e notificações</small>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">
+                    <span class="label-icon">[[icone:cadeado]]</span>
+                    Senha
+                </label>
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="senha" 
+                        placeholder="Mínimo 8 caracteres"
+                        autocomplete="new-password"
+                        maxlength="100"
+                    >
+                    <button type="button" class="toggle-password" id="toggle-senha" aria-label="Mostrar senha">[[icone:visualizar]]</button>
+                </div>
+                <div class="password-strength" id="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-bar-fill" id="strength-fill"></div>
+                    </div>
+                    <div class="strength-text" id="strength-text">—</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="senha2">
+                    <span class="label-icon">[[icone:cadeado]]</span>
+                    Confirmar Senha
+                </label>
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="senha2" 
+                        placeholder="Repita a senha"
+                        autocomplete="new-password"
+                        maxlength="100"
+                    >
+                    <button type="button" class="toggle-password" id="toggle-senha2" aria-label="Mostrar senha">[[icone:visualizar]]</button>
+                </div>
+                <small id="senha-match" style="display:none;"></small>
+            </div>
+
+            <!-- ============================================
+                 BOTÃO ENTRAR
+                 ============================================ -->
+            <button type="button" class="btn btn-primary btn-block btn-lg btn-entrar" id="btn-entrar" onclick="entrarEmpresa()">
+                <span id="btn-entrar-texto">[[icone:sair]] Entrar na Empresa</span>
+            </button>
+
+            <!-- ============================================
+                 MENSAGENS
+                 ============================================ -->
+            <div id="msg-erro" class="error-message"></div>
+            <div id="msg-sucesso" class="success-message"></div>
+
+            <!-- ============================================
+                 PASSOS
+                 ============================================ -->
+            <div class="steps-info">
+                <div class="steps-info-title">[[icone:ordens]] Como funciona</div>
+                <div class="step-info-item">
+                    <span class="step-info-number">1</span>
+                    <span>Peça o <strong>código da empresa</strong> ao seu administrador</span>
+                </div>
+                <div class="step-info-item">
+                    <span class="step-info-number">2</span>
+                    <span>Preencha seus dados e crie uma senha pessoal</span>
+                </div>
+                <div class="step-info-item">
+                    <span class="step-info-number">3</span>
+                    <span>Pronto! Você já pode abrir ordens de serviço</span>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 FOOTER
+                 ============================================ -->
+            <div class="auth-footer">
+                <p>Já tem uma conta? <a href="login.html">Fazer login</a></p>
+                <p>Tem uma empresa? <a href="criar-empresa.html">Criar uma empresa</a></p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // ==========================================
+        // ELEMENTOS
+        // ==========================================
+        const codigoInput = document.getElementById('codigo');
+        const nomeInput = document.getElementById('nome');
+        const emailInput = document.getElementById('email');
+        const senhaInput = document.getElementById('senha');
+        const senha2Input = document.getElementById('senha2');
+        const btnEntrar = document.getElementById('btn-entrar');
+        const btnEntrarTexto = document.getElementById('btn-entrar-texto');
+        const msgErro = document.getElementById('msg-erro');
+        const msgSucesso = document.getElementById('msg-sucesso');
+        const toggleSenha = document.getElementById('toggle-senha');
+        const toggleSenha2 = document.getElementById('toggle-senha2');
+        const passwordStrength = document.getElementById('password-strength');
+        const strengthFill = document.getElementById('strength-fill');
+        const strengthText = document.getElementById('strength-text');
+        const senhaMatch = document.getElementById('senha-match');
+
+        // ==========================================
+        // MÁSCARA DO CÓDIGO
+        // ==========================================
+        codigoInput.addEventListener('input', function(e) {
+            let valor = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+            // Remover GEST- se já tem
+            if (valor.startsWith('GEST')) {
+                valor = valor.substring(4);
+            }
+
+            // Limitar ao tamanho máximo do código
+            valor = valor.substring(0, 20);
+
+            // Formatar
+            e.target.value = valor ? 'GEST-' + valor : '';
+
+            // Validar
+            const completo = /^GEST-[A-Z0-9]{6,20}$/.test(e.target.value);
+            if (completo) {
+                e.target.classList.add('valid');
+            } else {
+                e.target.classList.remove('valid');
+            }
+        });
+
+        // ==========================================
+        // TOGGLE SENHA
+        // ==========================================
+        toggleSenha.addEventListener('click', function() {
+            const isPassword = senhaInput.type === 'password';
+            senhaInput.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? '[[icone:ocultar]]' : '[[icone:visualizar]]';
+        });
+
+        toggleSenha2.addEventListener('click', function() {
+            const isPassword = senha2Input.type === 'password';
+            senha2Input.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? '[[icone:ocultar]]' : '[[icone:visualizar]]';
+        });
+
+        // ==========================================
+        // FORÇA DA SENHA
+        // ==========================================
+        senhaInput.addEventListener('input', function() {
+            const senha = this.value;
+
+            if (senha.length === 0) {
+                passwordStrength.classList.remove('show');
+                return;
+            }
+
+            passwordStrength.classList.add('show');
+
+            let forca = 0;
+
+            if (senha.length >= 6) forca++;
+            if (senha.length >= 10) forca++;
+            if (/[A-Z]/.test(senha) && /[a-z]/.test(senha)) forca++;
+            if (/[0-9]/.test(senha)) forca++;
+            if (/[^A-Za-z0-9]/.test(senha)) forca++;
+
+            strengthFill.classList.remove('fraca', 'media', 'forte');
+            strengthText.classList.remove('fraca', 'media', 'forte');
+
+            if (forca <= 2) {
+                strengthFill.classList.add('fraca');
+                strengthText.classList.add('fraca');
+                strengthText.textContent = '[[icone:status]] Senha fraca';
+            } else if (forca <= 3) {
+                strengthFill.classList.add('media');
+                strengthText.classList.add('media');
+                strengthText.textContent = '[[icone:status]] Senha média';
+            } else {
+                strengthFill.classList.add('forte');
+                strengthText.classList.add('forte');
+                strengthText.textContent = '[[icone:status]] Senha forte';
+            }
+        });
+
+        // ==========================================
+        // VERIFICAR SE AS SENHAS COINCIDEM
+        // ==========================================
+        senha2Input.addEventListener('input', function() {
+            const s1 = senhaInput.value;
+            const s2 = this.value;
+
+            if (!s2) {
+                senhaMatch.style.display = 'none';
+                return;
+            }
+
+            senhaMatch.style.display = 'block';
+
+            if (s1 === s2) {
+                senhaMatch.style.color = 'var(--success)';
+                senhaMatch.textContent = '[[icone:confirmar]] As senhas coincidem';
+            } else {
+                senhaMatch.style.color = 'var(--danger)';
+                senhaMatch.textContent = '[[icone:fechar]] As senhas não coincidem';
+            }
+        });
+
+        // ==========================================
+        // MENSAGENS
+        // ==========================================
+        function mostrarErro(msg) {
+            msgSucesso.classList.remove('show');
+            msgErro.textContent = msg;
+            msgErro.classList.add('show');
+            msgErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function mostrarSucesso(msg) {
+            msgErro.classList.remove('show');
+            msgSucesso.innerHTML = msg;
+            msgSucesso.classList.add('show');
+        }
+
+        // ==========================================
+        // ENTRAR NA EMPRESA
+        // ==========================================
+        function entrarEmpresa() {
+            console.log('[[icone:estrela]] entrarEmpresa() chamada');
+
+            msgErro.classList.remove('show');
+            msgSucesso.classList.remove('show');
+
+            const codigo = codigoInput.value.trim().toUpperCase();
+            const nome = nomeInput.value.trim();
+            const email = emailInput.value.trim();
+            const senha = senhaInput.value;
+            const senha2 = senha2Input.value;
+
+            // ===== VALIDAÇÕES =====
+            if (!codigo) {
+                mostrarErro('[[icone:alerta]] Informe o código da empresa');
+                codigoInput.focus();
+                return;
+            }
+
+            if (!/^GEST-[A-Z0-9]{6,20}$/.test(codigo)) {
+                mostrarErro('[[icone:alerta]] Código inválido. Cole o código completo fornecido pela empresa');
+                codigoInput.focus();
+                return;
+            }
+
+            if (!nome || nome.length < 3) {
+                mostrarErro('[[icone:alerta]] Informe seu nome completo (mínimo 3 caracteres)');
+                nomeInput.focus();
+                return;
+            }
+
+            if (!email) {
+                mostrarErro('[[icone:alerta]] Informe um e-mail');
+                emailInput.focus();
+                return;
+            }
+
+            if (!validarEmail(email)) {
+                mostrarErro('[[icone:alerta]] Formato de e-mail inválido');
+                emailInput.focus();
+                return;
+            }
+
+            if (!senha) {
+                mostrarErro('[[icone:alerta]] Informe uma senha');
+                senhaInput.focus();
+                return;
+            }
+
+            if (senha.length < 8) {
+                mostrarErro('[[icone:alerta]] A senha deve ter no mínimo 8 caracteres');
+                senhaInput.focus();
+                return;
+            }
+
+            if (senha !== senha2) {
+                mostrarErro('[[icone:alerta]] As senhas não coincidem');
+                senha2Input.focus();
+                return;
+            }
+
+            // ===== LOADING =====
+            btnEntrar.disabled = true;
+            btnEntrarTexto.innerHTML = '<span class="loading-spinner"></span>Entrando na empresa...';
+
+            // ===== API =====
+            apiRequest('/empresas/entrar', {
+                method: 'POST',
+                body: JSON.stringify({
+                    codigo: codigo,
+                    nome: nome,
+                    email: email,
+                    senha: senha
+                })
+            })
+            .then(function(response) {
+                
+
+                // Salvar sessão
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('usuario', JSON.stringify(response.usuario));
+                localStorage.setItem('empresa', JSON.stringify(response.empresa));
+
+                // Mostrar sucesso
+                mostrarSucesso(
+                    '[[icone:estrela]] <strong>Bem-vindo(a), ' + response.usuario.nome.split(' ')[0] + '!</strong><br><br>' +
+                    'Você entrou na empresa:<br>' +
+                    '<strong style="font-size: 1.1rem; color: var(--success);">' + response.empresa.nome + '</strong><br><br>' +
+                    '[[icone:relogio]] Redirecionando para seu dashboard...'
+                );
+
+                // Desabilitar interação
+                codigoInput.disabled = true;
+                nomeInput.disabled = true;
+                emailInput.disabled = true;
+                senhaInput.disabled = true;
+                senha2Input.disabled = true;
+
+                // Redirecionar
+                setTimeout(function() {
+                    window.location.href = 'colaborador/dashboard.html';
+                }, 2500);
+            })
+            .catch(function(error) {
+                console.error('[[icone:fechar]] Erro:', error);
+
+                let mensagem = error.message || 'Erro ao entrar na empresa';
+
+                if (mensagem.includes('não encontrada') || mensagem.includes('inativa')) {
+                    mensagem = '[[icone:alerta]] Código da empresa não encontrado. Verifique com o administrador.';
+                    codigoInput.focus();
+                    codigoInput.select();
+                } else if (mensagem.includes('já está cadastrado')) {
+                    mensagem = '[[icone:alerta]] Este e-mail já está cadastrado. Faça login ou use outro e-mail.';
+                    emailInput.focus();
+                } else if (mensagem.includes('conexão') || mensagem.includes('fetch')) {
+                    mensagem = '[[icone:caixa]] Erro de conexão. Verifique se o servidor está rodando.';
+                }
+
+                mostrarErro(mensagem);
+
+                btnEntrar.disabled = false;
+                btnEntrarTexto.innerHTML = '[[icone:sair]] Entrar na Empresa';
+            });
+        }
+
+        // ==========================================
+        // ENTER PARA ENVIAR
+        // ==========================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !btnEntrar.disabled) {
+                const activeEl = document.activeElement;
+                if (activeEl && activeEl.tagName === 'INPUT') {
+                    entrarEmpresa();
+                }
+            }
+        });
+
+        // ==========================================
+        // VERIFICAR SE JÁ ESTÁ LOGADO
+        // ==========================================
+        if (estaLogado()) {
+            const user = getUsuario();
+            if (user) {
+                const dashboards = {
+                    'administrador_principal': 'admin/dashboard.html',
+                    'administrador_setor': 'admin/dashboard.html',
+                    'gestor': 'gestor/dashboard.html',
+                    'colaborador': 'colaborador/dashboard.html'
+                };
+                if (dashboards[user.role]) {
+                    window.location.href = dashboards[user.role];
+                }
+            }
+        }
+
+        console.log('[[icone:confirmar]] entrar-empresa.html carregado com sucesso!');
+    </script>
+
+<script src="js/icones.js"></script>
+</body>
+</html>

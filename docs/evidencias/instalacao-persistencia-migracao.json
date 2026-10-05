@@ -1,0 +1,26 @@
+{
+  "node": "v24.19.0",
+  "plataforma": "linux",
+  "resultados": [
+    "npm start iniciou Express e entregou o build com Helmet/CSP.",
+    "Guia /docs e inventário OpenAPI acessíveis.",
+    "Empresa persistiu após encerrar e reiniciar npm start; login JWT aprovado.",
+    "Backup SQLite e uploads criado pelo script oficial.",
+    {
+      "migracao_real_do_zip": {
+        "empresas": 5,
+        "setores": 50,
+        "usuarios": 6,
+        "categorias": 15,
+        "ordens": 1,
+        "historico": 1,
+        "notificacoes": 1,
+        "auditoria": 10,
+        "chats": 5,
+        "conhecimento": 0
+      },
+      "integrity_check": "ok",
+      "foreign_key_check": 0
+    }
+  ]
+}

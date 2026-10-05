@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Conheça todos os recursos da plataforma Gestão OS">
+    <title>Recursos - Gestão OS</title>
+    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+<link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        /* ==========================================
+           ESTILOS ESPECÍFICOS DA PÁGINA
+           ========================================== */
+        .page-hero {
+            padding: 60px 0 40px;
+            text-align: center;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .page-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-hero p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .resource-section {
+            padding: 60px 0;
+        }
+
+        .resource-section:nth-child(even) {
+            background: var(--bg-card);
+        }
+
+        .resource-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-align: center;
+            display: block;
+        }
+
+        .resource-section h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .resource-section > .container > p {
+            text-align: center;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 48px;
+        }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .resource-card {
+            background: var(--bg-card);
+            padding: 32px 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-section:nth-child(even) .resource-card {
+            background: var(--bg);
+        }
+
+        .resource-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--blue-200);
+        }
+
+        .resource-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .resource-card-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius);
+            background: var(--blue-50);
+            font-size: 1.75rem;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+
+        .resource-card:hover .resource-card-icon {
+            background: var(--gradient-primary);
+            transform: scale(1.1);
+        }
+
+        .resource-card h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .resource-card p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* ==========================================
+           COMPARAÇÃO
+           ========================================== */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .comparison-card {
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+        }
+
+        .comparison-card.bad {
+            background: #fff5f5;
+            border-color: #fed7d7;
+        }
+
+        .comparison-card.good {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        [data-theme="dark"] .comparison-card.bad {
+            background: #2d1515;
+            border-color: #7f1d1d;
+        }
+
+        [data-theme="dark"] .comparison-card.good {
+            background: #0f291a;
+            border-color: #064e3b;
+        }
+
+        .comparison-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+        }
+
+        .comparison-card.bad h3 {
+            color: var(--danger);
+        }
+
+        .comparison-card.good h3 {
+            color: var(--success);
+        }
+
+        .comparison-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .comparison-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .comparison-list li::before {
+            content: '';
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .comparison-card.bad .comparison-list li::before {
+            content: '✕';
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .comparison-card.good .comparison-list li::before {
+            content: '✓';
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        [data-theme="dark"] .comparison-card.bad .comparison-list li::before {
+            background: #7f1d1d;
+            color: #f87171;
+        }
+
+        [data-theme="dark"] .comparison-card.good .comparison-list li::before {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        /* ==========================================
+           RESPONSIVO
+           ========================================== */
+        @media (max-width: 1024px) {
+            .resource-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-hero {
+                padding: 40px 0 30px;
+            }
+
+            .page-hero h1 {
+                font-size: 2rem;
+            }
+
+            .page-hero p {
+                font-size: 1rem;
+            }
+
+            .resource-section {
+                padding: 40px 0;
+            }
+
+            .resource-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .resource-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         NAVBAR
+         ============================================ -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <img src="assets/logo.png" alt="Gestão OS" style="height: 40px; width: auto;">
+                <span class="brand-text">Gestão OS</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="recursos.html" class="active">Recursos</a></li>
+                <li><a href="como-funciona.html">Como Funciona</a></li>
+                <li><a href="seguranca.html">Segurança</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="sobre.html">Sobre</a></li>
+                <li><a href="contato.html">Contato</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="btn btn-outline" onclick="window.location.href='entrar-empresa.html'">
+                    Entrar
+                </button>
+                <button class="btn btn-primary" onclick="window.location.href='criar-empresa.html'">
+                    Criar Empresa
+                </button>
+                <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema">[[icone:lua]]</button>
+                <button class="nav-toggle" aria-label="Menu">[[icone:menu]]</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================
+         PAGE HERO
+         ============================================ -->
+    <section class="page-hero">
+        <div class="container page-hero-content">
+            <span class="section-badge">Recursos</span>
+            <h1>Tudo que sua empresa precisa</h1>
+            <p>Uma plataforma completa para gestão de ordens de serviço, com recursos pensados para empresas de todos os tamanhos.</p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         SEÇÃO 1: CORE (ESSENCIAIS)
+         ============================================ -->
+    <section class="resource-section">
+        <div class="container">
+            <span class="resource-section-title">Essenciais</span>
+            <h2>Recursos Fundamentais</h2>
+            <p>As funcionalidades base para começar a gerenciar suas ordens de serviço</p>
+
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:empresa]]</div>
+                    <h3>Multiempresa</h3>
+                    <p>Ambientes totalmente isolados. Cada empresa possui seus próprios usuários, setores e ordens de serviço, sem interferência entre si.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:ordens]]</div>
+                    <h3>Ordens de Serviço</h3>
+                    <p>Fluxo completo: abertura, classificação, priorização, encaminhamento, atendimento e conclusão com histórico detalhado.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:setores]]</div>
+                    <h3>Gestão de Setores</h3>
+                    <p>Crie, edite e organize setores. Atribua gestores e defina permissões específicas para cada área da empresa.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:equipe]]</div>
+                    <h3>Controle de Usuários</h3>
+                    <p>Gerencie colaboradores, gestores e administradores com diferentes níveis de permissão e acesso.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:cadeado]]</div>
+                    <h3>Segurança</h3>
+                    <p>Autenticação JWT, senhas criptografadas com bcrypt, verificação de e-mail e rate limiting contra ataques.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:chave]]</div>
+                    <h3>Código da Empresa</h3>
+                    <p>Sistema de código único para entrada de colaboradores, similar ao Google Classroom. Fácil de compartilhar e renovar.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         SEÇÃO 2: PRODUTIVIDADE
+         ============================================ -->
+    <section class="resource-section">
+        <div class="container">
+            <span class="resource-section-title">Produtividade</span>
+            <h2>Ferramentas de Gestão</h2>
+            <p>Recursos avançados para otimizar o dia a dia e melhorar a eficiência</p>
+
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:painel]]</div>
+                    <h3>Dashboards</h3>
+                    <p>Visualizações em tempo real com gráficos, indicadores e métricas de desempenho dos setores.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:grafico]]</div>
+                    <h3>Relatórios</h3>
+                    <p>Relatórios detalhados por setor, categoria, prioridade, período e tempo de atendimento. Exportação em CSV e PDF.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:notificacao]]</div>
+                    <h3>Notificações</h3>
+                    <p>Central de notificações com alertas para novas OS, urgências, prazos próximos e conclusões.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:calendario]]</div>
+                    <h3>Calendário</h3>
+                    <p>Visualize prazos e eventos em formato de calendário mensal, semanal ou diário com filtros por setor.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:ordens]]</div>
+                    <h3>Kanban</h3>
+                    <p>Quadro visual com arrastar e soltar entre colunas, permitindo gestão visual das OS por status.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:chat]]</div>
+                    <h3>Chat Interno</h3>
+                    <p>Comunicação direta entre setores e colaboradores, com chats por equipe e conversas privadas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         SEÇÃO 3: AVANÇADOS
+         ============================================ -->
+    <section class="resource-section">
+        <div class="container">
+            <span class="resource-section-title">Avançados</span>
+            <h2>Recursos Profissionais</h2>
+            <p>Funcionalidades que elevam a gestão ao nível empresarial</p>
+
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:relogio]]</div>
+                    <h3>SLA Configurável</h3>
+                    <p>Defina prazos por prioridade: Baixa (7 dias), Média (5 dias), Alta (3 dias), Urgente (24h).</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:cadeado]]</div>
+                    <h3>Solicitações Sigilosas</h3>
+                    <p>OS com sigilo protegem a identidade do solicitante em situações sensíveis como denúncias e reclamações.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:anexo]]</div>
+                    <h3>Anexos</h3>
+                    <p>Anexe arquivos JPG, PNG e PDF nas ordens de serviço com validação de formato e tamanho (até 5MB).</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:buscar]]</div>
+                    <h3>Auditoria</h3>
+                    <p>Registro completo de todas as ações: quem fez, quando, o que alterou. Rastreabilidade total.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:conhecimento]]</div>
+                    <h3>Base de Conhecimento</h3>
+                    <p>Wiki interna com artigos, tutoriais e soluções. Compartilhe conhecimento dentro da empresa.</p>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-card-icon">[[icone:configuracoes]]</div>
+                    <h3>Modo Escuro</h3>
+                    <p>Tema claro e escuro com preferência salva. Conforto visual para longas jornadas de trabalho.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         SEÇÃO 4: COMPARAÇÃO
+         ============================================ -->
+    <section class="resource-section">
+        <div class="container">
+            <span class="resource-section-title">Comparação</span>
+            <h2>Gestão desorganizada vs. Gestão OS</h2>
+            <p>Veja a diferença que a plataforma faz na sua empresa</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-card bad">
+                    <h3>[[icone:fechar]] Sem Gestão OS</h3>
+                    <ul class="comparison-list">
+                        <li>Solicitações perdidas em WhatsApp, e-mail e papel</li>
+                        <li>Sem responsável definido para cada demanda</li>
+                        <li>Não há controle de prazos ou SLA</li>
+                        <li>Impossível saber o histórico de cada solicitação</li>
+                        <li>Dificuldade para medir desempenho dos setores</li>
+                        <li>Falta de relatórios e indicadores confiáveis</li>
+                        <li>Nenhuma rastreabilidade de ações</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card good">
+                    <h3>[[icone:confirmar]] Com Gestão OS</h3>
+                    <ul class="comparison-list">
+                        <li>Centralização de todas as solicitações em um só lugar</li>
+                        <li>Encaminhamento automático para o setor responsável</li>
+                        <li>SLA configurável com alertas de prazo e atraso</li>
+                        <li>Histórico completo com timeline de cada OS</li>
+                        <li>Dashboards com métricas em tempo real</li>
+                        <li>Relatórios detalhados e exportáveis</li>
+                        <li>Auditoria completa de todas as ações</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CTA FINAL
+         ============================================ -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Pronto para começar?</h2>
+                <p>Crie sua empresa e comece a gerenciar ordens de serviço em minutos</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary btn-lg" onclick="window.location.href='criar-empresa.html'">
+                        Criar Empresa Grátis
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="window.location.href='como-funciona.html'">
+                        Ver Como Funciona
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="brand">[[icone:ordens]] Gestão OS</span>
+                    <p>Plataforma profissional para gestão de ordens de serviço empresarial.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="LinkedIn">[[icone:link]]</a>
+                        <a href="#" aria-label="GitHub">[[icone:caixa]]</a>
+                        <a href="#" aria-label="YouTube">[[icone:direita]]</a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Produto</h4>
+                    <a href="recursos.html">Recursos</a>
+                    <a href="como-funciona.html">Como Funciona</a>
+                    <a href="seguranca.html">Segurança</a>
+                    <a href="faq.html">FAQ</a>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Empresa</h4>
+                    <a href="sobre.html">Sobre</a>
+                    <a href="contato.html">Contato</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Privacidade</a>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Acesso</h4>
+                    <a href="login.html">Login</a>
+                    <a href="criar-empresa.html">Criar Empresa</a>
+                    <a href="entrar-empresa.html">Entrar em Empresa</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Gestão de Ordens de Serviço Empresarial. Todos os direitos reservados.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // ==========================================
+        // SCROLL SUAVE
+        // ==========================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                e.preventDefault();
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ==========================================
+        // NAVBAR SCROLL EFFECT
+        // ==========================================
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.boxShadow = '';
+            }
+        });
+    </script>
+
+<script src="js/icones.js"></script>
+</body>
+</html>
