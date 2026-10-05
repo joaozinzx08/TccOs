@@ -8,20 +8,330 @@
     <script src="js/i18n.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dark-mode.css">
-<link rel="icon" type="image/png" href="assets/logo.png"></head>
-<body class="auth-page">
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <style>
+        .saas-auth-page {
+            min-height: 100vh;
+            padding: 0;
+            align-items: stretch;
+            justify-content: stretch;
+            background: #f5f7fb;
+            overflow-x: hidden;
+        }
 
+        .auth-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .auth-showcase {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-width: 0;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: clamp(36px, 6vw, 80px);
+            color: #fff;
+            background:
+                radial-gradient(ellipse at 15% 85%, rgba(37, 99, 235, 0.5), transparent 42%),
+                linear-gradient(145deg, #0b1734 0%, #102b58 56%, #123c78 100%);
+        }
+
+        .auth-showcase::before,
+        .auth-showcase::after {
+            position: absolute;
+            content: "";
+            pointer-events: none;
+            border: 1px solid rgba(191, 219, 254, 0.12);
+            border-radius: 50%;
+        }
+
+        .auth-showcase::before {
+            width: 540px;
+            height: 540px;
+            right: -250px;
+            top: -205px;
+        }
+
+        .auth-showcase::after {
+            width: 390px;
+            height: 390px;
+            right: -180px;
+            top: -130px;
+        }
+
+        .showcase-brand,
+        .showcase-content,
+        .showcase-bottom {
+            position: relative;
+            z-index: 1;
+        }
+
+        .showcase-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            width: fit-content;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .showcase-brand img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #fff;
+            padding: 4px;
+        }
+
+        .showcase-brand strong {
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .showcase-content {
+            width: min(100%, 540px);
+            margin: auto 0;
+            padding: 64px 0 40px;
+        }
+
+        .showcase-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+            color: #bfdbfe;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .showcase-eyebrow::before {
+            width: 22px;
+            height: 1px;
+            background: currentColor;
+            content: "";
+        }
+
+        .showcase-content h2 {
+            max-width: 540px;
+            margin: 0 0 22px;
+            color: #fff;
+            font-size: clamp(2.8rem, 5vw, 4.5rem);
+            font-weight: 750;
+            letter-spacing: -0.055em;
+            line-height: 1.04;
+        }
+
+        .showcase-content > p {
+            max-width: 470px;
+            margin: 0;
+            color: #c7d6ee;
+            font-size: clamp(1rem, 1.35vw, 1.125rem);
+            line-height: 1.75;
+        }
+
+        .showcase-benefits {
+            display: grid;
+            gap: 12px;
+            margin-top: 34px;
+        }
+
+        .showcase-benefit {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            min-height: 58px;
+            padding: 12px 16px;
+            border: 1px solid rgba(219, 234, 254, 0.16);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.075);
+            color: #f8fbff;
+            font-size: 0.92rem;
+            font-weight: 550;
+            backdrop-filter: blur(12px);
+            animation: auth-card-float 6s ease-in-out infinite;
+        }
+
+        .showcase-benefit:nth-child(2) { animation-delay: -1.5s; }
+        .showcase-benefit:nth-child(3) { animation-delay: -3s; }
+
+        .showcase-benefit [data-icone] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            border-radius: 10px;
+            background: rgba(96, 165, 250, 0.18);
+            color: #93c5fd;
+        }
+
+        .showcase-benefit svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .showcase-bottom {
+            color: #8fa8cb;
+            font-size: 0.78rem;
+            letter-spacing: 0.02em;
+        }
+
+        .auth-form-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            padding: clamp(32px, 6vw, 88px);
+        }
+
+        .saas-auth-page .auth-container {
+            width: 100%;
+            max-width: 460px;
+        }
+
+        .saas-auth-page .auth-card {
+            padding: clamp(28px, 4vw, 48px);
+            border: 1px solid #e8edf5;
+            border-radius: 22px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(15, 35, 70, 0.09);
+        }
+
+        .saas-auth-page .auth-brand {
+            display: none;
+        }
+
+        .saas-auth-page .auth-header {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .saas-auth-page .auth-header h2 {
+            margin-bottom: 8px;
+            color: #172033;
+            font-size: 1.8rem;
+            letter-spacing: -0.035em;
+        }
+
+        .saas-auth-page .auth-header p,
+        .saas-auth-page .auth-footer p {
+            color: #68758a;
+            line-height: 1.6;
+        }
+
+        .saas-auth-page .form-group label {
+            margin-bottom: 8px;
+            color: #344054;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .saas-auth-page .form-group input {
+            min-height: 50px;
+            border: 1px solid #d9e1ec;
+            border-radius: 10px;
+            background: #fff;
+            color: #172033;
+            font-size: 0.95rem;
+        }
+
+        .saas-auth-page .form-group input:focus {
+            border-color: #3978e8;
+            box-shadow: 0 0 0 4px rgba(57, 120, 232, 0.12);
+        }
+
+        .saas-auth-page #toggle-senha {
+            color: #68758a !important;
+        }
+
+        .saas-auth-page #btn-login {
+            min-height: 52px;
+            border-radius: 10px;
+            background: #2563eb;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+            font-weight: 650;
+        }
+
+        .saas-auth-page #btn-login:hover {
+            background: #1d4ed8;
+        }
+
+        .saas-auth-page .auth-footer {
+            margin-top: 28px;
+        }
+
+        .saas-auth-page .auth-footer a,
+        .saas-auth-page .forgot-password {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        @keyframes auth-card-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @media (max-width: 900px) {
+            .auth-layout { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+            .auth-showcase { padding: 40px; }
+            .auth-form-panel { padding: 36px; }
+            .showcase-content h2 { font-size: clamp(2.5rem, 5vw, 3.5rem); }
+        }
+
+        @media (max-width: 680px) {
+            .auth-layout { grid-template-columns: minmax(0, 1fr); }
+            .auth-showcase {
+                min-height: auto;
+                padding: 28px 24px 30px;
+            }
+            .showcase-content { padding: 38px 0 24px; }
+            .showcase-content h2 { font-size: clamp(2.45rem, 11vw, 3.5rem); }
+            .showcase-content > p { font-size: 0.96rem; }
+            .showcase-benefits { gap: 8px; margin-top: 22px; }
+            .showcase-benefit { min-height: 50px; padding: 8px 11px; font-size: 0.85rem; }
+            .showcase-benefit [data-icone] { width: 30px; height: 30px; flex-basis: 30px; }
+            .showcase-bottom { display: none; }
+            .auth-form-panel { padding: 28px 18px 36px; }
+            .saas-auth-page .auth-card { padding: 28px 22px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .showcase-benefit { animation: none; }
+        }
+    </style>
+</head>
+<body class="auth-page saas-auth-page">
+
+    <main class="auth-layout">
+        <section class="auth-showcase" aria-label="Sobre o Gestão OS">
+            <a href="index.html" class="showcase-brand">
+                <img src="assets/logo.png" alt="">
+                <strong>Gestão OS</strong>
+            </a>
+            <div class="showcase-content">
+                <span class="showcase-eyebrow">Gestão simples. Resultados reais.</span>
+                <h2>Organize.<br>Acompanhe.<br>Resolva.</h2>
+                <p>Centralize ordens de serviço, acompanhe solicitações e conecte todos os setores da sua empresa em um único lugar.</p>
+                <div class="showcase-benefits">
+                    <div class="showcase-benefit"><span data-icone="ordens"></span><span>Ordens de serviço centralizadas</span></div>
+                    <div class="showcase-benefit"><span data-icone="equipe"></span><span>Gestão de equipes e setores</span></div>
+                    <div class="showcase-benefit"><span data-icone="grafico"></span><span>Acompanhamento em tempo real</span></div>
+                </div>
+            </div>
+            <div class="showcase-bottom">Uma plataforma para manter sua operação em movimento.</div>
+        </section>
+        <section class="auth-form-panel" aria-label="Acessar sua conta">
     <div class="auth-container">
         <div class="auth-card">
-
-            <!-- ============================================
-                 BRAND
-                 ============================================ -->
-            <a href="index.html" class="auth-brand" style="text-decoration:none;">
-                <img src="assets/logo.png" alt="Gestão OS" style="height: 40px; width: auto;">
-                <h1>Gestão OS</h1>
-            </a>
-
             <!-- ============================================
                  HEADER
                  ============================================ -->
@@ -44,7 +354,6 @@
                         required 
                         placeholder="seu@email.com" 
                         autocomplete="email"
-                        autofocus
                     >
                 </div>
 
@@ -120,6 +429,8 @@
 
         </div>
     </div>
+        </section>
+    </main>
 
     <!-- ============================================
          SCRIPTS

@@ -459,31 +459,345 @@
                 padding: 16px;
             }
         }
+
+        .saas-auth-page {
+            min-height: 100vh;
+            padding: 0;
+            align-items: stretch;
+            justify-content: stretch;
+            background: #f5f7fb;
+            overflow-x: hidden;
+        }
+
+        .auth-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            align-items: start;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .auth-showcase {
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-width: 0;
+            height: 100vh;
+            min-height: 680px;
+            overflow: hidden;
+            padding: clamp(36px, 5vw, 72px);
+            color: #fff;
+            background:
+                radial-gradient(ellipse at 15% 85%, rgba(37, 99, 235, 0.5), transparent 42%),
+                linear-gradient(145deg, #0b1734 0%, #102b58 56%, #123c78 100%);
+        }
+
+        .auth-showcase::before,
+        .auth-showcase::after {
+            position: absolute;
+            content: "";
+            pointer-events: none;
+            border: 1px solid rgba(191, 219, 254, 0.12);
+            border-radius: 50%;
+        }
+
+        .auth-showcase::before {
+            width: 540px;
+            height: 540px;
+            right: -250px;
+            top: -205px;
+        }
+
+        .auth-showcase::after {
+            width: 390px;
+            height: 390px;
+            right: -180px;
+            top: -130px;
+        }
+
+        .showcase-brand,
+        .showcase-content,
+        .showcase-bottom {
+            position: relative;
+            z-index: 1;
+        }
+
+        .showcase-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            width: fit-content;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .showcase-brand img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #fff;
+            padding: 4px;
+        }
+
+        .showcase-brand strong {
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .showcase-content {
+            width: min(100%, 540px);
+            margin: auto 0;
+            padding: 48px 0 32px;
+        }
+
+        .showcase-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+            color: #bfdbfe;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .showcase-eyebrow::before {
+            width: 22px;
+            height: 1px;
+            background: currentColor;
+            content: "";
+        }
+
+        .showcase-content h2 {
+            max-width: 500px;
+            margin: 0 0 20px;
+            color: #fff;
+            font-size: clamp(2.65rem, 4.6vw, 4rem);
+            font-weight: 750;
+            letter-spacing: -0.055em;
+            line-height: 1.06;
+        }
+
+        .showcase-content > p {
+            max-width: 470px;
+            margin: 0;
+            color: #c7d6ee;
+            font-size: clamp(0.97rem, 1.2vw, 1.08rem);
+            line-height: 1.75;
+        }
+
+        .showcase-benefits {
+            display: grid;
+            gap: 10px;
+            margin-top: 28px;
+        }
+
+        .showcase-benefit {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            min-height: 54px;
+            padding: 10px 14px;
+            border: 1px solid rgba(219, 234, 254, 0.16);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.075);
+            color: #f8fbff;
+            font-size: 0.88rem;
+            font-weight: 550;
+            backdrop-filter: blur(12px);
+            animation: auth-card-float 6s ease-in-out infinite;
+        }
+
+        .showcase-benefit:nth-child(2) { animation-delay: -1.5s; }
+        .showcase-benefit:nth-child(3) { animation-delay: -3s; }
+
+        .showcase-benefit [data-icone] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            flex: 0 0 33px;
+            border-radius: 10px;
+            background: rgba(96, 165, 250, 0.18);
+            color: #93c5fd;
+        }
+
+        .showcase-benefit svg { width: 19px; height: 19px; }
+
+        .showcase-bottom {
+            color: #8fa8cb;
+            font-size: 0.78rem;
+            letter-spacing: 0.02em;
+        }
+
+        .auth-form-panel {
+            min-width: 0;
+            padding: 40px clamp(28px, 4vw, 64px);
+        }
+
+        .saas-auth-page .auth-container {
+            width: 100%;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .saas-auth-page .auth-card {
+            padding: clamp(28px, 3vw, 42px);
+            border: 1px solid #e8edf5;
+            border-radius: 22px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(15, 35, 70, 0.09);
+        }
+
+        .saas-auth-page .auth-brand { display: none; }
+        .saas-auth-page .auth-hero { display: none; }
+
+        .saas-auth-page .auth-header {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .saas-auth-page .auth-header h2 {
+            margin-bottom: 7px;
+            color: #172033;
+            font-size: 1.75rem;
+            letter-spacing: -0.035em;
+        }
+
+        .saas-auth-page .auth-header p,
+        .saas-auth-page .auth-footer p {
+            color: #68758a;
+            line-height: 1.6;
+        }
+
+        .saas-auth-page .info-box-success {
+            border: 1px solid #d8e6ff;
+            border-left: 4px solid #3978e8;
+            border-radius: 10px;
+            background: #f2f7ff;
+            color: #465a78;
+        }
+
+        .saas-auth-page .info-box-success strong { color: #1d4ed8; }
+
+        .saas-auth-page .form-group { margin-bottom: 16px; }
+
+        .saas-auth-page .form-group label {
+            margin-bottom: 7px;
+            color: #344054;
+            font-size: 0.86rem;
+            font-weight: 600;
+        }
+
+        .saas-auth-page .form-group input {
+            min-height: 48px;
+            border: 1px solid #d9e1ec;
+            border-radius: 10px;
+            background: #fff;
+            color: #172033;
+            font-size: 0.93rem;
+        }
+
+        .saas-auth-page .form-group input:focus {
+            border-color: #3978e8;
+            box-shadow: 0 0 0 4px rgba(57, 120, 232, 0.12);
+        }
+
+        .saas-auth-page .form-group small { color: #748198; }
+
+        .saas-auth-page .toggle-password { color: #68758a; }
+
+        .saas-auth-page .terms-check {
+            border: 1px solid #e7edf5;
+            border-radius: 10px;
+            background: #f7f9fc;
+        }
+
+        .saas-auth-page #btn-criar {
+            min-height: 52px;
+            border-radius: 10px;
+            background: #2563eb;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+            font-weight: 650;
+        }
+
+        .saas-auth-page #btn-criar:hover { background: #1d4ed8; }
+
+        .saas-auth-page .auth-footer {
+            margin-top: 22px;
+            border-top-color: #e7edf5;
+        }
+
+        .saas-auth-page .auth-footer a { color: #2563eb; }
+
+        @keyframes auth-card-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @media (max-width: 900px) {
+            .auth-layout { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+            .auth-showcase { padding: 34px; }
+            .auth-form-panel { padding: 32px 24px; }
+            .showcase-content h2 { font-size: clamp(2.45rem, 4.8vw, 3.35rem); }
+            .showcase-benefit { font-size: 0.82rem; }
+        }
+
+        @media (max-width: 680px) {
+            .auth-layout { grid-template-columns: minmax(0, 1fr); }
+            .auth-showcase {
+                position: relative;
+                height: auto;
+                min-height: auto;
+                padding: 26px 22px 28px;
+            }
+            .showcase-content { padding: 34px 0 22px; }
+            .showcase-content h2 { font-size: clamp(2.35rem, 10vw, 3.2rem); }
+            .showcase-content > p { font-size: 0.94rem; }
+            .showcase-benefits { gap: 8px; margin-top: 20px; }
+            .showcase-benefit { min-height: 48px; padding: 8px 10px; font-size: 0.83rem; }
+            .showcase-benefit [data-icone] { width: 29px; height: 29px; flex-basis: 29px; }
+            .showcase-bottom { display: none; }
+            .auth-form-panel { padding: 22px 14px 34px; }
+            .saas-auth-page .auth-card { padding: 24px 19px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .showcase-benefit { animation: none; }
+        }
     </style>
 </head>
-<body class="auth-page">
+<body class="auth-page saas-auth-page">
 
-    <div class="auth-container" style="max-width: 480px;">
-        <div class="auth-card">
-
-            <!-- ============================================
-                 BRAND
-                 ============================================ -->
-            <a href="index.html" class="auth-brand" style="text-decoration:none;">
-                <img src="assets/logo.png" alt="Gestão OS" style="height: 40px; width: auto;">
-                <h1>Gestão OS</h1>
+    <main class="auth-layout">
+        <section class="auth-showcase" aria-label="Sobre o Gestão OS">
+            <a href="index.html" class="showcase-brand">
+                <img src="assets/logo.png" alt="">
+                <strong>Gestão OS</strong>
             </a>
-
-            <!-- ============================================
-                 HERO
-                 ============================================ -->
-            <div class="auth-hero">
-                <div class="auth-hero-icon">[[icone:empresa]]</div>
+            <div class="showcase-content">
+                <span class="showcase-eyebrow">Um espaço pronto para crescer</span>
+                <h2>Sua empresa começa organizada.</h2>
+                <p>Crie sua empresa no GestãoOS e tenha um ambiente exclusivo para gerenciar usuários, setores e ordens de serviço.</p>
+                <div class="showcase-benefits">
+                    <div class="showcase-benefit"><span data-icone="seguranca"></span><span>Código exclusivo da empresa</span></div>
+                    <div class="showcase-benefit"><span data-icone="empresa"></span><span>Dados separados entre empresas</span></div>
+                    <div class="showcase-benefit"><span data-icone="equipe"></span><span>Gestão completa de usuários e setores</span></div>
+                </div>
             </div>
-
-            <!-- ============================================
-                 HEADER
-                 ============================================ -->
+            <div class="showcase-bottom">Organização para cada equipe, desde o primeiro dia.</div>
+        </section>
+        <section class="auth-form-panel" aria-label="Criar uma empresa">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <!-- ============================================
+                         HEADER
+                         ============================================ -->
             <div class="auth-header">
                 <h2>Criar Nova Empresa</h2>
                 <p>Configure seu ambiente em menos de 1 minuto</p>
@@ -513,7 +827,6 @@
                     id="nome" 
                     placeholder="Ex: Minha Empresa Ltda"
                     autocomplete="organization"
-                    autofocus
                     maxlength="100"
                 >
             </div>
@@ -614,28 +927,6 @@
             <div id="msg-sucesso" class="success-message"></div>
 
             <!-- ============================================
-                 BENEFÍCIOS
-                 ============================================ -->
-            <div class="benefits-list">
-                <div class="benefit-item">
-                    <span class="check">✓</span>
-                    <span>Ambiente isolado e seguro por empresa</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="check">✓</span>
-                    <span>Código único para adicionar funcionários</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="check">✓</span>
-                    <span>10 setores pré-configurados (editáveis)</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="check">✓</span>
-                    <span>Dashboards, relatórios e auditoria inclusos</span>
-                </div>
-            </div>
-
-            <!-- ============================================
                  FOOTER
                  ============================================ -->
             <div class="auth-footer">
@@ -643,8 +934,10 @@
                 <p>É funcionário? <a href="entrar-empresa.html">Entrar em uma empresa</a></p>
             </div>
 
-        </div>
-    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- ============================================
          SCRIPTS
