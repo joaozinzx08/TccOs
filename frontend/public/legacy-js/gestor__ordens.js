@@ -60,6 +60,15 @@
         // ==========================================
         // CARREGAR DADOS (com auto-refresh funcional)
         // ==========================================
+        var escopoParam = new URLSearchParams(location.search).get('escopo');
+        var escopoAtual = ['meu-setor', 'minhas', 'todas'].includes(escopoParam) ? escopoParam : 'meu-setor';
+        document.querySelectorAll('[data-escopo]').forEach(function(link) {
+            if (link.dataset.escopo === escopoAtual) { link.className = 'btn btn-primary'; link.setAttribute('aria-current', 'page'); }
+        });
+        document.getElementById('escopo-descricao').textContent = escopoAtual === 'meu-setor'
+            ? 'Ordens destinadas ao seu setor. Atenda e acompanhe as solicitações autorizadas.'
+            : escopoAtual === 'minhas' ? 'Ordens que você abriu, inclusive para outros setores. Acompanhe o andamento e comente.'
+            : 'Ordens do seu setor e solicitações abertas por você.';
         async function carregarDados() {
             try {
                 console.log('[[icone:atualizar]] Carregando ordens...');
@@ -67,7 +76,7 @@
                 var headers = { 'Authorization': 'Bearer ' + token };
 
                 var results = await Promise.allSettled([
-                    window.legacyFetch('/api/ordens', { headers: headers }).then(function(r) { return r.json(); }),
+                    window.legacyFetch('/api/ordens?escopo=' + escopoAtual, { headers: headers }).then(function(r) { return r.json(); }),
                     window.legacyFetch('/api/setores', { headers: headers }).then(function(r) { return r.json(); })
                 ]);
 

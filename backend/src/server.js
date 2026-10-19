@@ -8,6 +8,8 @@ const app = createApp({
   dbPath: path.resolve(root, process.env.DATABASE_PATH || 'data/gestao.sqlite'),
   uploads: path.resolve(root, process.env.UPLOADS_PATH || 'data/uploads'),
   frontend: path.resolve(root, '../frontend/dist'),
+  authLimit: Number(process.env.AUTH_RATE_LIMIT || 25),
+  apiLimit: Number(process.env.API_RATE_LIMIT || 300),
 });
 const port = Number(process.env.PORT || 3000),
   host = process.env.HOST || '127.0.0.1';

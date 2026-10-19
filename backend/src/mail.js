@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 export function mailer({ directory, env = process.env }) {
-  return async ({ to, subject, text }) => {
+  return async ({ to, subject, text, html }) => {
     if (env.SMTP_HOST) {
       const transport = nodemailer.createTransport({
         host: env.SMTP_HOST,
@@ -13,12 +13,12 @@ export function mailer({ directory, env = process.env }) {
         connectionTimeout: 10000,
         socketTimeout: 10000,
       });
-      await transport.sendMail({ from: env.SMTP_FROM || env.SMTP_USER, to, subject, text });
+      await transport.sendMail({ from: env.SMTP_FROM || env.SMTP_USER, to, subject, text, html });
     } else if (env.NODE_ENV !== 'production') {
       mkdirSync(directory, { recursive: true, mode: 0o700 });
       writeFileSync(
         path.join(directory, randomUUID() + '.json'),
-        JSON.stringify({ to, subject, text, data: new Date().toISOString() }, null, 2),
+        JSON.stringify({ to, subject, text, html, data: new Date().toISOString() }, null, 2),
         { mode: 0o600 },
       );
       console.log(

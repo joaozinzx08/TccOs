@@ -84,9 +84,9 @@
                 headers: { 'Authorization': 'Bearer ' + token }
             })
             .then(function(r) { return r.json(); })
-            .then(function(data) {
+            .then(async function(data) {
                 console.log('[[icone:caixa]] Perfil:', data);
-                renderizarPerfil(data);
+                await renderizarPerfil(data);
                 carregarStats(data.id);
             })
             .catch(function(err) {
@@ -100,15 +100,26 @@
         // ==========================================
         // RENDERIZAR PERFIL
         // ==========================================
-        function renderizarPerfil(data) {
+        async function renderizarPerfil(data) {
             var nome = data.nome || 'Usuário';
             var primeiro = nome.split(' ')[0];
             var inicial = primeiro.charAt(0).toUpperCase();
 
             // Avatar
             var avatarBig = document.getElementById('profile-avatar');
+            var avatarUrl = '';
             if (data.avatar) {
-                avatarBig.innerHTML = '<img src="' + window.avatarURL(data.avatar) + '">';
+                await window.cacheAvatar(data.avatar);
+                avatarUrl = window.avatarURL(data.avatar);
+            }
+            if (avatarUrl) {
+                avatarBig.innerHTML = '<img src="' + avatarUrl + '" alt="Foto de perfil">';
+                usuarioAtual.avatar = data.avatar;
+                var localUser = JSON.parse(localStorage.getItem('usuario') || '{}');
+                localUser.avatar = data.avatar;
+                localStorage.setItem('usuario', JSON.stringify(localUser));
+                var sidebarAvatar = document.getElementById('sidebar-avatar');
+                if (sidebarAvatar) sidebarAvatar.innerHTML = '<img src="' + avatarUrl + '" alt="Foto de perfil">';
             } else {
                 avatarBig.textContent = inicial;
             }
@@ -274,46 +285,41 @@
         // ==========================================
         // AVATAR UPLOAD
         // ==========================================
-        document.getElementById('avatar-input').addEventListener('change', function(e) {
-            var file = e.target.files[0];
+        document.getElementById('avatar-input').addEventListener('change', async function(e) {
+            var input = e.target;
+            var file = input.files[0];
+            var status = document.getElementById('avatar-status');
             if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) { alert('Máximo 5MB'); return; }
-            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { alert('Formato inválido'); return; }
-
-            // Preview
-            var reader = new FileReader();
-            reader.onload = function(ev) {
-                document.getElementById('profile-avatar').innerHTML = '<img src="' + ev.target.result + '">';
-            };
-            reader.readAsDataURL(file);
-
-            // Upload
-            var formData = new FormData();
-            formData.append('avatar', file);
-            var token = localStorage.getItem('token');
-
-            window.legacyFetch('/api/perfil/avatar', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token },
-                body: formData
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.avatar) {
-                    // Atualizar localStorage
-                    var user = JSON.parse(localStorage.getItem('usuario') || '{}');
-                    user.avatar = data.avatar;
-                    localStorage.setItem('usuario', JSON.stringify(user));
-                    alert('[[icone:confirmar]] Avatar atualizado!');
-                    location.reload();
-                } else {
-                    alert('Erro: ' + (data.error || 'desconhecido'));
-                }
-            })
-            .catch(function(err) {
-                alert('Erro: ' + err.message);
-            });
+            if (file.size > 5 * 1024 * 1024) { status.textContent = 'A foto deve ter no máximo 5 MB.'; input.value = ''; return; }
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { status.textContent = 'Envie uma foto JPG, PNG ou WebP.'; input.value = ''; return; }
+            input.disabled = true;
+            status.textContent = 'Enviando e compactando sua foto…';
+            try {
+                var formData = new FormData();
+                formData.append('avatar', file);
+                var response = await window.legacyFetch('/api/perfil/avatar', { method: 'POST', body: formData });
+                var data = await response.json();
+                if (!response.ok || !data.avatar) throw Error(data.error || 'Não foi possível salvar a foto.');
+                var user = JSON.parse(localStorage.getItem('usuario') || '{}');
+                user.avatar = data.avatar;
+                localStorage.setItem('usuario', JSON.stringify(user));
+                usuarioAtual.avatar = data.avatar;
+                await window.cacheAvatar(data.avatar);
+                ['profile-avatar', 'sidebar-avatar'].forEach(function(id) {
+                    var container = document.getElementById(id);
+                    if (!container) return;
+                    var image = document.createElement('img');
+                    image.src = window.avatarURL(data.avatar);
+                    image.alt = 'Sua foto de perfil';
+                    container.replaceChildren(image);
+                });
+                status.textContent = 'Foto salva: ' + Math.max(1, Math.round(data.tamanhoFinal / 1024)) + ' KB · ' + data.largura + ' × ' + data.altura + ' px.';
+            } catch (error) {
+                status.textContent = error.message || 'Erro ao enviar a foto. Tente novamente.';
+            } finally {
+                input.disabled = false;
+                input.value = '';
+            }
         });
 
         // ==========================================

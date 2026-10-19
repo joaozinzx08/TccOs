@@ -5,6 +5,8 @@
         // ==========================================
         const form = document.getElementById('login-form');
         const emailInput = document.getElementById('email');
+        const companyInput = document.getElementById('codigo-empresa');
+        companyInput.addEventListener('input', () => companyInput.setCustomValidity(''));
         const senhaInput = document.getElementById('senha');
         const btnLogin = document.getElementById('btn-login');
         const errorDiv = document.getElementById('error-message');
@@ -109,7 +111,7 @@
             try {
                 const data = await apiRequest('/login', {
                     method: 'POST',
-                    body: JSON.stringify({ email, senha })
+                    body: JSON.stringify({ email, senha, codigoEmpresa: companyInput.value.trim() || undefined })
                 });
 
                 // Salvar e-mail se "Lembrar-me" estiver marcado

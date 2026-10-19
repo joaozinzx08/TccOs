@@ -1,6 +1,7 @@
 import express from 'express';
 import { mailer } from './mail.js';
 import { accountRecovery } from './account-recovery.js';
+import { compressAvatar } from './avatar-image.js';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import multer from 'multer';
@@ -62,7 +63,10 @@ export function createApp({
   jwtSecret = process.env.JWT_SECRET,
   jwtTtl = process.env.JWT_EXPIRES_IN || '8h',
   authLimit = 25,
+  apiLimit = 300,
   sendMail,
+  publicAppUrl = process.env.PUBLIC_APP_URL,
+  recoveryClock,
 } = {}) {
   const db = database(dbPath),
     app = express();
@@ -99,7 +103,7 @@ export function createApp({
       '/api',
       rateLimit({
         windowMs: 60000,
-        limit: 300,
+        limit: apiLimit,
         standardHeaders: 'draft-8',
         legacyHeaders: false,
         message: { error: 'Muitas requisições. Aguarde um minuto.' },
@@ -225,7 +229,14 @@ export function createApp({
   }
   function orders(req) {
     let rows = list('ordens', req).filter((o) => visible(o, req));
-    const { status, setorId, categoria, prioridade, q, periodo, de, ate } = req.query;
+    const { status, setorId, categoria, prioridade, q, periodo, de, ate, escopo } = req.query;
+    if (escopo && !['todas', 'meu-setor', 'minhas'].includes(escopo))
+      fail(400, 'Visão de ordens inválida.');
+    if (escopo === 'meu-setor') {
+      if (!isManager(req.user)) fail(403, 'Esta visão é exclusiva da gestão.');
+      rows = rows.filter((o) => req.user.setorId && o.setorResponsavelId === req.user.setorId);
+    }
+    if (escopo === 'minhas') rows = rows.filter((o) => o.solicitanteId === req.user.id);
     if (status && !statuses.includes(status)) fail(400, 'Status inválido.');
     if (prioridade && !priorities.includes(prioridade)) fail(400, 'Prioridade inválida.');
     let start = de ? Date.parse(de) : null,
@@ -268,6 +279,7 @@ export function createApp({
       ).map(([label, value]) => ({ label, value, nome: label, total: value }));
     const stats = {
       total: os.length,
+      pendentes: open.length,
       abertas: os.filter((o) => o.status === 'Aberta').length,
       emAnalise: os.filter((o) => o.status === 'Em análise').length,
       emAtendimento: os.filter((o) => o.status === 'Em atendimento').length,
@@ -474,6 +486,8 @@ export function createApp({
     auth,
     sendMail: sendMail || mailer({ directory: path.resolve(uploads, '../outbox') }),
     secret: jwtSecret,
+    publicAppUrl,
+    clock: recoveryClock,
   });
   app.use('/api', auth);
   app.post('/api/logout', (req, res) => {
@@ -528,6 +542,10 @@ export function createApp({
           fail(400, 'Senha atual incorreta.');
         user.senha = hashPassword(password(req.body.novaSenha));
         revoke(req.company, user.id);
+        for (const c of list('desafios', req).filter(
+          (c) => c.usuarioId === user.id && c.finalidade === 'senha',
+        ))
+          db.remove('desafios', c.id, req.company);
       }
       db.save('usuarios', req.company, user);
       audit(
@@ -1187,23 +1205,41 @@ export function createApp({
     });
     res.status(201).json(m);
   });
-  app.post('/api/perfil/avatar', upload.single('avatar'), (req, res) => {
+  app.post('/api/perfil/avatar', upload.single('avatar'), async (req, res) => {
+    let image,
+      saved = false;
     try {
-      if (!req.file || !req.file.mimetype.startsWith('image/'))
+      if (!req.file || !['image/png', 'image/jpeg', 'image/webp'].includes(req.file.mimetype))
         fail(400, 'Selecione uma imagem PNG, JPG ou WebP.');
       validFile(req.file);
-      const old = req.user.avatar;
-      db.save('usuarios', req.company, {
-        ...req.user,
-        avatar: req.file.filename,
-        avatarTipo: req.file.mimetype,
+      image = await compressAvatar(req.file);
+      const old = db.transaction(() => {
+        const current = get('usuarios', req.user.id, req);
+        db.save('usuarios', req.company, {
+          ...current,
+          avatar: image.filename,
+          avatarTipo: 'image/webp',
+        });
+        audit(req, 'Foto de perfil atualizada', 'Avatar otimizado em WebP');
+        return current.avatar;
       });
-      audit(req, 'Foto de perfil atualizada', 'Avatar atualizado');
-      if (old && existsSync(path.join(uploads, old))) unlinkSync(path.join(uploads, old));
-      res.json({ avatar: req.file.filename });
-    } catch (e) {
-      cleanup([req.file].filter(Boolean));
-      throw e;
+      saved = true;
+      if (old && existsSync(path.join(uploads, old))) {
+        try {
+          unlinkSync(path.join(uploads, old));
+        } catch {
+          console.warn('Não foi possível remover o avatar anterior.');
+        }
+      }
+      res.json({
+        avatar: image.filename,
+        tamanhoOriginal: req.file.size,
+        tamanhoFinal: image.size,
+        largura: image.width,
+        altura: image.height,
+      });
+    } finally {
+      cleanup([req.file, ...(!saved && image ? [image] : [])].filter(Boolean));
     }
   });
   app.get('/api/avatares/:id', (req, res) => {

@@ -2,7 +2,8 @@ import { defineConfig } from '@playwright/test';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-const dir = mkdtempSync(path.join(tmpdir(), 'gestao-e2e-'));
+const dir = process.env.GESTAO_TEST_DIR || mkdtempSync(path.join(tmpdir(), 'gestao-e2e-'));
+process.env.GESTAO_TEST_DIR = dir;
 const production = process.env.GESTAO_TEST_PRODUCTION === '1';
 const baseURL = `http://127.0.0.1:${production ? 3017 : 5179}`;
 export default defineConfig({
@@ -33,9 +34,12 @@ export default defineConfig({
       HOST: '127.0.0.1',
       PORT: '3017',
       VITE_PORT: '5179',
+      PUBLIC_APP_URL: baseURL,
       DATABASE_PATH: path.join(dir, 'test.sqlite'),
       UPLOADS_PATH: path.join(dir, 'uploads'),
       JWT_SECRET: 'browser-test-secret-at-least-thirty-two-characters',
+      AUTH_RATE_LIMIT: '1000',
+      API_RATE_LIMIT: '3000',
     },
   },
 });

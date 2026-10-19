@@ -87,7 +87,7 @@
         // ==========================================
         async function carregarDashboard() {
             try {
-                const data = await apiRequest('/dashboard');
+                const data = await apiRequest('/dashboard?escopo=meu-setor');
                 
                 // ===== STATS =====
                 animarNumero('total-os', data.stats.total || 0);
@@ -98,7 +98,7 @@
                 animarNumero('atrasadas-os', data.stats.atrasadas || 0);
 
                 // ===== CARD DO SETOR =====
-                const pendentes = (data.stats.abertas || 0) + (data.stats.emAtendimento || 0);
+                const pendentes = data.stats.pendentes || 0;
                 document.getElementById('setor-total').textContent = data.stats.total || 0;
                 document.getElementById('setor-pendentes').textContent = pendentes;
 
@@ -279,7 +279,7 @@
                 cachedOrdens = ordens || [];
 
                 // Re-renderizar gráfico de prioridade com dados completos
-                const charts = await apiRequest('/dashboard');
+                const charts = await apiRequest('/dashboard?escopo=meu-setor');
                 atualizarGraficos(charts.charts);
 
                 // Mostrar ordens urgentes + recentes
@@ -494,7 +494,7 @@
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
             const observer = new MutationObserver(() => {
-                apiRequest('/dashboard').then(data => {
+                apiRequest('/dashboard?escopo=meu-setor').then(data => {
                     atualizarGraficos(data.charts);
                 }).catch(() => {});
             });

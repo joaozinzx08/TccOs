@@ -194,7 +194,10 @@ export function installBridge({ login }) {
     );
   window.onLegacyReady = (callback) => queueMicrotask(callback);
   window.clearSession = clearSession;
-  window.avatarURL = (id) => avatars.get(id) || '/assets/logo.png';
+  // Never use the application logo as a failed-avatar fallback. It made a
+  // missing/cached-late photo look like a broken profile image.
+  window.avatarURL = (id) => avatars.get(id) || '';
+  window.cacheAvatar = cacheAvatar;
   window.legacyDownload = (order, id, name) => download(`/ordens/${order}/anexos/${id}`, name);
   window.apiRequest = async (endpoint, options = {}) => {
     let body = options.body
@@ -241,12 +244,8 @@ export function installBridge({ login }) {
       data = await api(endpoint, options);
     } catch (error) {
       if (endpoint === '/login' && error.code === 'COMPANY_CODE_REQUIRED') {
-        const codigoEmpresa = prompt('Informe o código exclusivo da empresa:');
-        if (!codigoEmpresa) throw error;
-        data = await api(endpoint, {
-          ...options,
-          body: JSON.stringify({ ...body, codigoEmpresa }),
-        });
+        document.getElementById('codigo-empresa')?.focus();
+        throw Error('Informe o código exclusivo da empresa no campo acima do e-mail.');
       } else throw error;
     }
     if (data?.token && data?.usuario) login(data);
@@ -318,26 +317,31 @@ export function installBridge({ login }) {
       if (recovery) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        try {
-          const codigoEmpresa = prompt('Código da empresa:'),
-            email = document.getElementById('email')?.value || prompt('E-mail cadastrado:');
-          if (!codigoEmpresa || !email) return;
-          await api('/auth/esqueci-senha', {
-            method: 'POST',
-            body: JSON.stringify({ codigoEmpresa, email }),
-          });
-          alert('Se os dados estiverem corretos, um código foi enviado ao e-mail cadastrado.');
-          const codigo = prompt('Código de 8 dígitos recebido:'),
-            novaSenha = codigo && prompt('Nova senha (8 a 128 caracteres):');
-          if (!codigo || !novaSenha) return;
-          await api('/auth/redefinir-senha', {
-            method: 'POST',
-            body: JSON.stringify({ codigoEmpresa, email, codigo, novaSenha }),
-          });
-          window.showToast?.('Senha alterada. Faça seu login.', 'success');
-        } catch (error) {
-          window.showToast?.(error.message, 'error');
+        const profile = /\/(admin|gestor|colaborador)\//.test(location.pathname);
+        const emailInput = document.getElementById('email');
+        const companyInput = document.getElementById('codigo-empresa');
+        if (!profile) {
+          if (!companyInput?.value.trim()) {
+            companyInput?.setCustomValidity(
+              'Informe o código da empresa para redefinir sua senha.',
+            );
+            companyInput?.reportValidity();
+            companyInput?.focus();
+            return;
+          }
+          if (!emailInput?.reportValidity()) return;
         }
+        document.getElementById('modal-senha')?.style.setProperty('display', 'none');
+        window.dispatchEvent(
+          new CustomEvent('gestao-password-recovery', {
+            detail: profile
+              ? { profile: true }
+              : {
+                  codigoEmpresa: companyInput.value.trim(),
+                  email: emailInput.value.trim(),
+                },
+          }),
+        );
       }
       const a = event.target.closest('[data-anexo]');
       if (a) {
@@ -353,11 +357,18 @@ export function installBridge({ login }) {
   );
 }
 async function cacheAvatar(id) {
-  if (!id || avatars.has(id)) return;
+  if (!id) return false;
+  if (avatars.has(id)) return true;
   try {
     const r = await request('/avatares/' + id);
-    if (r.ok) avatars.set(id, URL.createObjectURL(await r.blob()));
-  } catch {}
+    if (!r.ok) return false;
+    const blob = await r.blob();
+    if (!blob.size || !blob.type.startsWith('image/')) return false;
+    avatars.set(id, URL.createObjectURL(blob));
+    return true;
+  } catch {
+    return false;
+  }
 }
 export async function prepareLegacy(key) {
   if (/^(admin|gestor|colaborador)\//.test(key)) {

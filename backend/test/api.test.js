@@ -96,6 +96,15 @@ test('Fluxo completo, isolamento, autorização, persistência e logout', async 
       senha: 'Senha123!',
     });
     const gt = g.data.token;
+    const secondSector = await call('/setores', at, { nome: 'Financeiro' });
+    assert.equal(secondSector.status, 201);
+    const managerRequest = await call('/ordens', gt, {
+      titulo: 'Solicitação do gestor para Financeiro',
+      descricao: 'Solicitação aberta pelo gestor para outro setor.',
+      setorResponsavelId: secondSector.data.id,
+      prioridade: 'Média',
+    });
+    assert.equal(managerRequest.status, 201);
     assert.equal(
       (
         await call('/usuarios', ct, {
@@ -116,6 +125,18 @@ test('Fluxo completo, isolamento, autorização, persistência e logout', async 
     });
     assert.equal(created.status, 201);
     const id = created.data.id;
+    const received = await call('/ordens?escopo=meu-setor', gt);
+    assert.equal(received.status, 200);
+    assert.deepEqual(received.data.map((o) => o.id), [id]);
+    const mine = await call('/ordens?escopo=minhas', gt);
+    assert.equal(mine.status, 200);
+    assert.deepEqual(mine.data.map((o) => o.id), [managerRequest.data.id]);
+    const allManagerOrders = await call('/ordens?escopo=todas', gt);
+    assert.deepEqual(
+      new Set(allManagerOrders.data.map((o) => o.id)),
+      new Set([id, managerRequest.data.id]),
+    );
+    assert.equal((await call('/ordens?escopo=meu-setor', ct)).status, 403);
     assert.equal((await call('/ordens', bt)).data.length, 0);
     assert.equal((await call('/ordens/' + id, bt)).status, 404);
     assert.equal(
@@ -227,7 +248,7 @@ test('Fluxo completo, isolamento, autorização, persistência e logout', async 
       testing: true,
       jwtSecret: 'integration-test-secret-with-at-least-32-bytes',
     });
-    assert.equal(reopened.locals.db.list('ordens', a.data.empresa.id).length, 1);
+    assert.equal(reopened.locals.db.list('ordens', a.data.empresa.id).length, 2);
     reopened.locals.db.sql.close();
   } finally {
     await new Promise((r) => server.close(r));

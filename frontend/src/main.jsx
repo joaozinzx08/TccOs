@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { api, clearSession } from './api.js';
 import { installBridge, loadScript, prepareLegacy, finishLegacy } from './legacy-bridge.js';
 import manifest from './manifest.json';
+import { PasswordRecovery, ResetPasswordPage } from './password-recovery.jsx';
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 const pages = import.meta.glob('./pages/*.jsx');
@@ -96,6 +97,7 @@ function LegacyPage({ page }) {
         <style key={i}>{css}</style>
       ))}
       <page.default />
+      <PasswordRecovery />
     </>
   );
 }
@@ -106,15 +108,18 @@ function App() {
       : location.pathname.endsWith('.html')
         ? location.pathname
         : location.pathname + '.html';
+  const resetRoute = route === '/redefinir-senha.html';
   const entry = manifest[route];
   const [page, setPage] = useState(null);
   useEffect(() => {
+    if (resetRoute) return;
     if (!entry) {
       location.replace('/index.html');
       return;
     }
     pages[`./pages/${entry.file}.jsx`]().then(setPage);
   }, []);
+  if (resetRoute) return <ResetPasswordPage />;
   if (!page) return null;
   return (
     <ProtectedRoute entry={entry}>

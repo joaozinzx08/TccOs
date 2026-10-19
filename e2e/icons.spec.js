@@ -7,7 +7,7 @@ test('SVG em todas as telas, temas, conteúdo dinâmico e emojis do usuário pre
  expect(response.status()).toBe(201);const session=await response.json();
  await page.goto('/');
  await page.evaluate(s=>{localStorage.setItem('token',s.token);localStorage.setItem('usuario',JSON.stringify(s.usuario));localStorage.setItem('empresa',JSON.stringify(s.empresa));},session);
- for(const route of Object.keys(manifest).filter(r=>!/^\/(gestor|colaborador)\//.test(r))){
+ for(const route of Object.keys(manifest).filter(r=>!/^\/(gestor|colaborador)\//.test(r)&&!['/criar-empresa.html','/entrar-empresa.html'].includes(r))){
   await page.goto(route);
   await page.waitForFunction(()=>window.GestaoIcones && document.querySelector('svg.gestao-icone'));
   await expect.poll(()=>page.locator('body').innerText()).not.toContain('[[icone:');

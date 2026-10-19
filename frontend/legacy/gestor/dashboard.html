@@ -419,12 +419,19 @@
             </div>
 
             <ul class="sidebar-menu">
-                <li class="active"><a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
-                <li><a href="ordens.html"><span class="menu-icon">[[icone:ordens]]</span> Ordens</a></li>
+                <li><a href="dashboard.html"><span class="menu-icon">[[icone:painel]]</span> Dashboard</a></li>
+                <li><a href="ordens.html?escopo=meu-setor"><span class="menu-icon">[[icone:ordens]]</span> OS do Meu Setor</a></li>
+                <li><a href="ordens.html?escopo=minhas"><span class="menu-icon">[[icone:email]]</span> Minhas Solicitações</a></li>
+                <li><a href="ordens.html?escopo=todas"><span class="menu-icon">[[icone:buscar]]</span> Todas que acompanho</a></li>
                 <li><a href="kanban.html"><span class="menu-icon">[[icone:kanban]]</span> Kanban</a></li>
+                <li><a href="calendario.html"><span class="menu-icon">[[icone:calendario]]</span> Calendário</a></li>
+                <li><a href="relatorios.html"><span class="menu-icon">[[icone:grafico]]</span> Relatórios</a></li>
                 <li class="divider"></li>
+                <li><a href="notificacoes.html"><span class="menu-icon">[[icone:notificacao]]</span> Notificações</a></li>
+                <li><a href="conhecimento.html"><span class="menu-icon">[[icone:conhecimento]]</span> Conhecimento</a></li>
                 <li><a href="chat.html"><span class="menu-icon">[[icone:chat]]</span> Chat</a></li>
                 <li><a href="perfil.html"><span class="menu-icon">[[icone:usuario]]</span> Meu Perfil</a></li>
+                <li><a href="configuracoes.html"><span class="menu-icon">[[icone:configuracoes]]</span> Configurações</a></li>
                 <li><a href="#" id="logout"><span class="menu-icon">[[icone:sair]]</span> Sair</a></li>
             </ul>
         </nav>
@@ -491,6 +498,11 @@
                 </div>
             </div>
 
+            <nav aria-label="Ações do gestor" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px;">
+                <a class="btn btn-primary" href="ordens.html?acao=nova">[[icone:adicionar]] Criar OS para um setor</a>
+                <a class="btn btn-outline" href="ordens.html?escopo=meu-setor">OS do Meu Setor</a>
+                <a class="btn btn-outline" href="ordens.html?escopo=minhas">Minhas Solicitações</a>
+            </nav>
             <!-- STATS GRID -->
             <div class="stats-grid" id="stats-grid">
                 <div class="stat-card primary">
@@ -688,7 +700,7 @@
         // ==========================================
         async function carregarDashboard() {
             try {
-                const data = await apiRequest('/dashboard');
+                const data = await apiRequest('/dashboard?escopo=meu-setor');
                 
                 // ===== STATS =====
                 animarNumero('total-os', data.stats.total || 0);
@@ -699,7 +711,7 @@
                 animarNumero('atrasadas-os', data.stats.atrasadas || 0);
 
                 // ===== CARD DO SETOR =====
-                const pendentes = (data.stats.abertas || 0) + (data.stats.emAtendimento || 0);
+                const pendentes = data.stats.pendentes || 0;
                 document.getElementById('setor-total').textContent = data.stats.total || 0;
                 document.getElementById('setor-pendentes').textContent = pendentes;
 
@@ -880,7 +892,7 @@
                 cachedOrdens = ordens || [];
 
                 // Re-renderizar gráfico de prioridade com dados completos
-                const charts = await apiRequest('/dashboard');
+                const charts = await apiRequest('/dashboard?escopo=meu-setor');
                 atualizarGraficos(charts.charts);
 
                 // Mostrar ordens urgentes + recentes
@@ -1095,7 +1107,7 @@
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
             const observer = new MutationObserver(() => {
-                apiRequest('/dashboard').then(data => {
+                apiRequest('/dashboard?escopo=meu-setor').then(data => {
                     atualizarGraficos(data.charts);
                 }).catch(() => {});
             });
