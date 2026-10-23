@@ -1,4 +1,5 @@
 import express from 'express';
+import sharp from 'sharp';
 import { mailer } from './mail.js';
 import { accountRecovery } from './account-recovery.js';
 import { compressAvatar } from './avatar-image.js';
@@ -1242,10 +1243,28 @@ export function createApp({
       cleanup([req.file, ...(!saved && image ? [image] : [])].filter(Boolean));
     }
   });
-  app.get('/api/avatares/:id', (req, res) => {
+  app.get('/api/avatares/:id', async (req, res) => {
     const u = list('usuarios', req).find((u) => u.avatar === req.params.id);
     if (!u) fail(404, 'Imagem não encontrada.');
-    res.type(u.avatarTipo || 'image/png').sendFile(path.resolve(uploads, u.avatar));
+
+    const arquivo = path.resolve(uploads, u.avatar);
+    // Lê e fecha o arquivo antes de responder para permitir exclusão no Windows.
+    const bytes = readFileSync(arquivo);
+    let tipo = u.avatarTipo;
+
+    // Avatares antigos podem ser WebP sem extensão e sem avatarTipo.
+    if (!tipo) {
+      const metadata = await sharp(bytes).metadata();
+      const tipos = {
+        webp: 'image/webp',
+        png: 'image/png',
+        jpeg: 'image/jpeg',
+      };
+      tipo = tipos[metadata.format];
+      if (!tipo) fail(415, 'Formato de avatar não suportado.');
+    }
+
+    res.type(tipo).send(bytes);
   });
   app.use('/api', (req, res) =>
     res.status(404).json({ error: 'Rota não encontrada.', requestId: req.requestId }),
