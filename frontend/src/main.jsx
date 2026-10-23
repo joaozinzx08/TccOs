@@ -4,6 +4,7 @@ import { api, clearSession } from './api.js';
 import { installBridge, loadScript, prepareLegacy, finishLegacy } from './legacy-bridge.js';
 import manifest from './manifest.json';
 import { PasswordRecovery, ResetPasswordPage } from './password-recovery.jsx';
+import { FirstAccessPage } from './first-access.jsx';
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 const pages = import.meta.glob('./pages/*.jsx');
@@ -49,6 +50,10 @@ function ProtectedRoute({ entry, children }) {
   if (entry.protected && !ready) return null;
   if (entry.protected && !user) {
     location.replace('/login.html');
+    return null;
+  }
+  if (entry.protected && user.precisaTrocarSenha) {
+    location.replace('/primeiro-acesso.html');
     return null;
   }
   if (entry.protected) {
@@ -101,6 +106,10 @@ function LegacyPage({ page }) {
     </>
   );
 }
+function FirstAccessRoute() {
+  const { user, ready } = useAuth();
+  return <FirstAccessPage user={user} ready={ready} />;
+}
 function App() {
   const route =
     location.pathname === '/'
@@ -109,10 +118,11 @@ function App() {
         ? location.pathname
         : location.pathname + '.html';
   const resetRoute = route === '/redefinir-senha.html';
+  const firstAccessRoute = route === '/primeiro-acesso.html';
   const entry = manifest[route];
   const [page, setPage] = useState(null);
   useEffect(() => {
-    if (resetRoute) return;
+    if (resetRoute || firstAccessRoute) return;
     if (!entry) {
       location.replace('/index.html');
       return;
@@ -120,6 +130,7 @@ function App() {
     pages[`./pages/${entry.file}.jsx`]().then(setPage);
   }, []);
   if (resetRoute) return <ResetPasswordPage />;
+  if (firstAccessRoute) return <FirstAccessRoute />;
   if (!page) return null;
   return (
     <ProtectedRoute entry={entry}>
